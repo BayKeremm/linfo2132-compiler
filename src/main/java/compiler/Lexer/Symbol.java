@@ -2,16 +2,20 @@ package compiler.Lexer;
 
 enum SymbolKind {
     EOF(""),
-    // BASE TYPES
+    // IDENTIFIERS
     INTEGER("int"), FLOAT("float"),
-    BOOLEAN("bool"), STRING("string"),
+    BOOLEAN("bool"), STRING("string"), IDENTIFIER("<IDENTIFIER>"),
 
     // OPERATORS
     PLUS("+"), MINUS("-"), STAR("*"),
     SLASH("/"), EQUAL("=="),
     ASSIGN("="), NEGATE("!"), NOT_EQUAL("!="), LT("<"), GT(">"),
     LE("<="), GE(">="), MODULO("%"), LAND("&&"),
-    LOR("||"), IDENTIFIER("<IDENTIFIER>");
+    LOR("||"),
+
+    // KEYWORDS
+    FINAL("final"), STRUCT("struct"), DEF("def"), FOR("for"),
+    WHILE("while"), IF("if"), ELSE("else"), RETURN("return");
 
     private String image;
 

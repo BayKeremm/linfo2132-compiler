@@ -20,7 +20,7 @@ public class Lexer {
     // Line number of current token.
     private int line;
 
-    // keywords in the language
+    // identifiers in the language
     private Hashtable<String, SymbolKind> keywords;
 
     public Lexer(String  fileName) throws FileNotFoundException {
@@ -32,6 +32,16 @@ public class Lexer {
         keywords.put(FLOAT.image(), FLOAT);
         keywords.put(BOOLEAN.image(),BOOLEAN);
         keywords.put(STRING.image(),STRING);
+
+        keywords.put(FINAL.image(),FINAL);
+        keywords.put(STRUCT.image(),STRUCT);
+        keywords.put(DEF.image(),DEF);
+        keywords.put(FOR.image(),FOR);
+        keywords.put(WHILE.image(),WHILE);
+        keywords.put(IF.image(),IF);
+        keywords.put(ELSE.image(),ELSE);
+        keywords.put(RETURN.image(),RETURN);
+
 
         nextCh();
     }
@@ -158,8 +168,6 @@ public class Lexer {
             reportLexerError("Unable to read characters from input");
         }
     }
-    // Reports a lexical error and records the fact that an error has occurred. This fact can be
-    // ascertained from the Lexer by sending it an errorHasOccurred message.
     private void reportLexerError(String message, Object... args) {
         //isInError = true;
         System.err.printf("%s:%d: error: ", fileName, line);
