@@ -13,7 +13,7 @@ import java.util.List;
 import compiler.Lexer.Lexer;
 
 public class TestLexer {
-    public static List<String> readImagesFromFile(String filename) {
+    public static List<String> readSymbolRepsFromFile(String filename) {
         List<String> tokens = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
@@ -30,11 +30,11 @@ public class TestLexer {
     @Test
     public void testOperators() throws FileNotFoundException {
         Lexer lexer = new Lexer("./test_files/test_operators.lang");
-        List<String> expectedImages = readImagesFromFile("./test_files/test_operators.txt");
+        List<String> expectedImages = readSymbolRepsFromFile("./test_files/test_operators.txt");
         List<String> actualImages = new ArrayList<>();
         Symbol s = lexer.getNextSymbol();
         while(s != null){
-            actualImages.add(s.image());
+            actualImages.add(s.symbolRep());
             s = lexer.getNextSymbol();
         }
         assertEquals(expectedImages, actualImages);
