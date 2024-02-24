@@ -67,16 +67,54 @@ public class Lexer {
                 }else{
                     return new Symbol(ASSIGN,line);
                 }
+            case '!': // ! | !=
+                nextCh();
+                if(ch == '='){
+                    nextCh();
+                    return new Symbol(NOT_EQUAL,line);
+                }else{
+                    return new Symbol(NEGATE,line);
+                }
+            case '<': // < | <=
+                nextCh();
+                if(ch == '='){
+                    nextCh();
+                    return new Symbol(LE,line);
+                }else{
+                    return new Symbol(LT,line);
+                }
+            case '>':
+                nextCh();
+                if(ch == '='){
+                    nextCh();
+                    return new Symbol(GE,line);
+                }else{
+                    return new Symbol(GT,line);
+                }
+            case '%':
+                nextCh();
+                return new Symbol(MODULO,line);
+            case '&':
+                nextCh();
+                if(ch == '&'){
+                    nextCh();
+                    return new Symbol(LAND,line);
+                }else{
+                    reportLexerError("Operator & is not supported in lang");
+                    return getNextSymbol();
+                }
+            case '|':
+                nextCh();
+                if(ch == '|'){
+                    nextCh();
+                    return new Symbol(LOR,line);
+                }else{
+                    reportLexerError("Operator | is not supported in lang");
+                    return getNextSymbol();
+                }
+            default:
+                return null;
         }
-
-
-
-
-
-
-
-
-        return null;
     }
     // Advances ch to the next character from input, and updates the line number.
     private void nextCh() {

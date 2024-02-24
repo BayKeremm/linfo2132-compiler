@@ -9,7 +9,7 @@ enum SymbolKind {
     // OPERATORS
     PLUS("+"), MINUS("-"), STAR("*"),
     SLASH("/"), EQUAL("=="),
-    ASSIGN("="), NOT_EQUAL("!="), LT("<"), GT(">"),
+    ASSIGN("="), NEGATE("!"), NOT_EQUAL("!="), LT("<"), GT(">"),
     LE("<="), GE(">="), MODULO("%"), LAND("&&"),
     LOR("||");
 
