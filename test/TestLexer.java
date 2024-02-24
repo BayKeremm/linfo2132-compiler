@@ -28,9 +28,9 @@ public class TestLexer {
         return tokens;
     }
     @Test
-    public void testBaseTypes() throws FileNotFoundException {
-        Lexer lexer = new Lexer("./test_files/test_basetypes.lang");
-        List<String> expectedImages = readSymbolRepsFromFile("./test_files/test_basetypes.txt");
+    public void testKeywords() throws FileNotFoundException {
+        Lexer lexer = new Lexer("./test_files/test_keywords.lang");
+        List<String> expectedImages = readSymbolRepsFromFile("./test_files/test_keywords.txt");
         List<String> actualImages = new ArrayList<>();
         Symbol s = lexer.getNextSymbol();
         while(!(s.image().isEmpty())){
