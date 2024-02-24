@@ -8,7 +8,7 @@ enum SymbolKind {
 
     // OPERATORS
     PLUS("+"), MINUS("-"), STAR("*"),
-    SLASH("/"), UNARY_MINUS("-"), EQUAL("=="),
+    SLASH("/"), EQUAL("=="),
     ASSIGN("="), NOT_EQUAL("!="), LT("<"), GT(">"),
     LE("<="), GE(">="), MODULO("%"), LAND("&&"),
     LOR("||");
