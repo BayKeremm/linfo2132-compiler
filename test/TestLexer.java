@@ -28,14 +28,37 @@ public class TestLexer {
         return tokens;
     }
     @Test
+    public void testBaseTypes() throws FileNotFoundException {
+        Lexer lexer = new Lexer("./test_files/test_basetypes.lang");
+        List<String> expectedImages = readSymbolRepsFromFile("./test_files/test_basetypes.txt");
+        List<String> actualImages = new ArrayList<>();
+        Symbol s = lexer.getNextSymbol();
+        while(!(s.image().isEmpty())){
+            actualImages.add(s.symbolRep());
+            //System.out.println(s.symbolRep());
+            s = lexer.getNextSymbol();
+        }
+        try{
+            lexer.finish();
+        }catch (Exception e){
+            System.err.println("Error finishing the lexer");
+        }
+        assertEquals(expectedImages, actualImages);
+    }
+    @Test
     public void testOperators() throws FileNotFoundException {
         Lexer lexer = new Lexer("./test_files/test_operators.lang");
         List<String> expectedImages = readSymbolRepsFromFile("./test_files/test_operators.txt");
         List<String> actualImages = new ArrayList<>();
         Symbol s = lexer.getNextSymbol();
-        while(s != null){
+        while(!(s.image().isEmpty())){
             actualImages.add(s.symbolRep());
             s = lexer.getNextSymbol();
+        }
+        try{
+            lexer.finish();
+        }catch (Exception e){
+           System.err.println("Error finishing the lexer");
         }
         assertEquals(expectedImages, actualImages);
     }

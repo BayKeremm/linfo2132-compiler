@@ -1,0 +1,7 @@
+"int"
+<IDENTIFIER>
+"bool"
+<IDENTIFIER>
+"float"
+"string"
+<IDENTIFIER>

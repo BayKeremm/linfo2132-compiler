@@ -11,7 +11,7 @@ enum SymbolKind {
     SLASH("/"), EQUAL("=="),
     ASSIGN("="), NEGATE("!"), NOT_EQUAL("!="), LT("<"), GT(">"),
     LE("<="), GE(">="), MODULO("%"), LAND("&&"),
-    LOR("||");
+    LOR("||"), IDENTIFIER("<IDENTIFIER>");
 
     private String image;
 

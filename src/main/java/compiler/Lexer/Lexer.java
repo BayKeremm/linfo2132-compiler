@@ -1,7 +1,11 @@
 package compiler.Lexer;
+import javax.swing.plaf.synth.SynthButtonUI;
 import java.io.*;
+import java.util.Hashtable;
 
+import static compiler.Lexer.CharReader.EOFCH;
 import static compiler.Lexer.SymbolKind.*;
+import static java.lang.Character.isDigit;
 
 public class Lexer {
     // Source file name.
@@ -12,35 +16,46 @@ public class Lexer {
 
     // Next unscanned character.
     private char ch;
+
     // Line number of current token.
     private int line;
+
+    // keywords in the language
+    private Hashtable<String, SymbolKind> keywords;
 
     public Lexer(String  fileName) throws FileNotFoundException {
         this.fileName = fileName;
         this.input = new CharReader(fileName);
+
+        keywords = new Hashtable<String, SymbolKind>();
+        keywords.put(INTEGER.image(), INTEGER);
+        keywords.put(FLOAT.image(), FLOAT);
+        keywords.put(BOOLEAN.image(),BOOLEAN);
+        keywords.put(STRING.image(),STRING);
+
         nextCh();
+    }
+    public void finish() throws IOException {
+        this.input.close();
     }
     
     public Symbol getNextSymbol() {
         StringBuffer buffer;
         boolean moreWhiteSpace = true;
 
-        // match whitespace and SLASH
-        /*
-        * (//)([a-zA-Z]|[0-9])* => comment
-        * / => SLASH
-        */
         while (moreWhiteSpace) {
+            // RE = (' ' | '\t' | '\n' | '\f')*
             while (isWhitespace(ch)) {
                 nextCh();
             }
+           // RE = (//)([a-zA-Z]|[0-9])*
             if (ch == '/') {
                 nextCh();
                 if (ch == '/') {
-                    while (ch != '\n' && ch != CharReader.EOFCH) {
+                    while (ch != '\n' && ch != EOFCH) {
                         nextCh();
                     }
-                } else {
+                } else { // RE = /
                     nextCh();
                     return new Symbol(SLASH, input.line());
                 }
@@ -50,16 +65,16 @@ public class Lexer {
         }
         line = input.line();
         switch(ch){
-            case '+': // +
+            case '+': // RE = +
                 nextCh();
                 return new Symbol(PLUS,line);
-            case '-': // -
+            case '-': // RE = -
                 nextCh();
                 return new Symbol(MINUS,line);
-            case '*': // *
+            case '*': // RE = *
                 nextCh();
                 return new Symbol(STAR,line);
-            case '=': // = | ==
+            case '=': // RE = (= | ==)
                 nextCh();
                 if(ch == '='){
                     nextCh();
@@ -67,7 +82,7 @@ public class Lexer {
                 }else{
                     return new Symbol(ASSIGN,line);
                 }
-            case '!': // ! | !=
+            case '!': // RE = (! | !=)
                 nextCh();
                 if(ch == '='){
                     nextCh();
@@ -75,7 +90,7 @@ public class Lexer {
                 }else{
                     return new Symbol(NEGATE,line);
                 }
-            case '<': // < | <=
+            case '<': // RE = (< | <=)
                 nextCh();
                 if(ch == '='){
                     nextCh();
@@ -83,7 +98,7 @@ public class Lexer {
                 }else{
                     return new Symbol(LT,line);
                 }
-            case '>':
+            case '>': // RE = (> | >=)
                 nextCh();
                 if(ch == '='){
                     nextCh();
@@ -91,10 +106,10 @@ public class Lexer {
                 }else{
                     return new Symbol(GT,line);
                 }
-            case '%':
+            case '%': // RE = %
                 nextCh();
                 return new Symbol(MODULO,line);
-            case '&':
+            case '&': // RE = &&
                 nextCh();
                 if(ch == '&'){
                     nextCh();
@@ -103,7 +118,7 @@ public class Lexer {
                     reportLexerError("Operator & is not supported in lang");
                     return getNextSymbol();
                 }
-            case '|':
+            case '|': // RE = ||
                 nextCh();
                 if(ch == '|'){
                     nextCh();
@@ -112,8 +127,26 @@ public class Lexer {
                     reportLexerError("Operator | is not supported in lang");
                     return getNextSymbol();
                 }
-            default:
-                return null;
+            case EOFCH: // RE = ""
+                return new Symbol(EOF, line);
+            default: // RE = ([a-zA-Z]|_)+([0-9]*
+                if(isIdentifierStart(ch)){
+                    buffer = new StringBuffer();
+                    while(isIdentifierPart(ch)){
+                        buffer.append(ch);
+                        nextCh();
+                    }
+                    String identifier = buffer.toString();
+                    if(keywords.containsKey(identifier)){
+                        return new Symbol(keywords.get(identifier),line);
+                    }else{
+                        return new Symbol(IDENTIFIER, identifier, line);
+                    }
+                }else{
+                    reportLexerError("Unidentified input char %s",ch);
+                    nextCh();
+                    return getNextSymbol();
+                }
         }
     }
     // Advances ch to the next character from input, and updates the line number.
@@ -142,6 +175,16 @@ public class Lexer {
     // Returns true if the specified character is a whitespace, and false otherwise.
     private boolean isWhitespace(char c) {
         return (c == ' ' || c == '\t' || c == '\n' || c == '\f');
+    }
+
+    // Returns true if the specified character can start an identifier name, and false otherwise.
+    private boolean isIdentifierStart(char c) {
+        return (c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c == '_');
+    }
+    // Returns true if the specified character can be part of an identifier name, and false
+    // otherwise.
+    private boolean isIdentifierPart(char c) {
+        return (isIdentifierStart(c) || isDigit(c));
     }
 }
 class CharReader{
