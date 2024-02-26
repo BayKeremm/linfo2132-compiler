@@ -201,8 +201,42 @@ public class Lexer {
                     String identifier = buffer.toString();
                     if(keywords.containsKey(identifier)){
                         return new Symbol(keywords.get(identifier),line);
+                    }else if(identifier.equals("true") || identifier.equals("false")){
+                        return new Symbol(BOOLEAN_LITERAL, identifier, line);
                     }else{
                         return new Symbol(IDENTIFIER, identifier, line);
+                    }
+                }else if(isDigit(ch)){ // RE = ([0-9])*+[.]+([0-9])*
+                    buffer = new StringBuffer();
+                    while(isDigit(ch)){
+                        buffer.append(ch);
+                        nextCh();
+                    }if(ch == '.'){
+                        buffer.append(ch);
+                        nextCh();
+                        while(isDigit(ch)){
+                            buffer.append(ch);
+                            nextCh();
+                        }
+                        if(!isWhitespace(ch) && ch != EOFCH){
+                            while(!isWhitespace(ch) && ch != EOFCH){
+                                buffer.append(ch);
+                                nextCh();
+                            }
+                            reportLexerError("Invalid float literal %s",buffer.toString());
+                            return getNextSymbol();
+                        }
+                        return new Symbol(FLOAT_LITERAL, buffer.toString(), line);
+                    }else if(!isWhitespace(ch) && ch != EOFCH){
+                        while(!isWhitespace(ch) && ch != EOFCH){
+                            buffer.append(ch);
+                            nextCh();
+                        }
+                        reportLexerError("Invalid identifier %s",buffer.toString());
+                        return getNextSymbol();
+                    }
+                    else{
+                        return new Symbol(NATURAL_LITERAL, buffer.toString(), line);
                     }
                 }else{
                     reportLexerError("Unidentified input char %s",ch);

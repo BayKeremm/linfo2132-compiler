@@ -121,5 +121,26 @@ public class TestLexer {
         }
         assertEquals(expectedImages, actualImages);
     }
-
+    @Test
+    public void testLiterals() throws FileNotFoundException{
+        String fileName = "./test_files/test_literals.lang";
+        String expectedLexing = "./test_files/test_literals.txt";
+        LineNumberReader reader = new LineNumberReader(new FileReader(fileName));
+        Lexer lexer = new Lexer(reader);
+        lexer.setFileName(fileName);
+        List<String> expectedImages = readSymbolRepsFromFile(expectedLexing);
+        List<String> actualImages = new ArrayList<>();
+        Symbol s = lexer.getNextSymbol();
+        while(!(s.image().isEmpty())){
+            actualImages.add(s.symbolRep());
+            //System.out.println(s.symbolRep());
+            s = lexer.getNextSymbol();
+        }
+        try{
+            lexer.finish();
+        }catch (Exception e){
+            System.err.println("Error finishing the lexer");
+        }
+        assertEquals(expectedImages, actualImages);
+    }
 }
