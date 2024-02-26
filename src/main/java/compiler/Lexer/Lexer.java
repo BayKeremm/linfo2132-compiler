@@ -218,26 +218,25 @@ public class Lexer {
                             buffer.append(ch);
                             nextCh();
                         }
-                        if(!isWhitespace(ch) && ch != EOFCH){
-                            while(!isWhitespace(ch) && ch != EOFCH){
+                        if (ch == '.'){
+                            while(ch == '.' || isDigit(ch)){
                                 buffer.append(ch);
                                 nextCh();
                             }
-                            reportLexerError("Invalid float literal %s",buffer.toString());
+                            reportLexerError("Invalid float %s",buffer.toString());
                             return getNextSymbol();
                         }
                         return new Symbol(FLOAT_LITERAL, buffer.toString(), line);
-                    }else if(!isWhitespace(ch) && ch != EOFCH){
-                        while(!isWhitespace(ch) && ch != EOFCH){
+                    }else if(isIdentifierPart(ch)){
+                        while(isIdentifierPart(ch)){
                             buffer.append(ch);
                             nextCh();
                         }
                         reportLexerError("Invalid identifier %s",buffer.toString());
                         return getNextSymbol();
                     }
-                    else{
-                        return new Symbol(NATURAL_LITERAL, buffer.toString(), line);
-                    }
+                    return new Symbol(NATURAL_LITERAL, buffer.toString(), line);
+                
                 }else{
                     reportLexerError("Unidentified input char %s",ch);
                     nextCh();
