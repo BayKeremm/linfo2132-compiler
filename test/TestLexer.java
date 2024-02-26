@@ -28,6 +28,30 @@ public class TestLexer {
         return tokens;
     }
     @Test
+    public void testSpecialSymbols() throws FileNotFoundException {
+        String fileName = "./test_files/test_special_symbols.lang";
+        String expectedLexing = "./test_files/test_special_symbols.txt";
+        LineNumberReader reader = new LineNumberReader(new FileReader(fileName));
+
+        Lexer lexer = new Lexer(reader);
+        lexer.setFileName(fileName);
+
+        List<String> expectedImages = readSymbolRepsFromFile(expectedLexing);
+        List<String> actualImages = new ArrayList<>();
+        Symbol s = lexer.getNextSymbol();
+        while(!(s.image().isEmpty())){
+            actualImages.add(s.symbolRep());
+            //System.out.println(s.symbolRep());
+            s = lexer.getNextSymbol();
+        }
+        try{
+            lexer.finish();
+        }catch (Exception e){
+            System.err.println("Error finishing the lexer");
+        }
+        assertEquals(expectedImages, actualImages);
+    }
+    @Test
     public void testStringLiterals() throws FileNotFoundException {
         String fileName = "./test_files/test_string_literals.lang";
         String expectedLexing = "./test_files/test_string_literals.txt";
@@ -54,7 +78,7 @@ public class TestLexer {
     @Test
     public void testKeywords() throws FileNotFoundException {
         String fileName = "./test_files/test_keywords.lang";
-        String expectedLexing = "./test_files/test_keywords.lang";
+        String expectedLexing = "./test_files/test_keywords.txt";
         LineNumberReader reader = new LineNumberReader(new FileReader(fileName));
 
         Lexer lexer = new Lexer(reader);
@@ -78,10 +102,11 @@ public class TestLexer {
     @Test
     public void testOperators() throws FileNotFoundException {
         String fileName ="./test_files/test_operators.lang" ;
+        String expectedLexing ="./test_files/test_operators.txt" ;
         LineNumberReader reader = new LineNumberReader(new FileReader(fileName));
         Lexer lexer = new Lexer(reader);
         lexer.setFileName(fileName);
-        List<String> expectedImages = readSymbolRepsFromFile(fileName);
+        List<String> expectedImages = readSymbolRepsFromFile(expectedLexing);
         List<String> actualImages = new ArrayList<>();
         Symbol s = lexer.getNextSymbol();
         while(!(s.image().isEmpty())){

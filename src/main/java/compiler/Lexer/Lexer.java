@@ -3,7 +3,6 @@ import javax.swing.plaf.synth.SynthButtonUI;
 import java.io.*;
 import java.util.Hashtable;
 
-import static compiler.Lexer.CharReader.EOFCH;
 import static compiler.Lexer.SymbolKind.*;
 import static java.lang.Character.isDigit;
 
@@ -11,11 +10,11 @@ public class Lexer {
     // Source file name.
     private String fileName;
 
-    // Source characters.
-    private CharReader input;
-
     // Next unscanned character.
     private char ch;
+
+    // The underlying reader records line numbers.
+    final private LineNumberReader lineNumberReader;
 
     // Line number of current token.
     private int line;
@@ -23,14 +22,17 @@ public class Lexer {
     // identifiers in the language
     private Hashtable<String, SymbolKind> keywords;
 
+    public final static char EOFCH = (char) -1;
+
     public Lexer(Reader reader) throws FileNotFoundException {
-        this.input = new CharReader(reader);
+        this.lineNumberReader = (LineNumberReader) reader;
 
         keywords = new Hashtable<String, SymbolKind>();
         keywords.put(INTEGER.image(), INTEGER);
         keywords.put(FLOAT.image(), FLOAT);
         keywords.put(BOOLEAN.image(),BOOLEAN);
         keywords.put(STRING.image(),STRING);
+        keywords.put(FREE.image(),FREE);
 
         keywords.put(FINAL.image(),FINAL);
         keywords.put(STRUCT.image(),STRUCT);
@@ -45,7 +47,7 @@ public class Lexer {
         nextCh();
     }
     public void finish() throws IOException {
-        this.input.close();
+        this.lineNumberReader.close();
     }
     public void setFileName(String name){
         this.fileName = name;
@@ -69,14 +71,41 @@ public class Lexer {
                     }
                 } else { // RE = /
                     nextCh();
-                    return new Symbol(SLASH, input.line());
+                    return new Symbol(SLASH, this.lineNumber());
                 }
             }else{
                 moreWhiteSpace = false;
             }
         }
-        line = input.line();
+        line = this.lineNumber();
         switch(ch){
+            case '(':
+                nextCh();
+                return new Symbol(LPARAN,line);
+            case ')':
+                nextCh();
+                return new Symbol(RPARAN,line);
+            case '{':
+                nextCh();
+                return new Symbol(LCURLY,line);
+            case '}':
+                nextCh();
+                return new Symbol(RCURLY,line);
+            case '[':
+                nextCh();
+                return new Symbol(LSQUARE,line);
+            case ']':
+                nextCh();
+                return new Symbol(RSQUARE,line);
+            case ';':
+                nextCh();
+                return new Symbol(SEMI_COLON,line);
+            case '.':
+                nextCh();
+                return new Symbol(DOT,line);
+            case ',':
+                nextCh();
+                return new Symbol(COMMA,line);
             case '+': // RE = +
                 nextCh();
                 return new Symbol(PLUS,line);
@@ -149,19 +178,13 @@ public class Lexer {
                 }
                 if(ch == '\n'){
                     reportLexerError("Unexpected new line in string literal");
-                    nextCh();
                     return getNextSymbol();
                 }else if(ch == EOFCH){
                     reportLexerError("Unexpected EOF in string literal");
-                    nextCh();
                     return getNextSymbol();
-                }else if (ch == '\"'){
-                   buffer.append('\"');
-                   nextCh();
-                }else{
-                    reportLexerError("Unexpected error lexing a string literal");
+                }else {
+                    buffer.append('\"');
                     nextCh();
-                    return getNextSymbol();
                 }
                 String string = buffer.toString();
                 return new Symbol(STRING_LITERAL,string,line);
@@ -190,23 +213,21 @@ public class Lexer {
     }
     // Advances ch to the next character from input, and updates the line number.
     private void nextCh() {
-        line = input.line();
+        line = this.lineNumber();
         try {
-            ch = input.nextChar();
+            ch = (char) lineNumberReader.read();
         } catch (Exception e) {
             reportLexerError("Unable to read characters from input");
         }
+    }
+    private int lineNumber(){
+       return  lineNumberReader.getLineNumber() + 1;
     }
     private void reportLexerError(String message, Object... args) {
         System.out.println("DECIDE WHAT TO DO IN ERROR");
         System.err.printf("%s:%d: error: ", fileName, line);
         System.err.printf(message, args);
         System.err.println();
-    }
-
-    public void debugChar(){
-        System.out.printf("current char: %s \n",ch);
-        nextCh();
     }
 
     // Returns true if the specified character is a whitespace, and false otherwise.
@@ -223,27 +244,4 @@ public class Lexer {
     private boolean isIdentifierPart(char c) {
         return (isIdentifierStart(c) || isDigit(c));
     }
-}
-class CharReader{
-    // Representation of the end of file as a character.
-    public final static char EOFCH = (char) -1;
-
-    // The underlying reader records line numbers.
-    final private LineNumberReader lineNumberReader;
-
-    // Name of the file that is being read.
-    private String fileName;
-    public CharReader(Reader input) throws FileNotFoundException {
-        this.lineNumberReader = (LineNumberReader) input;
-    }
-    public char nextChar() throws IOException {
-        return (char) lineNumberReader.read();
-    }
-    public int line() {
-        return lineNumberReader.getLineNumber() + 1; // LineNumberReader counts lines from 0
-    }
-    public void close() throws IOException {
-        lineNumberReader.close();
-    }
-
 }

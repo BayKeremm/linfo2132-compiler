@@ -5,7 +5,7 @@ import java.util.Objects;
 enum SymbolKind {
     EOF(""),
     // IDENTIFIERS
-    INTEGER("int"), FLOAT("float"),
+    INTEGER("int"), FLOAT("float"), FREE("free"),
     BOOLEAN("bool"), STRING("string"), IDENTIFIER("<IDENTIFIER>"),
 
     // OPERATORS
@@ -20,7 +20,12 @@ enum SymbolKind {
     WHILE("while"), IF("if"), ELSE("else"), RETURN("return"),
 
     // LITERALS
-    STRING_LITERAL("<STRING_LITERAL>");
+    STRING_LITERAL("<STRING_LITERAL>"),
+
+    //SPECIAL SYMBOLS
+    LCURLY("{"), RCURLY("}"), LPARAN("("),RPARAN(")"),
+    SEMI_COLON(";"), DOT("."), LSQUARE("["), RSQUARE("]"),
+    COMMA(",");
 
     private String image;
 
