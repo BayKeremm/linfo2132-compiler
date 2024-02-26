@@ -19,7 +19,7 @@ public class TestLexer {
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
             String line;
             while ((line = br.readLine()) != null) {
-                String[] tokensInLine = line.split("\\s+"); // Split by whitespace
+                String[] tokensInLine = line.split("\\n+"); // Split by newline
                 tokens.addAll(Arrays.asList(tokensInLine));
             }
         } catch (IOException e) {
@@ -28,9 +28,39 @@ public class TestLexer {
         return tokens;
     }
     @Test
+    public void testStringLiterals() throws FileNotFoundException {
+        String fileName = "./test_files/test_string_literals.lang";
+        String expectedLexing = "./test_files/test_string_literals.txt";
+        LineNumberReader reader = new LineNumberReader(new FileReader(fileName));
+
+        Lexer lexer = new Lexer(reader);
+        lexer.setFileName(fileName);
+
+        List<String> expectedImages = readSymbolRepsFromFile(expectedLexing);
+        List<String> actualImages = new ArrayList<>();
+        Symbol s = lexer.getNextSymbol();
+        while(!(s.image().isEmpty())){
+            actualImages.add(s.symbolRep());
+            //System.out.println(s.symbolRep());
+            s = lexer.getNextSymbol();
+        }
+        try{
+            lexer.finish();
+        }catch (Exception e){
+            System.err.println("Error finishing the lexer");
+        }
+        assertEquals(expectedImages, actualImages);
+    }
+    @Test
     public void testKeywords() throws FileNotFoundException {
-        Lexer lexer = new Lexer("./test_files/test_keywords.lang");
-        List<String> expectedImages = readSymbolRepsFromFile("./test_files/test_keywords.txt");
+        String fileName = "./test_files/test_keywords.lang";
+        String expectedLexing = "./test_files/test_keywords.lang";
+        LineNumberReader reader = new LineNumberReader(new FileReader(fileName));
+
+        Lexer lexer = new Lexer(reader);
+        lexer.setFileName(fileName);
+
+        List<String> expectedImages = readSymbolRepsFromFile(expectedLexing);
         List<String> actualImages = new ArrayList<>();
         Symbol s = lexer.getNextSymbol();
         while(!(s.image().isEmpty())){
@@ -47,12 +77,16 @@ public class TestLexer {
     }
     @Test
     public void testOperators() throws FileNotFoundException {
-        Lexer lexer = new Lexer("./test_files/test_operators.lang");
-        List<String> expectedImages = readSymbolRepsFromFile("./test_files/test_operators.txt");
+        String fileName ="./test_files/test_operators.lang" ;
+        LineNumberReader reader = new LineNumberReader(new FileReader(fileName));
+        Lexer lexer = new Lexer(reader);
+        lexer.setFileName(fileName);
+        List<String> expectedImages = readSymbolRepsFromFile(fileName);
         List<String> actualImages = new ArrayList<>();
         Symbol s = lexer.getNextSymbol();
         while(!(s.image().isEmpty())){
             actualImages.add(s.symbolRep());
+            //System.out.println(s.symbolRep());
             s = lexer.getNextSymbol();
         }
         try{

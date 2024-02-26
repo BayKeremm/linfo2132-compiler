@@ -1,5 +1,7 @@
 package compiler.Lexer;
 
+import java.util.Objects;
+
 enum SymbolKind {
     EOF(""),
     // IDENTIFIERS
@@ -15,7 +17,10 @@ enum SymbolKind {
 
     // KEYWORDS
     FINAL("final"), STRUCT("struct"), DEF("def"), FOR("for"),
-    WHILE("while"), IF("if"), ELSE("else"), RETURN("return");
+    WHILE("while"), IF("if"), ELSE("else"), RETURN("return"),
+
+    // LITERALS
+    STRING_LITERAL("<STRING_LITERAL>");
 
     private String image;
 
@@ -28,7 +33,7 @@ enum SymbolKind {
             return "<EOF>";
         }
         if (image.startsWith("<") && image.endsWith(">")) {
-            return image;
+            return image ;
         }
         return "\"" + image + "\"";
     }
@@ -62,7 +67,13 @@ public class Symbol {
     }
 
     public String symbolRep() {
-        return kind.symbolRep();
+        String rep = kind.symbolRep();
+        if(!Objects.equals(this.image, this.kind.image())){
+           rep = '<' + rep + ", " + this.image + '>';
+        }else{
+            rep = '<' + rep + ", " +  '>';
+        }
+        return rep;
     }
 
     public String image() {

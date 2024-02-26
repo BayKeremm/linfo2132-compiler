@@ -23,9 +23,8 @@ public class Lexer {
     // identifiers in the language
     private Hashtable<String, SymbolKind> keywords;
 
-    public Lexer(String  fileName) throws FileNotFoundException {
-        this.fileName = fileName;
-        this.input = new CharReader(fileName);
+    public Lexer(Reader reader) throws FileNotFoundException {
+        this.input = new CharReader(reader);
 
         keywords = new Hashtable<String, SymbolKind>();
         keywords.put(INTEGER.image(), INTEGER);
@@ -48,7 +47,10 @@ public class Lexer {
     public void finish() throws IOException {
         this.input.close();
     }
-    
+    public void setFileName(String name){
+        this.fileName = name;
+    }
+
     public Symbol getNextSymbol() {
         StringBuffer buffer;
         boolean moreWhiteSpace = true;
@@ -137,9 +139,36 @@ public class Lexer {
                     reportLexerError("Operator | is not supported in lang");
                     return getNextSymbol();
                 }
+            case '"': // RE = "(any char)*"
+                buffer = new StringBuffer();
+                buffer.append('\"');
+                nextCh();
+                while(ch != '\n' && ch != EOFCH && ch != '\"'){
+                    buffer.append(ch);
+                    nextCh();
+                }
+                if(ch == '\n'){
+                    reportLexerError("Unexpected new line in string literal");
+                    nextCh();
+                    return getNextSymbol();
+                }else if(ch == EOFCH){
+                    reportLexerError("Unexpected EOF in string literal");
+                    nextCh();
+                    return getNextSymbol();
+                }else if (ch == '\"'){
+                   buffer.append('\"');
+                   nextCh();
+                }else{
+                    reportLexerError("Unexpected error lexing a string literal");
+                    nextCh();
+                    return getNextSymbol();
+                }
+                String string = buffer.toString();
+                return new Symbol(STRING_LITERAL,string,line);
+
             case EOFCH: // RE = ""
                 return new Symbol(EOF, line);
-            default: // RE = ([a-zA-Z]|_)+([0-9]*
+            default: // RE = ([a-zA-Z]|_)+([0-9]*) | keywords
                 if(isIdentifierStart(ch)){
                     buffer = new StringBuffer();
                     while(isIdentifierPart(ch)){
@@ -169,7 +198,7 @@ public class Lexer {
         }
     }
     private void reportLexerError(String message, Object... args) {
-        //isInError = true;
+        System.out.println("DECIDE WHAT TO DO IN ERROR");
         System.err.printf("%s:%d: error: ", fileName, line);
         System.err.printf(message, args);
         System.err.println();
@@ -200,22 +229,18 @@ class CharReader{
     public final static char EOFCH = (char) -1;
 
     // The underlying reader records line numbers.
-    private LineNumberReader lineNumberReader;
+    final private LineNumberReader lineNumberReader;
 
     // Name of the file that is being read.
     private String fileName;
-    public CharReader(String fileName) throws FileNotFoundException {
-        lineNumberReader = new LineNumberReader(new FileReader(fileName));
-        this.fileName = fileName;
+    public CharReader(Reader input) throws FileNotFoundException {
+        this.lineNumberReader = (LineNumberReader) input;
     }
     public char nextChar() throws IOException {
         return (char) lineNumberReader.read();
     }
     public int line() {
         return lineNumberReader.getLineNumber() + 1; // LineNumberReader counts lines from 0
-    }
-    public String fileName() {
-        return fileName;
     }
     public void close() throws IOException {
         lineNumberReader.close();

@@ -1,8 +1,15 @@
-"int"
-<IDENTIFIER>
-"bool"
-<IDENTIFIER>
-"float"
-"string"
-<IDENTIFIER>
-LEFT HERE TESTING THE KEYWORDS IF ELSE ETC
+<"int", >
+<<IDENTIFIER>, x>
+<"bool", >
+<<IDENTIFIER>, y>
+<"float", >
+<"string", >
+<<IDENTIFIER>, z>
+<"final", >
+<"struct", >
+<"def", >
+<"for", >
+<"while", >
+<"if", >
+<"else", >
+<"return", >
