@@ -1,33 +1,31 @@
 package compiler.Lexer;
-import javax.swing.plaf.synth.SynthButtonUI;
 import java.io.*;
 import java.util.Hashtable;
 
-import static compiler.Lexer.SymbolKind.*;
+import static compiler.Lexer.Token.*;
 import static java.lang.Character.isDigit;
 
 public class Lexer {
+
     // Source file name.
     private String fileName;
 
-    // Next unscanned character.
+    // Next character to lex
     private char ch;
 
-    // The underlying reader records line numbers.
     final private LineNumberReader lineNumberReader;
 
-    // Line number of current token.
+    // Line number of current Symbol.
     private int line;
 
-    // identifiers in the language
-    private Hashtable<String, SymbolKind> keywords;
+    private Hashtable<String, Token> keywords;
 
-    public final static char EOFCH = (char) -1;
+    public final static char EOF_CHAR = (char) -1;
 
     public Lexer(Reader reader) throws FileNotFoundException {
         this.lineNumberReader = (LineNumberReader) reader;
 
-        keywords = new Hashtable<String, SymbolKind>();
+        keywords = new Hashtable<String, Token>();
         keywords.put(INTEGER.image(), INTEGER);
         keywords.put(FLOAT.image(), FLOAT);
         keywords.put(BOOLEAN.image(),BOOLEAN);
@@ -66,7 +64,7 @@ public class Lexer {
             if (ch == '/') {
                 nextCh();
                 if (ch == '/') {
-                    while (ch != '\n' && ch != EOFCH) {
+                    while (ch != '\n' && ch != EOF_CHAR) {
                         nextCh();
                     }
                 } else { // RE = /
@@ -172,14 +170,14 @@ public class Lexer {
                 buffer = new StringBuffer();
                 buffer.append('\"');
                 nextCh();
-                while(ch != '\n' && ch != EOFCH && ch != '\"'){
+                while(ch != '\n' && ch != EOF_CHAR && ch != '\"'){
                     buffer.append(ch);
                     nextCh();
                 }
                 if(ch == '\n'){
                     reportLexerError("Unexpected new line in string literal");
                     return getNextSymbol();
-                }else if(ch == EOFCH){
+                }else if(ch == EOF_CHAR){
                     reportLexerError("Unexpected EOF in string literal");
                     return getNextSymbol();
                 }else {
@@ -189,7 +187,7 @@ public class Lexer {
                 String string = buffer.toString();
                 return new Symbol(STRING_LITERAL,string,line);
 
-            case EOFCH: // RE = ""
+            case EOF_CHAR: // RE = ""
                 return new Symbol(EOF, line);
             default: // RE = ([a-zA-Z]|_)+([0-9]*) | keywords
                 if(isIdentifierStart(ch)){
@@ -244,7 +242,6 @@ public class Lexer {
                 }
         }
     }
-    // Advances ch to the next character from input, and updates the line number.
     private void nextCh() {
         line = this.lineNumber();
         try {
@@ -263,17 +260,12 @@ public class Lexer {
         System.err.println();
     }
 
-    // Returns true if the specified character is a whitespace, and false otherwise.
     private boolean isWhitespace(char c) {
         return (c == ' ' || c == '\t' || c == '\n' || c == '\f');
     }
-
-    // Returns true if the specified character can start an identifier name, and false otherwise.
     private boolean isIdentifierStart(char c) {
         return (c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c == '_');
     }
-    // Returns true if the specified character can be part of an identifier name, and false
-    // otherwise.
     private boolean isIdentifierPart(char c) {
         return (isIdentifierStart(c) || isDigit(c));
     }

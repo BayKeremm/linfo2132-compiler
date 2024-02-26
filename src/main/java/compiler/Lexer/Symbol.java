@@ -2,7 +2,7 @@ package compiler.Lexer;
 
 import java.util.Objects;
 
-enum SymbolKind {
+enum Token {
     EOF(""),
     // IDENTIFIERS
     INTEGER("int"), FLOAT("float"), FREE("free"),
@@ -30,7 +30,7 @@ enum SymbolKind {
 
     private String image;
 
-    private SymbolKind(String image) {
+    private Token(String image) {
         this.image = image;
     }
 
@@ -50,22 +50,22 @@ enum SymbolKind {
 }
 
 public class Symbol {
-    private SymbolKind kind;
-    private String image;
+    private Token token;
+    private String attribute;
     private int line;
 
-    public Symbol(SymbolKind kind, String image, int line) {
-        this.kind = kind;
-        this.image = image;
+    public Symbol(Token kind, String attribute, int line) {
+        this.token = kind;
+        this.attribute = attribute;
         this.line = line;
     }
 
-    public Symbol(SymbolKind kind, int line) {
+    public Symbol(Token kind, int line) {
         this(kind, kind.image(), line);
     }
 
-    public SymbolKind kind() {
-        return kind;
+    public Token token() {
+        return token;
     }
 
     public int line() {
@@ -73,9 +73,9 @@ public class Symbol {
     }
 
     public String symbolRep() {
-        String rep = kind.symbolRep();
-        if(!Objects.equals(this.image, this.kind.image())){
-           rep = '<' + rep + ", " + this.image + '>';
+        String rep = token.symbolRep();
+        if(!Objects.equals(this.attribute, this.token.image())){
+           rep = '<' + rep + ", " + this.attribute + '>';
         }else{
             rep = '<' + rep + ", " +  '>';
         }
@@ -83,6 +83,6 @@ public class Symbol {
     }
 
     public String image() {
-        return image;
+        return attribute;
     }
 }
