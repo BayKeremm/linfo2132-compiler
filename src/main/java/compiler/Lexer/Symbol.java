@@ -54,14 +54,14 @@ public class Symbol {
     private String attribute;
     private int line;
 
-    public Symbol(Token kind, String attribute, int line) {
-        this.token = kind;
+    public Symbol(Token token, String attribute, int line) {
+        this.token = token;
         this.attribute = attribute;
         this.line = line;
     }
 
-    public Symbol(Token kind, int line) {
-        this(kind, kind.image(), line);
+    public Symbol(Token token, int line) {
+        this(token, token.image(), line);
     }
 
     public Token token() {
