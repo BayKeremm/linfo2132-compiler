@@ -22,7 +22,7 @@ public class Lexer {
 
     public final static char EOF_CHAR = (char) -1;
 
-    public Lexer(Reader reader) throws FileNotFoundException {
+    public Lexer(Reader reader) throws Exception {
         this.lineNumberReader = (LineNumberReader) reader;
 
         keywords = new Hashtable<String, Token>();
@@ -51,7 +51,7 @@ public class Lexer {
         this.fileName = name;
     }
 
-    public Symbol getNextSymbol() {
+    public Symbol getNextSymbol() throws Exception {
         StringBuffer buffer;
         boolean moreWhiteSpace = true;
 
@@ -154,7 +154,7 @@ public class Lexer {
                     nextCh();
                     return new Symbol(LAND,line);
                 }else{
-                    reportLexerError("Operator & is not supported in lang");
+                    reportLexerError("Operator & is not supported in lang",false);
                     return getNextSymbol();
                 }
             case '|': // RE = ||
@@ -163,7 +163,7 @@ public class Lexer {
                     nextCh();
                     return new Symbol(LOR,line);
                 }else{
-                    reportLexerError("Operator | is not supported in lang");
+                    reportLexerError("Operator | is not supported in lang",false);
                     return getNextSymbol();
                 }
             case '"': // RE = "(any char)*"
@@ -175,10 +175,11 @@ public class Lexer {
                     nextCh();
                 }
                 if(ch == '\n'){
-                    reportLexerError("Unexpected new line in string literal");
+                    reportLexerError("Unexpected new line in string literal",false);
                     return getNextSymbol();
                 }else if(ch == EOF_CHAR){
-                    reportLexerError("Unexpected EOF in string literal");
+                    // TODO: RAISE ERROR
+                    reportLexerError("Unexpected EOF in string literal",false);
                     return getNextSymbol();
                 }else {
                     buffer.append('\"');
@@ -221,7 +222,7 @@ public class Lexer {
                                 buffer.append(ch);
                                 nextCh();
                             }
-                            reportLexerError("Invalid float %s",buffer.toString());
+                            reportLexerError("Invalid float %s",false, buffer.toString());
                             return getNextSymbol();
                         }
                         return new Symbol(FLOAT_LITERAL, buffer.toString(), line);
@@ -230,34 +231,39 @@ public class Lexer {
                             buffer.append(ch);
                             nextCh();
                         }
-                        reportLexerError("Invalid identifier %s",buffer.toString());
+                        reportLexerError("Invalid identifier %s",false, buffer.toString());
                         return getNextSymbol();
                     }
                     return new Symbol(NATURAL_LITERAL, buffer.toString(), line);
                 
                 }else{
-                    reportLexerError("Unidentified input char %s",ch);
+                    // TODO: RAISE ERROR
+                    reportLexerError("Unidentified input char %s",true, ch);
                     nextCh();
                     return getNextSymbol();
                 }
         }
     }
-    private void nextCh() {
+    private void nextCh() throws Exception {
         line = this.lineNumber();
         try {
             ch = (char) lineNumberReader.read();
         } catch (Exception e) {
-            reportLexerError("Unable to read characters from input");
+            reportLexerError("Unable to read characters from input",false);
         }
     }
     private int lineNumber(){
        return  lineNumberReader.getLineNumber() + 1;
     }
-    private void reportLexerError(String message, Object... args) {
+
+    private void reportLexerError(String message, Boolean throw_exception, Object... args) throws Exception {
         System.out.println("DECIDE WHAT TO DO IN ERROR");
         System.err.printf("%s:%d: error: ", fileName, line);
         System.err.printf(message, args);
         System.err.println();
+        if(throw_exception){
+            throw new Exception("Lexing error");
+        }
     }
 
     private boolean isWhitespace(char c) {

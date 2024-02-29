@@ -28,7 +28,7 @@ public class TestLexer {
         return tokens;
     }
     @Test
-    public void testSpecialSymbols() throws FileNotFoundException {
+    public void testSpecialSymbols() throws Exception {
         String fileName = "./test_files/test_special_symbols.lang";
         String expectedLexing = "./test_files/test_special_symbols.txt";
         LineNumberReader reader = new LineNumberReader(new FileReader(fileName));
@@ -52,7 +52,7 @@ public class TestLexer {
         assertEquals(expectedImages, actualImages);
     }
     @Test
-    public void testStringLiterals() throws FileNotFoundException {
+    public void testStringLiterals() throws Exception {
         String fileName = "./test_files/test_string_literals.lang";
         String expectedLexing = "./test_files/test_string_literals.txt";
         LineNumberReader reader = new LineNumberReader(new FileReader(fileName));
@@ -76,7 +76,7 @@ public class TestLexer {
         assertEquals(expectedImages, actualImages);
     }
     @Test
-    public void testKeywords() throws FileNotFoundException {
+    public void testKeywords() throws Exception {
         String fileName = "./test_files/test_keywords.lang";
         String expectedLexing = "./test_files/test_keywords.txt";
         LineNumberReader reader = new LineNumberReader(new FileReader(fileName));
@@ -100,7 +100,7 @@ public class TestLexer {
         assertEquals(expectedImages, actualImages);
     }
     @Test
-    public void testOperators() throws FileNotFoundException {
+    public void testOperators() throws Exception {
         String fileName ="./test_files/test_operators.lang" ;
         String expectedLexing ="./test_files/test_operators.txt" ;
         LineNumberReader reader = new LineNumberReader(new FileReader(fileName));
@@ -122,7 +122,7 @@ public class TestLexer {
         assertEquals(expectedImages, actualImages);
     }
     @Test
-    public void testLiterals() throws FileNotFoundException{
+    public void testLiterals() throws Exception {
         String fileName = "./test_files/test_literals.lang";
         String expectedLexing = "./test_files/test_literals.txt";
         LineNumberReader reader = new LineNumberReader(new FileReader(fileName));
