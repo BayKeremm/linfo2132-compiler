@@ -154,7 +154,7 @@ public class Lexer {
                     nextCh();
                     return new Symbol(LAND,line);
                 }else{
-                    reportLexerError("Operator & is not supported in lang",false);
+                    reportLexerError("Operator & is not supported in lang",true);
                     return getNextSymbol();
                 }
             case '|': // RE = ||
@@ -163,7 +163,7 @@ public class Lexer {
                     nextCh();
                     return new Symbol(LOR,line);
                 }else{
-                    reportLexerError("Operator | is not supported in lang",false);
+                    reportLexerError("Operator | is not supported in lang",true);
                     return getNextSymbol();
                 }
             case '"': // RE = "(any char)*"
@@ -175,11 +175,10 @@ public class Lexer {
                     nextCh();
                 }
                 if(ch == '\n'){
-                    reportLexerError("Unexpected new line in string literal",false);
+                    reportLexerError("Unexpected new line in string literal",true);
                     return getNextSymbol();
                 }else if(ch == EOF_CHAR){
-                    // TODO: RAISE ERROR
-                    reportLexerError("Unexpected EOF in string literal",false);
+                    reportLexerError("Unexpected EOF in string literal",true);
                     return getNextSymbol();
                 }else {
                     buffer.append('\"');
@@ -222,7 +221,7 @@ public class Lexer {
                                 buffer.append(ch);
                                 nextCh();
                             }
-                            reportLexerError("Invalid float %s",false, buffer.toString());
+                            reportLexerError("Invalid float %s",true, buffer.toString());
                             return getNextSymbol();
                         }
                         return new Symbol(FLOAT_LITERAL, buffer.toString(), line);
@@ -231,13 +230,12 @@ public class Lexer {
                             buffer.append(ch);
                             nextCh();
                         }
-                        reportLexerError("Invalid identifier %s",false, buffer.toString());
+                        reportLexerError("Invalid identifier %s",true, buffer.toString());
                         return getNextSymbol();
                     }
                     return new Symbol(NATURAL_LITERAL, buffer.toString(), line);
                 
                 }else{
-                    // TODO: RAISE ERROR
                     reportLexerError("Unidentified input char %s",true, ch);
                     nextCh();
                     return getNextSymbol();
@@ -249,7 +247,7 @@ public class Lexer {
         try {
             ch = (char) lineNumberReader.read();
         } catch (Exception e) {
-            reportLexerError("Unable to read characters from input",false);
+            reportLexerError("Unable to read characters from input",true);
         }
     }
     private int lineNumber(){

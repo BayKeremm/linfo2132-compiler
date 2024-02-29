@@ -3,8 +3,51 @@
  */
 package compiler;
 
+import compiler.Lexer.Lexer;
+import compiler.Lexer.Symbol;
+
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.LineNumberReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+
 public class Compiler {
-    public static void main(String[] args) {
-        System.out.println("Hello from the compiler !");
+    public static void main(String[] args) throws Exception {
+
+        LineNumberReader reader;
+
+        boolean debug = false;
+        String fileName;
+
+        if(args.length > 1){
+            if(args[0].equals("-lexer")){
+                debug = true;
+            }
+            fileName = args[1];
+        }else{
+            fileName = args[0];
+        }
+
+        reader = new LineNumberReader(new FileReader(fileName));
+
+        Lexer lexer = new Lexer(reader);
+        lexer.setFileName(fileName);
+
+        Symbol s = lexer.getNextSymbol();
+        while(!(s.image().isEmpty())){
+            if(debug){
+                System.out.println(s.symbolRep());
+            }
+            s = lexer.getNextSymbol();
+        }
+        try{
+            lexer.finish();
+        }catch (Exception e){
+            System.err.println("Error finishing the lexer");
+        }
     }
 }

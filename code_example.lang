@@ -1,0 +1,53 @@
+
+final int i = 3;
+final float j = 3.2*5.0;
+final k int = i*3;
+final string message = "Hello";
+final bool isEmpty = true;
+
+string s = "abx
+def";
+
+//struct Point {
+//    int x;
+//    int y;
+//}
+//
+//struct Person {
+//    string name;
+//    Point location;
+//    int[] history;
+//}
+//
+//
+//int a = 3;
+//
+//
+//int[] c = int[5];  // new array of length 5
+//Person d = Person("me", Point(3,7), int[i*2]);  // new structure
+//
+//
+//def int square(int v) {
+//    return v*v;
+//}
+
+//def Point copyPoints(Point[] p) {
+//    return Point(p[0].x+p[1].x, p[0].y+p[1].y);
+//}
+//
+//def void main() {
+//    int value = readInt();
+//    writeln(square(value));
+//    int i;
+//    for (i=1, i<100, i = i+1) {
+//        while (value!=3) {
+//            if (i > 10){
+//                // ....
+//            } else {
+//                // ....
+//            }
+//        }
+//    }
+//
+//    i = (i+2)*2;
+//}
