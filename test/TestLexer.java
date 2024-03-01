@@ -29,8 +29,8 @@ public class TestLexer {
     }
     @Test
     public void testSpecialSymbols() throws Exception {
-        String fileName = "./test_files/test_special_symbols.lang";
-        String expectedLexing = "./test_files/test_special_symbols.txt";
+        String fileName = "./test/test_files/test_special_symbols.lang";
+        String expectedLexing = "./test/test_files/test_special_symbols.txt";
         LineNumberReader reader = new LineNumberReader(new FileReader(fileName));
 
         Lexer lexer = new Lexer(reader);
@@ -53,8 +53,8 @@ public class TestLexer {
     }
     @Test
     public void testStringLiterals() throws Exception {
-        String fileName = "./test_files/test_string_literals.lang";
-        String expectedLexing = "./test_files/test_string_literals.txt";
+        String fileName = "./test/test_files/test_string_literals.lang";
+        String expectedLexing = "./test/test_files/test_string_literals.txt";
         LineNumberReader reader = new LineNumberReader(new FileReader(fileName));
 
         Lexer lexer = new Lexer(reader);
@@ -77,8 +77,8 @@ public class TestLexer {
     }
     @Test
     public void testKeywords() throws Exception {
-        String fileName = "./test_files/test_keywords.lang";
-        String expectedLexing = "./test_files/test_keywords.txt";
+        String fileName = "./test/test_files/test_keywords.lang";
+        String expectedLexing = "./test/test_files/test_keywords.txt";
         LineNumberReader reader = new LineNumberReader(new FileReader(fileName));
 
         Lexer lexer = new Lexer(reader);
@@ -101,8 +101,8 @@ public class TestLexer {
     }
     @Test
     public void testOperators() throws Exception {
-        String fileName ="./test_files/test_operators.lang" ;
-        String expectedLexing ="./test_files/test_operators.txt" ;
+        String fileName ="./test/test_files/test_operators.lang" ;
+        String expectedLexing ="./test/test_files/test_operators.txt" ;
         LineNumberReader reader = new LineNumberReader(new FileReader(fileName));
         Lexer lexer = new Lexer(reader);
         lexer.setFileName(fileName);
@@ -123,8 +123,8 @@ public class TestLexer {
     }
     @Test
     public void testLiterals() throws Exception {
-        String fileName = "./test_files/test_literals.lang";
-        String expectedLexing = "./test_files/test_literals.txt";
+        String fileName = "./test/test_files/test_literals.lang";
+        String expectedLexing = "./test/test_files/test_literals.txt";
         LineNumberReader reader = new LineNumberReader(new FileReader(fileName));
         Lexer lexer = new Lexer(reader);
         lexer.setFileName(fileName);

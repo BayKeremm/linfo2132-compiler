@@ -5,9 +5,6 @@ final k int = i*3;
 final string message = "Hello";
 final bool isEmpty = true;
 
-string s = "abx
-def";
-
 //struct Point {
 //    int x;
 //    int y;

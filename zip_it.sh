@@ -1,2 +1,8 @@
 #!/bin/bash
-zip submission.zip -r ./test ./test_files ./src ./build.gradle.kts
+
+mkdir -p submission
+
+cp -r test src build.gradle.kts submission/
+
+zip -r submission.zip submission
+
