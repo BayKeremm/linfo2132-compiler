@@ -7,6 +7,9 @@ import static java.lang.Character.isDigit;
 
 public class Lexer {
 
+    private Symbol lookaheadSymbol;
+    private Symbol currentSymbol;
+
     // Source file name.
     private String fileName;
 
@@ -18,7 +21,7 @@ public class Lexer {
     // Line number of current Symbol.
     private int line;
 
-    private Hashtable<String, Token> keywords;
+    private final Hashtable<String, Token> keywords;
 
     public final static char EOF_CHAR = (char) -1;
 
@@ -51,8 +54,25 @@ public class Lexer {
         this.fileName = name;
     }
 
-    public Symbol getNextSymbol() throws Exception {
-        StringBuffer buffer;
+    public void advanceLexer() throws Exception{
+        if(this.currentSymbol == null){
+            this.currentSymbol = getNextSymbol();
+        }else{
+            this.currentSymbol = this.lookaheadSymbol;
+        }
+        this.lookaheadSymbol = getNextSymbol();
+    }
+    public Symbol nextSymbol(){
+        return this.currentSymbol;
+    }
+
+    public Symbol lookaheadSymbol(){
+        return this.lookaheadSymbol;
+    }
+
+
+    private Symbol getNextSymbol() throws Exception {
+        StringBuilder buffer;
         boolean moreWhiteSpace = true;
 
         while (moreWhiteSpace) {
@@ -167,7 +187,7 @@ public class Lexer {
                     return getNextSymbol();
                 }
             case '"': // RE = "(any char)*"
-                buffer = new StringBuffer();
+                buffer = new StringBuilder();
                 buffer.append('\"');
                 nextCh();
                 while(ch != '\n' && ch != EOF_CHAR && ch != '\"'){
@@ -191,7 +211,7 @@ public class Lexer {
                 return new Symbol(EOF, line);
             default: // RE = ([a-zA-Z]|_)+([0-9]*) | keywords
                 if(isIdentifierStart(ch)){
-                    buffer = new StringBuffer();
+                    buffer = new StringBuilder();
                     while(isIdentifierPart(ch)){
                         buffer.append(ch);
                         nextCh();
@@ -205,7 +225,7 @@ public class Lexer {
                         return new Symbol(IDENTIFIER, identifier, line);
                     }
                 }else if(isDigit(ch)){ // RE = ([0-9])*+[.]+([0-9])*
-                    buffer = new StringBuffer();
+                    buffer = new StringBuilder();
                     while(isDigit(ch)){
                         buffer.append(ch);
                         nextCh();

@@ -7,7 +7,6 @@ import org.junit.Test;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import compiler.Lexer.Lexer;
@@ -38,11 +37,14 @@ public class TestLexer {
 
         List<String> expectedImages = readSymbolRepsFromFile(expectedLexing);
         List<String> actualImages = new ArrayList<>();
-        Symbol s = lexer.getNextSymbol();
+        lexer.advanceLexer();
+        Symbol s = lexer.nextSymbol();
         while(!(s.image().isEmpty())){
             actualImages.add(s.symbolRep());
             //System.out.println(s.symbolRep());
-            s = lexer.getNextSymbol();
+            //System.out.println(s.symbolRep());
+            lexer.advanceLexer();
+            s = lexer.nextSymbol();
         }
         try{
             lexer.finish();
@@ -62,11 +64,13 @@ public class TestLexer {
 
         List<String> expectedImages = readSymbolRepsFromFile(expectedLexing);
         List<String> actualImages = new ArrayList<>();
-        Symbol s = lexer.getNextSymbol();
+        lexer.advanceLexer();
+        Symbol s = lexer.nextSymbol();
         while(!(s.image().isEmpty())){
             actualImages.add(s.symbolRep());
             //System.out.println(s.symbolRep());
-            s = lexer.getNextSymbol();
+            lexer.advanceLexer();
+            s = lexer.nextSymbol();
         }
         try{
             lexer.finish();
@@ -86,11 +90,13 @@ public class TestLexer {
 
         List<String> expectedImages = readSymbolRepsFromFile(expectedLexing);
         List<String> actualImages = new ArrayList<>();
-        Symbol s = lexer.getNextSymbol();
+        lexer.advanceLexer();
+        Symbol s = lexer.nextSymbol();
         while(!(s.image().isEmpty())){
             actualImages.add(s.symbolRep());
             //System.out.println(s.symbolRep());
-            s = lexer.getNextSymbol();
+            lexer.advanceLexer();
+            s = lexer.nextSymbol();
         }
         try{
             lexer.finish();
@@ -108,11 +114,13 @@ public class TestLexer {
         lexer.setFileName(fileName);
         List<String> expectedImages = readSymbolRepsFromFile(expectedLexing);
         List<String> actualImages = new ArrayList<>();
-        Symbol s = lexer.getNextSymbol();
+        lexer.advanceLexer();
+        Symbol s = lexer.nextSymbol();
         while(!(s.image().isEmpty())){
             actualImages.add(s.symbolRep());
             //System.out.println(s.symbolRep());
-            s = lexer.getNextSymbol();
+            lexer.advanceLexer();
+            s = lexer.nextSymbol();
         }
         try{
             lexer.finish();
@@ -130,11 +138,13 @@ public class TestLexer {
         lexer.setFileName(fileName);
         List<String> expectedImages = readSymbolRepsFromFile(expectedLexing);
         List<String> actualImages = new ArrayList<>();
-        Symbol s = lexer.getNextSymbol();
+        lexer.advanceLexer();
+        Symbol s = lexer.nextSymbol();
         while(!(s.image().isEmpty())){
             actualImages.add(s.symbolRep());
             //System.out.println(s.symbolRep());
-            s = lexer.getNextSymbol();
+            lexer.advanceLexer();
+            s = lexer.nextSymbol();
         }
         try{
             lexer.finish();

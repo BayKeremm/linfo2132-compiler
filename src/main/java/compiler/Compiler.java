@@ -5,6 +5,9 @@ package compiler;
 
 import compiler.Lexer.Lexer;
 import compiler.Lexer.Symbol;
+import compiler.Lexer.Token;
+import compiler.Parser.Parser;
+import compiler.Parser.ParserException;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -16,7 +19,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 public class Compiler {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception, ParserException {
 
         LineNumberReader reader;
 
@@ -37,17 +40,31 @@ public class Compiler {
         Lexer lexer = new Lexer(reader);
         lexer.setFileName(fileName);
 
-        Symbol s = lexer.getNextSymbol();
+        Parser parser = new Parser(lexer);
+
+        Symbol s = parser.match(Token.FINAL);
+        s = parser.match(Token.INTEGER);
+        s = parser.match(Token.IDENTIFIER);
+        s = parser.match(Token.ASSIGN);
+        s = parser.match(Token.NATURAL_LITERAL);
+        s = parser.match(Token.SEMI_COLON);
+
+        /*
+        lexer.advanceLexer();
+        Symbol s = lexer.currentSymbol();
         while(!(s.image().isEmpty())){
             if(debug){
                 System.out.println(s.symbolRep());
             }
-            s = lexer.getNextSymbol();
+            lexer.advanceLexer();
+            s = lexer.currentSymbol();
         }
         try{
             lexer.finish();
         }catch (Exception e){
             System.err.println("Error finishing the lexer");
         }
+
+         */
     }
 }
