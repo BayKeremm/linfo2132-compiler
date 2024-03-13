@@ -23,7 +23,7 @@ public enum Token {
 
     //SPECIAL SYMBOLS
     LCURLY("{"), RCURLY("}"), LPARAN("("),RPARAN(")"),
-    SEMI_COLON(";"), DOT("."), LSQUARE("["), RSQUARE("]"),
+    SEMI_COLON(";"), DOT("."), LBRAC("["), RBRAC("]"),
     COMMA(",");
 
     private String image;
@@ -32,7 +32,7 @@ public enum Token {
         this.image = image;
     }
 
-    public String symbolRep() {
+    public String tokenRep() {
         if (this == EOF) {
             return "<EOF>";
         }

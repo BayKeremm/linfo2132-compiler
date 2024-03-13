@@ -26,9 +26,9 @@ public class Symbol {
     }
 
     public String symbolRep() {
-        String rep = token.symbolRep();
+        String rep = token.tokenRep();
         if(!Objects.equals(this.attribute, this.token.image())){
-           rep = '<' + rep + ", " + this.attribute + '>';
+            rep = '<' + rep + ", " + this.attribute + '>';
         }else{
             rep = '<' + rep + ", " +  '>';
         }
