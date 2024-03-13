@@ -31,17 +31,17 @@ public class Parser {
     }
     public Program program() throws ParserException, Exception {
         ArrayList<ConstantVariable> constantVariables = new ArrayList<>();
-        while(nextSymbol.token() == Token.FINAL){
+        while(have(Token.FINAL)){
             int line = nextSymbol.line();
-            match(Token.FINAL);
             Symbol type = type();
             Symbol identifier = qualifiedIdentifier();
-            if(!check(Token.ASSIGN)){
+            if(!have(Token.ASSIGN)){
                 // throw exception
             }
-            match(Token.ASSIGN);
             Expression expression = expression();
-            match(Token.SEMI_COLON);
+            if(!have(Token.SEMI_COLON)){
+                // throw exception
+            }
             constantVariables.add(new ConstantVariable(line,type,identifier,expression));
         }
 
@@ -50,34 +50,63 @@ public class Parser {
     private Expression expression(){
         return logicalExpression();
     }
+
     private Expression logicalExpression(){
         int line = nextSymbol.line();
         Expression lhs = equalityExpression();
-        return  lhs;
+        if(have(Token.LAND)){
+            return new LogicalAnd(line,lhs,logicalExpression());
+        }else if (have(Token.LOR)){
+            return new LogicalOr(line,lhs,logicalExpression());
+        }else{
+            return  lhs;
+        }
     }
     private Expression equalityExpression(){
         int line = nextSymbol.line();
         Expression lhs = comparisonExpression();
-        return lhs;
+        if(have(Token.NOT_EQUAL)){
+            return new NotEqualComparison(line,lhs,comparisonExpression());
+        }else if(have(Token.EQUAL)){
+            return new EqualComparison(line,lhs,comparisonExpression());
+        }else{
+            return lhs;
+        }
     }
 
     private Expression comparisonExpression(){
         int line = nextSymbol.line();
         Expression lhs = termExpression();
-        return lhs;
+        if(have(Token.GT)){
+            return new GTComparison(line,lhs,termExpression());
+        }else if(have(Token.LT)){
+            return new LTComparison(line,lhs,termExpression());
+        } else if (have(Token.GE)) {
+            return new GEComparison(line,lhs,termExpression());
+        } else if (have(Token.LE)) {
+            return new LEComparison(line,lhs,termExpression());
+        }else{
+            return lhs;
+        }
     }
 
     private Expression termExpression(){
         int line = nextSymbol.line();
         Expression lhs = unaryExpression();
-        return lhs;
+        if(have(Token.PLUS)){
+            return new PlusOperation(line,lhs, termExpression());
+        } else if (have(Token.MINUS)) {
+            return new MinusOperation(line,lhs, termExpression());
+        }else{
+            return lhs;
+        }
     }
     private Expression unaryExpression(){
         int line = nextSymbol.line();
-        if(check(Token.MINUS)){
-            return null;
-        }else if(check(Token.NEGATE)){
-            return null;
+        if(have(Token.MINUS)){
+            return new UnaryMinusOperation(line,null,factorExpression());
+        }else if(have(Token.NEGATE)){
+            return new UnaryNegateOperation(line,null,factorExpression());
         }
         else{
             return factorExpression();
@@ -86,25 +115,41 @@ public class Parser {
     private Expression factorExpression(){
         int line = nextSymbol.line();
         Expression lhs = primary();
-        return lhs;
+        if(have(Token.STAR)){
+            return new MultiplyOperation(line,lhs, factorExpression());
+        }else if(have(Token.MODULO)){
+            return new ModuloOperation(line,lhs, factorExpression());
+        }else if(have(Token.SLASH)){
+            return new DivideOperation(line,lhs, factorExpression());
+        }else{
+            return lhs;
+        }
+    }
+    private ArrayList<Expression> parseExpressions(){
+        ArrayList<Expression> expressions = new ArrayList<>();
+        while(!have(Token.RPARAN)){
+            expressions.add(expression());
+        }
+        return expressions;
     }
     private Expression primary(){
         int line = nextSymbol.line();
-        if(check(Token.LPARAN)){
-            ArrayList<Expression> expressions = new ArrayList<>();
-            while(!check(Token.RPARAN)){
-                expressions.add(expression());
-            }
-            match(Token.RPARAN);
-            return new ParanExpression(line,expressions);
+        if(have(Token.LPARAN)){
+            return new ParanExpression(line,parseExpressions());
         }else if(check(Token.IDENTIFIER)){
             Symbol id = qualifiedIdentifier();
-            // check if function call
+            ArrayList<Expression> expressions;
+            if(have(Token.LPARAN)){
+                expressions = parseExpressions();
+                return new FunctionCallExpression(line,id,expressions);
+            }else{
+                // TODO: RETURN VARIABLE
+                return null;
+            }
         }else{
             Symbol lit =  literal();
             return new LiteralExpression(line,lit);
         }
-        return null;
     }
     private Symbol literal() {
         if(literals.contains(nextSymbol.token())){
@@ -118,9 +163,10 @@ public class Parser {
     }
 
     private Symbol qualifiedIdentifier() {
+        //TODO: DOT
         return match(Token.IDENTIFIER);
     }
-    private Symbol type() throws Exception {
+    private Symbol type()  {
         if(isBasicType()){
             return match(nextSymbol.token());
         }
@@ -138,6 +184,14 @@ public class Parser {
             lexer.advanceLexer();
             nextSymbol = lexer.nextSymbol();
             return matchingSymbol;
+        }
+    }
+    private boolean have(Token token){
+        if(check(token)){
+            match(token);
+            return true;
+        }else{
+            return false;
         }
     }
 
