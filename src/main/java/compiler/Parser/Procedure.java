@@ -1,8 +1,10 @@
 package compiler.Parser;
 
 
+import com.google.errorprone.annotations.Var;
 import compiler.Lexer.Symbol;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 class Procedure extends Statement {
@@ -84,14 +86,58 @@ class Block extends Statement{
 }
 
 class IfElseStatement extends Statement {
+    Expression ifCondition;
+    Block ifBlock;
+    Block elseBlock;
 
-    protected IfElseStatement(int line) {
+    protected IfElseStatement(int line, Expression ifCondition,Block ifBlock, Block elseBlock) {
         super(line);
+        this.ifCondition=ifCondition;
+        this.ifBlock = ifBlock;
+        this.elseBlock = elseBlock;
     }
 
     @Override
     public void printNode() {
+        System.out.printf("\nIf %s:\n", ifCondition.getRep());
+        ifBlock.printNode();
+        System.out.print("\nElse:\n");
+        elseBlock.printNode();
+    }
+}
 
+class WhileStatement extends Statement {
+    Expression condition;
+    Block block;
+    protected WhileStatement(int line, Expression condition, Block block) {
+        super(line);
+        this.condition = condition;
+        this.block = block;
+    }
+
+    @Override
+    public void printNode() {
+        System.out.printf("\nwhile %s:\n", condition.getRep());
+        block.printNode();
+
+    }
+}
+
+class ForStatement extends Statement{
+    Block block;
+    Expression expression1,expression2;
+    VarDeclarator declarator;
+    protected ForStatement(int line,Expression e1, Expression e2, VarDeclarator dec, Block block) {
+        super(line);
+        this.block = block;
+    }
+
+    @Override
+    public void printNode() {
+        System.out.printf("\n for  %s, %s,\n", expression1.getRep(), expression2.getRep());
+        declarator.printNode();
+        System.out.print(":");
+        block.printNode();
     }
 }
 

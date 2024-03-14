@@ -1,6 +1,5 @@
 package compiler.Parser;
 
-import com.google.errorprone.annotations.Var;
 import compiler.Lexer.Lexer;
 import compiler.Lexer.Symbol;
 import compiler.Lexer.Token;
@@ -30,6 +29,96 @@ public class Parser {
         literals.add(Token.STRING_LITERAL);
         literals.add(Token.NATURAL_LITERAL);
     }
+    public Program program()  {
+        // Parse constants
+        ArrayList<ConstantVariable> constantVariables = new ArrayList<>();
+        ArrayList<Procedure> procedures = new ArrayList<>();
+        while(have(Token.FINAL)){
+            int line = nextSymbol.line();
+            Symbol type = type();
+            constantVariables.add(new ConstantVariable(line,type, parseVariable()));
+        }
+        // Parse procedures
+        while(have(Token.DEF)){
+            int line = nextSymbol.line();
+            Symbol type = type();
+            Symbol identifier = qualifiedIdentifier();
+            if(!have(Token.LPARAN)){
+                // problem
+            }
+            ArrayList<Parameter> params = parseParameters();
+            Block block = block();
+            ProcedureDeclarator dec = new ProcedureDeclarator(line,params,block);
+            procedures.add(new Procedure(line,dec,type, identifier));
+        }
+
+        if(have(Token.EOF)){
+            System.out.println("GET PARSED");
+        }
+
+        return new Program(lexer.getFileName(),constantVariables, procedures);
+    }
+    private Block block(){
+        boolean start = have(Token.LCURLY);
+        int blockLine = nextSymbol.line();
+        ArrayList<Statement> statements = new ArrayList<>();
+        while(!have(Token.RCURLY )&& start){
+            int line = nextSymbol.line();
+            if(have(Token.IF)){
+                have(Token.LPARAN);
+                Expression ifCondition = expression();
+                have(Token.RPARAN);
+                Block ifBlock = block();
+                if(have(Token.ELSE)){
+                    Block elseBlock = block();
+                    statements.add(new IfElseStatement(line,ifCondition,ifBlock,elseBlock));
+                    continue;
+                }
+                statements.add(new IfElseStatement(line,ifCondition,ifBlock,null));
+            }else if(have(Token.WHILE)){
+                have(Token.LPARAN);
+                Expression whileCondition = expression();
+                have(Token.RPARAN);
+                Block whileBlock = block();
+                statements.add(new WhileStatement(line,whileCondition,whileBlock));
+            }else if(have(Token.FOR)){
+                // TODO: for statement
+                // TODO: problem parsing uninitialized vars
+                /*
+                have(Token.LPARAN);
+                Expression e1 = expression();
+                have(Token.COMMA);
+                Expression e2 = expression();
+                have(Token.COMMA);
+                Symbol identifier = qualifiedIdentifier();
+                have(Token.ASSIGN);
+                Expression expression = expression();
+                have(Token.RPARAN);
+                VarDeclarator dec = new VarDeclarator(line, expression,identifier);
+
+                Block block = block();
+                statements.add(new ForStatement(line,e1,e2,dec,block));
+                * */
+
+            }else if(have(Token.RETURN)){
+
+            }else{
+                if(isType()){
+                    // local variable
+                    Symbol type = type();
+                    VarDeclarator declarator = parseVariable();
+                    statements.add(new LocalVariable(line,type, declarator));
+                }else{
+                    // assume variable from scope above
+                    VarDeclarator declarator = parseVariable();
+                    statements.add(new ScopeVariable(line, declarator));
+                }
+            }
+
+        }
+
+        return new Block(blockLine,statements);
+    }
     private ArrayList<Parameter> parseParameters(){
         ArrayList<Parameter> params = new ArrayList<>();
         boolean more = true;
@@ -45,7 +134,6 @@ public class Parser {
         return params;
     }
     private VarDeclarator parseVariable(){
-        Symbol type = type();
         int line = nextSymbol.line();
         Symbol identifier = qualifiedIdentifier();
         if(!have(Token.ASSIGN)){
@@ -56,66 +144,8 @@ public class Parser {
             // throw exception
         }
 
-        return new VarDeclarator(line,type,expression,identifier);
+        return new VarDeclarator(line,expression,identifier);
 
-    }
-    public Program program()  {
-        // Parse constants
-        ArrayList<ConstantVariable> constantVariables = new ArrayList<>();
-        ArrayList<Procedure> procedures = new ArrayList<>();
-        while(have(Token.FINAL)){
-            int line = nextSymbol.line();
-
-            constantVariables.add(new ConstantVariable(line,parseVariable()));
-        }
-        // Parse procedures
-        //System.out.println("before while");
-        while(have(Token.DEF)){
-            int line = nextSymbol.line();
-            Symbol type = type();
-            Symbol identifier = qualifiedIdentifier();
-            if(!have(Token.LPARAN)){
-                // problem
-            }
-            ArrayList<Parameter> params = parseParameters();
-            //System.out.println("after parse params");
-            Block block = block();
-            //System.out.println("after parse block");
-            ProcedureDeclarator dec = new ProcedureDeclarator(line,params,block);
-            //System.out.println("after parse procedure dec");
-            procedures.add(new Procedure(line,dec,type, identifier));
-        }
-        if(have(Token.EOF)){
-            System.out.println("GET PARSED");
-
-        }
-        //System.out.println("After while");
-
-        return new Program(lexer.getFileName(),constantVariables, procedures);
-    }
-    private Block block(){
-        boolean start = have(Token.LCURLY);
-        int blockLine = nextSymbol.line();
-        ArrayList<Statement> statements = new ArrayList<>();
-        while(!have(Token.RCURLY )&& start){
-            int line = nextSymbol.line();
-            if(check(Token.IF)){
-
-            }else if(check(Token.WHILE)){
-
-            }else if(check(Token.FOR)){
-
-            }else if(check(Token.RETURN)){
-
-            }else{
-                // local variable
-                VarDeclarator declarator = parseVariable();
-                statements.add(new LocalVariable(line,declarator));
-            }
-
-        }
-
-        return new Block(blockLine,statements);
     }
     private Expression expression(){
         return logicalExpression();
@@ -239,7 +269,7 @@ public class Parser {
         return match(Token.IDENTIFIER);
     }
     private Symbol type()  {
-        if(isBasicType()){
+        if(isType()){
             return match(nextSymbol.token());
         }else if(check(Token.IDENTIFIER)){
             return match(nextSymbol.token());
@@ -247,7 +277,8 @@ public class Parser {
             return null;
         }
     }
-    private Boolean isBasicType(){
+    private Boolean isType(){
+        // TODO: Add check for struct types defined before as well
         return basicTypes.contains(nextSymbol.token());
     }
 

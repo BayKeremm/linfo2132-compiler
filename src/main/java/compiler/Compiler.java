@@ -4,23 +4,16 @@
 package compiler;
 
 import compiler.Lexer.Lexer;
-import compiler.Lexer.Symbol;
-import compiler.Lexer.Token;
 import compiler.Parser.Parser;
-import compiler.Parser.ParserException;
 import compiler.Parser.Program;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.LineNumberReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
 public class Compiler {
-    public static void main(String[] args) throws Exception, ParserException {
+    public static void main(String[] args) throws Exception {
 
         LineNumberReader reader;
 
