@@ -30,23 +30,92 @@ public class Parser {
         literals.add(Token.STRING_LITERAL);
         literals.add(Token.NATURAL_LITERAL);
     }
+    private ArrayList<Parameter> parseParameters(){
+        ArrayList<Parameter> params = new ArrayList<>();
+        boolean more = true;
+        while(!have(Token.RPARAN) && more){
+            int line = nextSymbol.line();
+            Symbol type = type();
+            Expression e = expression();
+            params.add(new Parameter(line,type,e));
+            if(!have(Token.COMMA)){
+                more = false;
+            }
+        }
+        return params;
+    }
+    private VarDeclarator parseVariable(){
+        Symbol type = type();
+        int line = nextSymbol.line();
+        Symbol identifier = qualifiedIdentifier();
+        if(!have(Token.ASSIGN)){
+            // throw exception
+        }
+        Expression expression = expression();
+        if(!have(Token.SEMI_COLON)){
+            // throw exception
+        }
+
+        return new VarDeclarator(line,type,expression,identifier);
+
+    }
     public Program program()  {
+        // Parse constants
         ArrayList<ConstantVariable> constantVariables = new ArrayList<>();
+        ArrayList<Procedure> procedures = new ArrayList<>();
         while(have(Token.FINAL)){
+            int line = nextSymbol.line();
+
+            constantVariables.add(new ConstantVariable(line,parseVariable()));
+        }
+        // Parse procedures
+        //System.out.println("before while");
+        while(have(Token.DEF)){
             int line = nextSymbol.line();
             Symbol type = type();
             Symbol identifier = qualifiedIdentifier();
-            if(!have(Token.ASSIGN)){
-                // throw exception
+            if(!have(Token.LPARAN)){
+                // problem
             }
-            Expression expression = expression();
-            if(!have(Token.SEMI_COLON)){
-                // throw exception
+            ArrayList<Parameter> params = parseParameters();
+            //System.out.println("after parse params");
+            Block block = block();
+            //System.out.println("after parse block");
+            ProcedureDeclarator dec = new ProcedureDeclarator(line,params,block);
+            //System.out.println("after parse procedure dec");
+            procedures.add(new Procedure(line,dec,type, identifier));
+        }
+        if(have(Token.EOF)){
+            System.out.println("GET PARSED");
+
+        }
+        //System.out.println("After while");
+
+        return new Program(lexer.getFileName(),constantVariables, procedures);
+    }
+    private Block block(){
+        boolean start = have(Token.LCURLY);
+        int blockLine = nextSymbol.line();
+        ArrayList<Statement> statements = new ArrayList<>();
+        while(!have(Token.RCURLY )&& start){
+            int line = nextSymbol.line();
+            if(check(Token.IF)){
+
+            }else if(check(Token.WHILE)){
+
+            }else if(check(Token.FOR)){
+
+            }else if(check(Token.RETURN)){
+
+            }else{
+                // local variable
+                VarDeclarator declarator = parseVariable();
+                statements.add(new LocalVariable(line,declarator));
             }
-            constantVariables.add(new ConstantVariable(line,type,identifier,expression));
+
         }
 
-        return new Program(0,constantVariables,lexer.getFileName());
+        return new Block(blockLine,statements);
     }
     private Expression expression(){
         return logicalExpression();
@@ -172,8 +241,11 @@ public class Parser {
     private Symbol type()  {
         if(isBasicType()){
             return match(nextSymbol.token());
+        }else if(check(Token.IDENTIFIER)){
+            return match(nextSymbol.token());
+        }else{
+            return null;
         }
-        return null;
     }
     private Boolean isBasicType(){
         return basicTypes.contains(nextSymbol.token());

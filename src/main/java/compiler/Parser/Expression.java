@@ -17,7 +17,6 @@ abstract class Expression extends Statement{
         super(line);
     }
 
-    public abstract void printExpression();
     public abstract String getRep();
 
 }
@@ -30,7 +29,7 @@ abstract  class LogicalExpression extends Expression{
         super( line,  lhs,  rhs,  operator);
     }
     @Override
-    public void printExpression() {
+    public void printNode() {
         System.out.printf("%s%s%s", lhs.getRep(), operator, rhs.getRep());
     }
 
@@ -44,12 +43,20 @@ class LogicalAnd extends LogicalExpression{
         super(line, lhs, rhs, "&&");
     }
 
+    @Override
+    public void printNode() {
+
+    }
 }
 class LogicalOr extends LogicalExpression{
     public LogicalOr(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "||");
     }
 
+    @Override
+    public void printNode() {
+
+    }
 }
 /*--------------------------------------------------------------------------------------------------------------------*/
 /** EQUALITY EXPRESSION:
@@ -61,7 +68,7 @@ abstract class EqualityExpression extends Expression{
         super( line,  lhs,  rhs,  operator);
     }
     @Override
-    public void printExpression() {
+    public void printNode() {
         System.out.printf("%s%s%s", lhs.getRep(), operator, rhs.getRep());
     }
 
@@ -93,7 +100,7 @@ abstract class ComparisionExpression extends Expression {
         super( line,  lhs,  rhs,  operator);
     }
     @Override
-    public void printExpression() {
+    public void printNode() {
         System.out.printf("%s%s%s", lhs.getRep(), operator, rhs.getRep());
     }
 
@@ -135,7 +142,7 @@ abstract class TermExpression extends Expression{
         super( line,  lhs,  rhs,  operator);
     }
     @Override
-    public void printExpression() {
+    public void printNode() {
         System.out.printf("%s%s%s", lhs.getRep(), operator, rhs.getRep());
     }
 
@@ -165,7 +172,7 @@ abstract class UnaryExpression extends Expression{
         super( line,  lhs,  rhs,  operator);
     }
     @Override
-    public void printExpression() {
+    public void printNode() {
         System.out.printf("%s%s%s", lhs.getRep(), operator, rhs.getRep());
     }
 
@@ -196,7 +203,7 @@ abstract class FactorExpression extends Expression{
     }
 
     @Override
-    public void printExpression() { System.out.printf("%s%s%s", lhs.getRep(), operator, rhs.getRep());
+    public void printNode() { System.out.printf("%s%s%s", lhs.getRep(), operator, rhs.getRep());
     }@Override
     public String getRep() {
         return lhs.getRep() + operator + rhs.getRep();
@@ -220,31 +227,6 @@ class ModuloOperation extends FactorExpression{
 }
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-class VarDeclarator extends Expression{
-    boolean isInitialized;
-    Expression definition;
-    public VarDeclarator(int line, boolean isInitialized, Expression definition) {
-        super(line);
-        this.isInitialized=isInitialized;
-        this.definition = definition;
-    }
-    public VarDeclarator(int line){
-        super(line);
-        this.isInitialized=false;
-        this.definition = null;
-    }
-
-    @Override
-    public void printExpression() {
-        System.out.printf("Declarator: %s",definition.getRep());
-    }
-
-    @Override
-    public String getRep() {
-        return definition.getRep();
-    }
-}
-
 class VarExpression extends Expression{
     Symbol id;
     public VarExpression(int line, Symbol id) {
@@ -253,7 +235,7 @@ class VarExpression extends Expression{
     }
 
     @Override
-    public void printExpression() {
+    public void printNode() {
         System.out.printf("VarExpression: %s",id.image());
     }
 

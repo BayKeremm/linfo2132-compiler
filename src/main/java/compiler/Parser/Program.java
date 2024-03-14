@@ -8,17 +8,23 @@ import java.util.ArrayList;
 public class Program extends ASTNode{
     private String fileName;
     private ArrayList<ConstantVariable> constantVariables;
+    private ArrayList<Procedure> procedures;
 
-    protected Program(int line, ArrayList<ConstantVariable> constantVariables, String fileName) {
-        super(line);
+    protected Program(String fileName, ArrayList<ConstantVariable> constantVariables,ArrayList<Procedure> procedures) {
         this.fileName = fileName;
         this.constantVariables = constantVariables;
+        this.procedures = procedures;
         program = this;
     }
-
-    public void printProgram(){
+    @Override
+    public void printNode() {
         for(ConstantVariable c : constantVariables){
             c.printNode();
         }
+        for(Procedure p : procedures){
+            p.printNode();
+        }
+
     }
+
 }

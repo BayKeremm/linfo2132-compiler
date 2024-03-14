@@ -42,31 +42,23 @@ public class Compiler {
         lexer.setFileName(fileName);
 
         Parser parser = new Parser(lexer);
-
-        /*
-        Symbol s = parser.match(Token.FINAL);
-        s = parser.match(Token.INTEGER);
-        s = parser.match(Token.IDENTIFIER);
-        s = parser.match(Token.ASSIGN);
-        s = parser.match(Token.NATURAL_LITERAL);
-        s = parser.match(Token.SEMI_COLON);
-         */
         Program p = parser.program();
-        p.printProgram();
+        p.printNode();
 
-//        lexer.advanceLexer();
-//        Symbol s = lexer.nextSymbol();
-//        while(!(s.image().isEmpty())){
-//            if(debug){
-//                System.out.println(s.symbolRep());
-//            }
-//            lexer.advanceLexer();
-//            s = lexer.nextSymbol();
-//        }
-//        try{
-//            lexer.finish();
-//        }catch (Exception e){
-//            System.err.println("Error finishing the lexer");
-//        }
+
+        //lexer.advanceLexer();
+        //Symbol s = lexer.nextSymbol();
+        //while(!(s.image().isEmpty())){
+        //    if(debug){
+        //        System.out.println(s.symbolRep());
+        //    }
+        //    lexer.advanceLexer();
+        //    s = lexer.nextSymbol();
+        //}
+        //try{
+        //    lexer.finish();
+        //}catch (Exception e){
+        //    System.err.println("Error finishing the lexer");
+        //}
     }
 }

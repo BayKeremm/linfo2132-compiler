@@ -25,7 +25,7 @@ class FunctionCallExpression extends PrimaryExpression{
     }
 
     @Override
-    public void printExpression() {
+    public void printNode() {
         String string = "";
         for(Expression e : expressionParams){
             string = string.concat(e.getRep());
@@ -41,6 +41,7 @@ class FunctionCallExpression extends PrimaryExpression{
         }
         return string;
     }
+
 }
 
 class LiteralExpression extends PrimaryExpression{
@@ -51,7 +52,7 @@ class LiteralExpression extends PrimaryExpression{
     }
 
     @Override
-    public void printExpression() {
+    public void printNode() {
         System.out.printf("%s",literal.image());
     }
 
@@ -68,7 +69,7 @@ class ParanExpression extends PrimaryExpression{
     }
 
     @Override
-    public void printExpression() {
+    public void printNode() {
         String string = "(";
         for(Expression e : expressions){
             string = string.concat(e.getRep());
