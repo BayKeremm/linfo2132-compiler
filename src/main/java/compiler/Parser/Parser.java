@@ -1,5 +1,6 @@
 package compiler.Parser;
 
+import com.google.errorprone.annotations.Var;
 import compiler.Lexer.Lexer;
 import compiler.Lexer.Symbol;
 import compiler.Lexer.Token;
@@ -29,7 +30,7 @@ public class Parser {
         literals.add(Token.STRING_LITERAL);
         literals.add(Token.NATURAL_LITERAL);
     }
-    public Program program() throws ParserException, Exception {
+    public Program program()  {
         ArrayList<ConstantVariable> constantVariables = new ArrayList<>();
         while(have(Token.FINAL)){
             int line = nextSymbol.line();
@@ -126,9 +127,14 @@ public class Parser {
         }
     }
     private ArrayList<Expression> parseExpressions(){
+        // TODO: CHECK A BIT SHADY
         ArrayList<Expression> expressions = new ArrayList<>();
-        while(!have(Token.RPARAN)){
+        boolean more = true;
+        while(!have(Token.RPARAN) && more ){
             expressions.add(expression());
+            if(!have(Token.COMMA)){
+                more = false;
+            }
         }
         return expressions;
     }
@@ -138,13 +144,10 @@ public class Parser {
             return new ParanExpression(line,parseExpressions());
         }else if(check(Token.IDENTIFIER)){
             Symbol id = qualifiedIdentifier();
-            ArrayList<Expression> expressions;
             if(have(Token.LPARAN)){
-                expressions = parseExpressions();
-                return new FunctionCallExpression(line,id,expressions);
+                return new FunctionCallExpression(line,id,parseExpressions());
             }else{
-                // TODO: RETURN VARIABLE
-                return null;
+                return new VarExpression(line,id);
             }
         }else{
             Symbol lit =  literal();

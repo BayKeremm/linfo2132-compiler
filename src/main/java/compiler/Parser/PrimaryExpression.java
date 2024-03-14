@@ -23,6 +23,24 @@ class FunctionCallExpression extends PrimaryExpression{
         this.identifier= identifier;
         this.expressionParams = expressionParams;
     }
+
+    @Override
+    public void printExpression() {
+        String string = "";
+        for(Expression e : expressionParams){
+            string = string.concat(e.getRep());
+        }
+        System.out.println(string);
+    }
+
+    @Override
+    public String getRep() {
+        String string = "";
+        for(Expression e : expressionParams){
+            string = string.concat(e.getRep());
+        }
+        return string;
+    }
 }
 
 class LiteralExpression extends PrimaryExpression{
@@ -31,11 +49,31 @@ class LiteralExpression extends PrimaryExpression{
         super(line);
         this.literal = literal;
     }
+
+    @Override
+    public void printExpression() {
+        System.out.printf("%s",literal.image());
+    }
+
+    @Override
+    public String getRep() {
+        return literal.image();
+    }
 }
 class ParanExpression extends PrimaryExpression{
     ArrayList<Expression> expressions;
     public ParanExpression(int line, ArrayList<Expression> expressions) {
         super(line);
         this.expressions = expressions;
+    }
+
+    @Override
+    public void printExpression() {
+
+    }
+
+    @Override
+    public String getRep() {
+        return null;
     }
 }

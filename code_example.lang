@@ -1,7 +1,7 @@
 
-final int i = 3;
-final float j = 3.2*5.0;
-//final k int = i*3;
+final int i = 2*2+4;
+//final float j = 3.2*5.0;
+//final int k = i*3;
 //final string message = "Hello";
 //final bool isEmpty = true;
 

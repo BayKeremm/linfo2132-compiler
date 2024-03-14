@@ -1,6 +1,8 @@
 package compiler.Parser;
 
-abstract class Expression extends ASTNode{
+import compiler.Lexer.Symbol;
+
+abstract class Expression extends Statement{
     Expression lhs;
     Expression rhs;
     String operator;
@@ -15,9 +17,8 @@ abstract class Expression extends ASTNode{
         super(line);
     }
 
-    public void printExpression(){
-        System.out.println("Hello from expression:");
-    }
+    public abstract void printExpression();
+    public abstract String getRep();
 
 }
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -28,16 +29,27 @@ abstract  class LogicalExpression extends Expression{
     public LogicalExpression(int line, Expression lhs, Expression rhs, String operator) {
         super( line,  lhs,  rhs,  operator);
     }
+    @Override
+    public void printExpression() {
+        System.out.printf("%s%s%s", lhs.getRep(), operator, rhs.getRep());
+    }
+
+    @Override
+    public String getRep() {
+        return lhs.getRep() + operator + rhs.getRep();
+    }
 }
 class LogicalAnd extends LogicalExpression{
     public LogicalAnd(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "&&");
     }
+
 }
 class LogicalOr extends LogicalExpression{
     public LogicalOr(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "||");
     }
+
 }
 /*--------------------------------------------------------------------------------------------------------------------*/
 /** EQUALITY EXPRESSION:
@@ -48,18 +60,29 @@ abstract class EqualityExpression extends Expression{
     public EqualityExpression(int line, Expression lhs, Expression rhs, String operator) {
         super( line,  lhs,  rhs,  operator);
     }
+    @Override
+    public void printExpression() {
+        System.out.printf("%s%s%s", lhs.getRep(), operator, rhs.getRep());
+    }
+
+    @Override
+    public String getRep() {
+        return lhs.getRep() + operator + rhs.getRep();
+    }
 }
 class NotEqualComparison extends EqualityExpression{
 
     public NotEqualComparison(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "!=");
     }
+
 }
 class EqualComparison extends EqualityExpression{
 
     public EqualComparison(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "==");
     }
+
 }
 /*--------------------------------------------------------------------------------------------------------------------*/
 /** COMPARISON EXPRESSION:
@@ -69,26 +92,39 @@ abstract class ComparisionExpression extends Expression {
     public ComparisionExpression(int line, Expression lhs, Expression rhs, String operator) {
         super( line,  lhs,  rhs,  operator);
     }
+    @Override
+    public void printExpression() {
+        System.out.printf("%s%s%s", lhs.getRep(), operator, rhs.getRep());
+    }
+
+    @Override
+    public String getRep() {
+        return lhs.getRep() + operator + rhs.getRep();
+    }
 }
 class LTComparison extends ComparisionExpression{
     public LTComparison(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "<");
     }
+
 }
 class GTComparison extends ComparisionExpression{
     public GTComparison(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, ">");
     }
+
 }
 class LEComparison extends ComparisionExpression{
     public LEComparison(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "<=");
     }
+
 }
 class GEComparison extends ComparisionExpression{
     public GEComparison(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, ">=");
     }
+
 }
 /*--------------------------------------------------------------------------------------------------------------------*/
 /** TERM EXPRESSION:
@@ -98,16 +134,27 @@ abstract class TermExpression extends Expression{
     public TermExpression(int line, Expression lhs, Expression rhs, String operator) {
         super( line,  lhs,  rhs,  operator);
     }
+    @Override
+    public void printExpression() {
+        System.out.printf("%s%s%s", lhs.getRep(), operator, rhs.getRep());
+    }
+
+    @Override
+    public String getRep() {
+        return lhs.getRep() + operator + rhs.getRep();
+    }
 }
 class MinusOperation extends TermExpression{
     public MinusOperation(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "-");
     }
+
 }
 class PlusOperation extends TermExpression{
     public PlusOperation(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "+");
     }
+
 }
 /*--------------------------------------------------------------------------------------------------------------------*/
 /** UNARY EXPRESSION:
@@ -117,16 +164,27 @@ abstract class UnaryExpression extends Expression{
     public UnaryExpression(int line, Expression lhs, Expression rhs, String operator) {
         super( line,  lhs,  rhs,  operator);
     }
+    @Override
+    public void printExpression() {
+        System.out.printf("%s%s%s", lhs.getRep(), operator, rhs.getRep());
+    }
+
+    @Override
+    public String getRep() {
+        return lhs.getRep() + operator + rhs.getRep();
+    }
 }
 class UnaryNegateOperation extends UnaryExpression{
     public UnaryNegateOperation(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "!");
     }
+
 }
 class UnaryMinusOperation extends UnaryExpression{
     public UnaryMinusOperation(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "-");
     }
+
 }
 /*--------------------------------------------------------------------------------------------------------------------*/
 /** FACTOR EXPRESSION:
@@ -135,6 +193,13 @@ class UnaryMinusOperation extends UnaryExpression{
 abstract class FactorExpression extends Expression{
     public FactorExpression(int line, Expression lhs, Expression rhs, String operator) {
         super( line,  lhs,  rhs,  operator);
+    }
+
+    @Override
+    public void printExpression() { System.out.printf("%s%s%s", lhs.getRep(), operator, rhs.getRep());
+    }@Override
+    public String getRep() {
+        return lhs.getRep() + operator + rhs.getRep();
     }
 }
 class MultiplyOperation extends FactorExpression{
@@ -155,6 +220,46 @@ class ModuloOperation extends FactorExpression{
 }
 /*--------------------------------------------------------------------------------------------------------------------*/
 
+class VarDeclarator extends Expression{
+    boolean isInitialized;
+    Expression definition;
+    public VarDeclarator(int line, boolean isInitialized, Expression definition) {
+        super(line);
+        this.isInitialized=isInitialized;
+        this.definition = definition;
+    }
+    public VarDeclarator(int line){
+        super(line);
+        this.isInitialized=false;
+        this.definition = null;
+    }
 
+    @Override
+    public void printExpression() {
+        System.out.printf("Declarator: %s",definition.getRep());
+    }
 
+    @Override
+    public String getRep() {
+        return definition.getRep();
+    }
+}
+
+class VarExpression extends Expression{
+    Symbol id;
+    public VarExpression(int line, Symbol id) {
+        super(line);
+        this.id = id;
+    }
+
+    @Override
+    public void printExpression() {
+        System.out.printf("VarExpression: %s",id.image());
+    }
+
+    @Override
+    public String getRep() {
+        return id.image();
+    }
+}
 

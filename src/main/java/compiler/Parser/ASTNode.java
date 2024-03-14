@@ -12,7 +12,7 @@ abstract class ASTNode {
     public int line(){return this.line;}
 
     public void printNode(){
-        System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAA");
+
     }
 
 }
