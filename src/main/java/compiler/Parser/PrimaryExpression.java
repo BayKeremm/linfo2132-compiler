@@ -69,11 +69,19 @@ class ParanExpression extends PrimaryExpression{
 
     @Override
     public void printExpression() {
-
+        String string = "";
+        for(Expression e : expressions){
+            string = string.concat(e.getRep());
+        }
+        System.out.println(string);
     }
 
     @Override
     public String getRep() {
-        return null;
+        String string = "(";
+        for(Expression e : expressions){
+            string = string.concat(e.getRep());
+        }
+        return string + ")";
     }
 }
