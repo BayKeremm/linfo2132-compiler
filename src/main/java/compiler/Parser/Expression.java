@@ -103,7 +103,7 @@ abstract class ComparisionExpression extends Expression {
     }
     @Override
     public void printNode() {
-        System.out.printf("%s%s%s", lhs.getRep(), operator, rhs.getRep());
+        System.out.printf("\nComparison Expression:\n \t - Expression: %s%s%s", lhs.getRep(), operator, rhs.getRep());
     }
 
     @Override

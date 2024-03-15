@@ -1,6 +1,9 @@
 
 def int square(int v) {
-    int i = 3;
+    int i;
+    for(i=0, i<5, i=i+1){
+        int loc = 1;
+    }
 }
 
 

@@ -4,6 +4,7 @@ package compiler.Parser;
 import com.google.errorprone.annotations.Var;
 import compiler.Lexer.Symbol;
 
+import javax.swing.plaf.nimbus.State;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
@@ -125,18 +126,22 @@ class WhileStatement extends Statement {
 
 class ForStatement extends Statement{
     Block block;
-    Expression expression1,expression2;
-    VarDeclarator declarator;
-    protected ForStatement(int line,Expression e1, Expression e2, VarDeclarator dec, Block block) {
+    Statement pos0,pos2;
+    Expression pos1;
+    protected ForStatement(int line, Statement pos0,  Expression pos1, Statement pos2, Block block) {
         super(line);
         this.block = block;
+        this.pos0 = pos0;
+        this.pos1 = pos1;
+        this.pos2 = pos2;
     }
 
     @Override
     public void printNode() {
-        System.out.printf("\n for  %s, %s,\n", expression1.getRep(), expression2.getRep());
-        declarator.printNode();
-        System.out.print(":");
+        System.out.print("For statement: ");
+        pos0.printNode();
+        pos1.printNode();
+        pos2.printNode();
         block.printNode();
     }
 }

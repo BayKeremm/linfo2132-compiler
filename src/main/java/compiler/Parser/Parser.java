@@ -29,6 +29,13 @@ public class Parser {
         literals.add(Token.STRING_LITERAL);
         literals.add(Token.NATURAL_LITERAL);
     }
+    private VarDeclarator declarator(){
+        int line = nextSymbol.line();
+        Expression expression = expression();
+        have(Token.SEMI_COLON);
+        return new VarDeclarator(line,expression);
+
+    }
     public Program program()  {
         // Parse constants
         ArrayList<ConstantVariable> constantVariables = new ArrayList<>();
@@ -36,7 +43,8 @@ public class Parser {
         while(have(Token.FINAL)){
             int line = nextSymbol.line();
             Symbol type = type();
-            constantVariables.add(new ConstantVariable(line,type, parseVariable()));
+            Symbol identifier = qualifiedIdentifier();
+            constantVariables.add(new ConstantVariable(line,type,identifier, declarator()));
         }
         // Parse procedures
         while(have(Token.DEF)){
@@ -82,37 +90,18 @@ public class Parser {
                 Block whileBlock = block();
                 statements.add(new WhileStatement(line,whileCondition,whileBlock));
             }else if(have(Token.FOR)){
-                // TODO: for statement
-                // TODO: problem parsing uninitialized vars
-                /*
                 have(Token.LPARAN);
-                Expression e1 = expression();
+                Statement p0 = statement();
                 have(Token.COMMA);
-                Expression e2 = expression();
+                Expression p1 = expression();
                 have(Token.COMMA);
-                Symbol identifier = qualifiedIdentifier();
-                have(Token.ASSIGN);
-                Expression expression = expression();
+                Statement p2 = statement();
                 have(Token.RPARAN);
-                VarDeclarator dec = new VarDeclarator(line, expression,identifier);
-
-                Block block = block();
-                statements.add(new ForStatement(line,e1,e2,dec,block));
-                * */
-
+                statements.add(new ForStatement(line,p0,p1,p2,block()));
             }else if(have(Token.RETURN)){
 
             }else{
-                if(isType()){
-                    // local variable
-                    Symbol type = type();
-                    VarDeclarator declarator = parseVariable();
-                    statements.add(new LocalVariable(line,type, declarator));
-                }else{
-                    // assume variable from scope above
-                    VarDeclarator declarator = parseVariable();
-                    statements.add(new ScopeVariable(line, declarator));
-                }
+                statements.add(statement());
             }
 
         }
@@ -133,19 +122,29 @@ public class Parser {
         }
         return params;
     }
-    private VarDeclarator parseVariable(){
+    private Statement statement(){
+        return assignmentStatement();
+    }
+    private Statement assignmentStatement(){
         int line = nextSymbol.line();
-        Symbol identifier = qualifiedIdentifier();
-        if(!have(Token.ASSIGN)){
-            // throw exception
+        if(isType()){
+            Symbol type = type();
+            Symbol lhs = qualifiedIdentifier();
+            if(have(Token.ASSIGN)){
+                VarDeclarator declarator = declarator();
+                return new LocalVariable(line,type,lhs,declarator);
+            }
+            have(Token.SEMI_COLON);
+            return new UninitVariable(line,type,lhs);
+        }else{
+            Symbol lhs = qualifiedIdentifier();
+            if(have(Token.ASSIGN)){
+                VarDeclarator declarator = declarator();
+                return new ScopeVariable(line,lhs,declarator);
+            }
+            have(Token.SEMI_COLON);
+            return new VarExpression(line,lhs);
         }
-        Expression expression = expression();
-        if(!have(Token.SEMI_COLON)){
-            // throw exception
-        }
-
-        return new VarDeclarator(line,expression,identifier);
-
     }
     private Expression expression(){
         return logicalExpression();
