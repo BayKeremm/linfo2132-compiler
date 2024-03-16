@@ -1,9 +1,17 @@
-
-def int square(int v) {
+def void main() {
+    int value = readInt();
+    writeln(square(value));
     int i;
-    for(i=0, i<5, i=i+1){
-        int loc = 1;
+    for (i=1, i<100, i = i+1) {
+        while (value!=3) {
+            if (i > 10){
+                // ....
+            } else {
+                // ....
+            }
+        }
     }
+    i = (i+2)*2;
 }
 
 
@@ -14,6 +22,14 @@ def int square(int v) {
 //final int k = (i+2)*3;
 //final string message = "Hello";
 //final bool isEmpty = true;
+
+//def int square(int x, int y, int x ) {
+//    int x = 4*(4+2);
+//    int i;
+//    while(i < 3){
+//        i = i + 1;
+//    }
+//}
 
 //struct Point {
 //    int x;

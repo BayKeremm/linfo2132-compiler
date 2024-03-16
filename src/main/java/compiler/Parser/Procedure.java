@@ -146,3 +146,20 @@ class ForStatement extends Statement{
     }
 }
 
+class ReturnStatement extends Statement {
+    Expression expression;
+
+    protected ReturnStatement(int line, Expression expression) {
+        super(line);
+        this.expression = expression;
+    }
+
+    @Override
+    public void printNode() {
+        System.out.print("\n\tReturn: ");
+        expression.printNode();
+
+
+    }
+}
+

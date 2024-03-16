@@ -32,7 +32,7 @@ abstract  class LogicalExpression extends Expression{
     }
     @Override
     public void printNode() {
-        System.out.printf("%s%s%s", lhs.getRep(), operator, rhs.getRep());
+        System.out.printf("\t rhs: %s%s%s", lhs.getRep(), operator, rhs.getRep());
     }
 
     @Override
@@ -71,7 +71,7 @@ abstract class EqualityExpression extends Expression{
     }
     @Override
     public void printNode() {
-        System.out.printf("%s%s%s", lhs.getRep(), operator, rhs.getRep());
+        System.out.printf(" \t rhs: %s%s%s", lhs.getRep(), operator, rhs.getRep());
     }
 
     @Override
@@ -103,7 +103,7 @@ abstract class ComparisionExpression extends Expression {
     }
     @Override
     public void printNode() {
-        System.out.printf("\nComparison Expression:\n \t - Expression: %s%s%s", lhs.getRep(), operator, rhs.getRep());
+        System.out.printf("\t rhs: %s%s%s", lhs.getRep(), operator, rhs.getRep());
     }
 
     @Override
@@ -145,7 +145,7 @@ abstract class TermExpression extends Expression{
     }
     @Override
     public void printNode() {
-        System.out.printf("%s%s%s", lhs.getRep(), operator, rhs.getRep());
+        System.out.printf("\t rhs: %s%s%s", lhs.getRep(), operator, rhs.getRep());
     }
 
     @Override
@@ -175,7 +175,7 @@ abstract class UnaryExpression extends Expression{
     }
     @Override
     public void printNode() {
-        System.out.printf("%s%s%s", lhs.getRep(), operator, rhs.getRep());
+        System.out.printf("\t rhs: %s%s%s", lhs.getRep(), operator, rhs.getRep());
     }
 
     @Override
@@ -205,7 +205,7 @@ abstract class FactorExpression extends Expression{
     }
 
     @Override
-    public void printNode() { System.out.printf("%s%s%s", lhs.getRep(), operator, rhs.getRep());
+    public void printNode() { System.out.printf("\t rhs: %s%s%s", lhs.getRep(), operator, rhs.getRep());
     }@Override
     public String getRep() {
         return lhs.getRep() + operator + rhs.getRep();
@@ -250,11 +250,14 @@ class FunctionCallExpression extends PrimaryExpression{
 
     @Override
     public void printNode() {
+        System.out.printf("\nFunction call: %s(", identifier.image());
         String string = "";
         for(Expression e : expressionParams){
             string = string.concat(e.getRep());
+            string = string.concat(" ");
         }
-        System.out.println(string);
+        string = string.concat(")");
+        System.out.print(string);
     }
 
     @Override
@@ -277,7 +280,7 @@ class LiteralExpression extends PrimaryExpression{
 
     @Override
     public void printNode() {
-        System.out.printf("%s",literal.image());
+        System.out.printf("\t rhs: %s",literal.image());
     }
 
     @Override
@@ -312,16 +315,16 @@ class ParanExpression extends PrimaryExpression{
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
-class VarExpression extends Expression{
+class IdentifierExpression extends Expression{
     Symbol id;
-    public VarExpression(int line, Symbol id) {
+    public IdentifierExpression(int line, Symbol id) {
         super(line);
         this.id = id;
     }
 
     @Override
     public void printNode() {
-        System.out.printf("VarExpression: %s",id.image());
+        System.out.printf("%s\n",id.image());
     }
 
     @Override

@@ -9,24 +9,11 @@ abstract class Statement extends ASTNode {
     }
 
 }
-class VarDeclarator extends Statement{
-    Expression expression;
-    protected VarDeclarator(int line, Expression expression) {
-        super(line);
-        this.expression = expression;
-    }
-
-    @Override
-    public void printNode() {
-        System.out.print("    - Expression: ");
-        expression.printNode();
-    }
-}
 class LocalVariable extends Statement {
     Symbol type;
-    Symbol identifier;
-    VarDeclarator declarator;
-    public LocalVariable(int line, Symbol type, Symbol identifier,  VarDeclarator declarator) {
+    Expression identifier;
+    Expression declarator;
+    public LocalVariable(int line, Symbol type, Expression identifier,  Expression declarator) {
         super(line);
         this.declarator = declarator;
         this.type = type;
@@ -37,16 +24,17 @@ class LocalVariable extends Statement {
     public void printNode() {
         System.out.println("\nLocal variable:");
         System.out.printf("    - type: %s \n", type.image());
-        System.out.printf("    - identifier: %s \n", identifier.image());
+        System.out.print("    - identifier:");
+        identifier.printNode();
         declarator.printNode();
 
     }
 }
 class ConstantVariable extends Statement {
     Symbol type;
-    Symbol identifier;
-    VarDeclarator declarator;
-    public ConstantVariable(int line, Symbol type, Symbol identifier, VarDeclarator declarator) {
+    Expression identifier;
+    Expression declarator;
+    public ConstantVariable(int line, Symbol type, Expression identifier, Expression declarator) {
         super(line);
         this.declarator = declarator;
         this.type = type;
@@ -57,15 +45,16 @@ class ConstantVariable extends Statement {
     public void printNode() {
         System.out.println("\nConstant variable:");
         System.out.printf("    - type: %s \n", type.image());
-        System.out.printf("    - identifier: %s \n", identifier.image());
+        System.out.print("    - identifier:");
+        identifier.printNode();
         declarator.printNode();
 
     }
 }
 class ScopeVariable extends Statement {
-    VarDeclarator declarator;
-    Symbol identifier;
-    public ScopeVariable(int line, Symbol identifier, VarDeclarator declarator) {
+    Expression identifier;
+    Expression declarator;
+    public ScopeVariable(int line, Expression identifier, Expression declarator) {
         super(line);
         this.declarator = declarator;
         this.identifier = identifier;
@@ -74,15 +63,16 @@ class ScopeVariable extends Statement {
     @Override
     public void printNode() {
         System.out.println("\nScope variable:");
-        System.out.printf("    - identifier: %s \n", identifier.image());
+        System.out.print("    - identifier:");
+        identifier.printNode();
         declarator.printNode();
 
     }
 }
 class UninitVariable extends Statement {
     Symbol type;
-    Symbol identifier;
-    public UninitVariable(int line, Symbol type,Symbol identifier) {
+    Expression identifier;
+    public UninitVariable(int line, Symbol type,Expression identifier) {
         super(line);
         this.type = type;
         this.identifier = identifier;
@@ -92,7 +82,8 @@ class UninitVariable extends Statement {
     public void printNode() {
         System.out.println("\n Uninit variable:");
         System.out.printf("    - type: %s \n", type.image());
-        System.out.printf("    - identifier: %s \n", identifier.image());
+        System.out.print("    - identifier:");
+        identifier.printNode();
     }
 }
 

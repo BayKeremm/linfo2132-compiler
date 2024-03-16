@@ -29,6 +29,7 @@ public class Parser {
         literals.add(Token.STRING_LITERAL);
         literals.add(Token.NATURAL_LITERAL);
     }
+    /*
     private VarDeclarator declarator(){
         int line = nextSymbol.line();
         Expression expression = expression();
@@ -36,6 +37,8 @@ public class Parser {
         return new VarDeclarator(line,expression);
 
     }
+
+     */
     public Program program()  {
         // Parse constants
         ArrayList<ConstantVariable> constantVariables = new ArrayList<>();
@@ -43,8 +46,11 @@ public class Parser {
         while(have(Token.FINAL)){
             int line = nextSymbol.line();
             Symbol type = type();
-            Symbol identifier = qualifiedIdentifier();
-            constantVariables.add(new ConstantVariable(line,type,identifier, declarator()));
+            Expression identifier = expression();
+            have(Token.ASSIGN);
+            Expression declarator = expression();
+            have(Token.SEMI_COLON);
+            constantVariables.add(new ConstantVariable(line,type,identifier, declarator));
         }
         // Parse procedures
         while(have(Token.DEF)){
@@ -61,7 +67,7 @@ public class Parser {
         }
 
         if(have(Token.EOF)){
-            System.out.println("GET PARSED");
+            System.out.println("That's rough buddy");
         }
 
         return new Program(lexer.getFileName(),constantVariables, procedures);
@@ -99,7 +105,9 @@ public class Parser {
                 have(Token.RPARAN);
                 statements.add(new ForStatement(line,p0,p1,p2,block()));
             }else if(have(Token.RETURN)){
-
+                Expression exp = expression();
+                statements.add(new ReturnStatement(line,exp));
+                have(Token.SEMI_COLON);
             }else{
                 statements.add(statement());
             }
@@ -129,21 +137,23 @@ public class Parser {
         int line = nextSymbol.line();
         if(isType()){
             Symbol type = type();
-            Symbol lhs = qualifiedIdentifier();
+            Expression idExpression = expression();
             if(have(Token.ASSIGN)){
-                VarDeclarator declarator = declarator();
-                return new LocalVariable(line,type,lhs,declarator);
+                Expression declarator = expression();
+                have(Token.SEMI_COLON);
+                return new LocalVariable(line,type,idExpression,declarator);
             }
             have(Token.SEMI_COLON);
-            return new UninitVariable(line,type,lhs);
+            return new UninitVariable(line,type,idExpression);
         }else{
-            Symbol lhs = qualifiedIdentifier();
+            Expression expression = expression();
             if(have(Token.ASSIGN)){
-                VarDeclarator declarator = declarator();
-                return new ScopeVariable(line,lhs,declarator);
+                Expression declarator = expression();
+                have(Token.SEMI_COLON);
+                return new ScopeVariable(line,expression,declarator);
             }
             have(Token.SEMI_COLON);
-            return new VarExpression(line,lhs);
+            return expression;
         }
     }
     private Expression expression(){
@@ -224,18 +234,6 @@ public class Parser {
             return lhs;
         }
     }
-    private ArrayList<Expression> parseExpressions(){
-        // TODO: CHECK A BIT SHADY
-        ArrayList<Expression> expressions = new ArrayList<>();
-        boolean more = true;
-        while(!have(Token.RPARAN) && more ){
-            expressions.add(expression());
-            if(!have(Token.COMMA)){
-                more = false;
-            }
-        }
-        return expressions;
-    }
     private Expression primary(){
         int line = nextSymbol.line();
         if(have(Token.LPARAN)){
@@ -245,7 +243,7 @@ public class Parser {
             if(have(Token.LPARAN)){
                 return new FunctionCallExpression(line,id,parseExpressions());
             }else{
-                return new VarExpression(line,id);
+                return new IdentifierExpression(line,id);
             }
         }else{
             Symbol lit =  literal();
@@ -262,7 +260,18 @@ public class Parser {
         }
         return null;
     }
-
+    private ArrayList<Expression> parseExpressions(){
+        // TODO: CHECK A BIT SHADY
+        ArrayList<Expression> expressions = new ArrayList<>();
+        boolean more = true;
+        while(!have(Token.RPARAN) && more ){
+            expressions.add(expression());
+            if(!have(Token.COMMA)){
+                more = false;
+            }
+        }
+        return expressions;
+    }
     private Symbol qualifiedIdentifier() {
         //TODO: DOT
         return match(Token.IDENTIFIER);
