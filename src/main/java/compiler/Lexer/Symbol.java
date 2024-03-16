@@ -38,4 +38,11 @@ public class Symbol {
     public String image() {
         return attribute;
     }
+
+    @Override
+    public String toString() {
+        return "Symbol{" +
+                attribute +
+                '}';
+    }
 }

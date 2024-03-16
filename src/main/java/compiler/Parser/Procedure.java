@@ -1,19 +1,16 @@
 package compiler.Parser;
 
 
-import com.google.errorprone.annotations.Var;
 import compiler.Lexer.Symbol;
 
-import javax.swing.plaf.nimbus.State;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 class Procedure extends Statement {
     ProcedureDeclarator declarator;
-    Symbol returnType;
+    TypeDeclaration returnType;
     Symbol identifier;
 
-    protected Procedure(int line,ProcedureDeclarator declarator, Symbol returnType, Symbol identifier) {
+    protected Procedure(int line,ProcedureDeclarator declarator, TypeDeclaration returnType, Symbol identifier) {
         super(line);
         this.returnType = returnType;
         this.identifier = identifier;
@@ -24,15 +21,25 @@ class Procedure extends Statement {
     public void printNode() {
         System.out.println("\n Procedure:");
         System.out.printf("     - procedure name: %s\n", identifier.image());
-        System.out.printf("     - return type: %s\n", returnType.image());
+        System.out.print("     - return type: ");
+        returnType.printNode();
         declarator.printNode();
+    }
+
+    @Override
+    public void prettyPrint(String indentation) {
+        System.out.println("Procedure: ");
+        System.out.printf(indentation+"- return type: %s\n", returnType.toString());
+        System.out.printf(indentation+"- name: %s\n", identifier.toString());
+        declarator.prettyPrint(indentation);
+
     }
 }
 class ProcedureDeclarator extends Statement {
-    ArrayList<Parameter> parameters;
+    ArrayList<Expression> parameters;
     Block block;
 
-    protected ProcedureDeclarator(int line, ArrayList<Parameter> parameters, Block block) {
+    protected ProcedureDeclarator(int line, ArrayList<Expression> parameters, Block block) {
         super(line);
         this.parameters = parameters;
         this.block = block;
@@ -41,18 +48,25 @@ class ProcedureDeclarator extends Statement {
     @Override
     public void printNode() {
         System.out.print("     - Parameters: ");
-        for(Parameter p: parameters){
+        for(Expression p: parameters){
             System.out.printf(" %s ",p.getRep());
         }
         System.out.print("\n     - Block: ");
         block.printNode();
 
     }
+
+    @Override
+    public void prettyPrint(String indentation) {
+        System.out.printf(indentation + "- Parameters: %s\n", parameters);
+        System.out.printf(indentation+"- Block: %s\n",block.toString());
+
+    }
 }
 class Parameter extends Expression {
-    Symbol type;
+    TypeDeclaration type;
     Expression expression;
-    protected Parameter(int line, Symbol type, Expression expression) {
+    protected Parameter(int line, TypeDeclaration type, Expression expression) {
         super(line);
         this.type = type;
         this.expression = expression;
@@ -60,7 +74,7 @@ class Parameter extends Expression {
 
     @Override
     public String getRep() {
-        return type.image() + " " +  expression.getRep();
+        return type.toString() + " " +  expression.getRep();
     }
 
     @Override
@@ -69,6 +83,18 @@ class Parameter extends Expression {
     }
 
 
+    @Override
+    public void prettyPrint(String indentation) {
+
+    }
+
+    @Override
+    public String toString() {
+        return "Param{ " +
+                type +
+                ", " + expression +
+                " }";
+    }
 }
 class Block extends Statement{
     ArrayList<Statement> statements;
@@ -82,6 +108,18 @@ class Block extends Statement{
         for(Statement s : statements){
             s.printNode();
         }
+
+    }
+
+    @Override
+    public String toString() {
+        return "Block{" +
+                "statements=" + statements +
+                '}';
+    }
+
+    @Override
+    public void prettyPrint(String indentation) {
 
     }
 }
@@ -105,6 +143,11 @@ class IfElseStatement extends Statement {
         System.out.print("\nElse:\n");
         elseBlock.printNode();
     }
+
+    @Override
+    public void prettyPrint(String indentation) {
+
+    }
 }
 
 class WhileStatement extends Statement {
@@ -121,6 +164,19 @@ class WhileStatement extends Statement {
         System.out.printf("\nwhile %s:\n", condition.getRep());
         block.printNode();
 
+    }
+
+    @Override
+    public void prettyPrint(String indentation) {
+
+    }
+
+    @Override
+    public String toString() {
+        return "WhileStatement{ " +
+                "( " + condition + " )"+
+                ", " + block +
+                " }";
     }
 }
 
@@ -144,6 +200,11 @@ class ForStatement extends Statement{
         pos2.printNode();
         block.printNode();
     }
+
+    @Override
+    public void prettyPrint(String indentation) {
+
+    }
 }
 
 class ReturnStatement extends Statement {
@@ -159,6 +220,11 @@ class ReturnStatement extends Statement {
         System.out.print("\n\tReturn: ");
         expression.printNode();
 
+
+    }
+
+    @Override
+    public void prettyPrint(String indentation) {
 
     }
 }

@@ -1,27 +1,41 @@
-def void main() {
-    int value = readInt();
-    writeln(square(value));
-    int i;
-    for (i=1, i<100, i = i+1) {
-        while (value!=3) {
-            if (i > 10){
-                // ....
-            } else {
-                // ....
-            }
-        }
-    }
-    i = (i+2)*2;
-}
 
-
-
-
+//final int a = (((2+2)-4)*2) / 3;
 //final int i = 2*2+4;
 //final float j = 3.2*5.0;
 //final int k = (i+2)*3;
 //final string message = "Hello";
 //final bool isEmpty = true;
+//
+//struct Point {
+//    int x;
+//    int y;
+//}
+//struct Person {
+//    int x;
+//    string name;
+//    Point location;
+//    int[] history;
+//}
+//
+//int abc = 5;
+//Person d = Person("me", Point(3,7), int[i*2]);  // new structure
+//int[] c = int[5];  // new array of length 5
+//
+//def int square(int x, int y, int x ) {
+//    int x = 4*(4+2);
+//    int i;
+//    while(i < 3){
+//        i = i + 1;
+//    }
+//}
+//
+
+def Point copyPoints(Point[] p) {
+    return Point(p[0].x+p[1].x, p[0].y+p[1].y);
+}
+
+
+
 
 //def int square(int x, int y, int x ) {
 //    int x = 4*(4+2);

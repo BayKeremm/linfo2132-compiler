@@ -5,23 +5,24 @@ import compiler.Lexer.Symbol;
 import compiler.Lexer.Token;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 
 public class Parser {
     private Lexer lexer;
     private Symbol nextSymbol;
-    private ArrayList<Token> basicTypes;
+    private ArrayList<String> types;
     private ArrayList<Token> literals;
 
     public Parser(Lexer lexer) throws Exception {
         this.lexer = lexer;
         lexer.advanceLexer();
         this.nextSymbol = lexer.nextSymbol();
-        basicTypes = new ArrayList<>();
-        basicTypes.add(Token.INTEGER);
-        basicTypes.add(Token.FLOAT);
-        basicTypes.add(Token.STRING);
-        basicTypes.add(Token.BOOLEAN);
+        types = new ArrayList<>();
+        types.add(Token.INTEGER.image());
+        types.add(Token.FLOAT.image());
+        types.add(Token.STRING.image());
+        types.add(Token.BOOLEAN.image());
 
         this.literals = new ArrayList<>();
         literals.add(Token.BOOLEAN_LITERAL);
@@ -29,38 +30,58 @@ public class Parser {
         literals.add(Token.STRING_LITERAL);
         literals.add(Token.NATURAL_LITERAL);
     }
-    /*
-    private VarDeclarator declarator(){
-        int line = nextSymbol.line();
-        Expression expression = expression();
-        have(Token.SEMI_COLON);
-        return new VarDeclarator(line,expression);
-
-    }
-
-     */
     public Program program()  {
         // Parse constants
         ArrayList<ConstantVariable> constantVariables = new ArrayList<>();
+        ArrayList<StructDeclaration> structs = new ArrayList<>();
         ArrayList<Procedure> procedures = new ArrayList<>();
+        ArrayList<Statement> globals = new ArrayList<>();
         while(have(Token.FINAL)){
             int line = nextSymbol.line();
-            Symbol type = type();
+            TypeDeclaration type = type();
             Expression identifier = expression();
             have(Token.ASSIGN);
             Expression declarator = expression();
             have(Token.SEMI_COLON);
             constantVariables.add(new ConstantVariable(line,type,identifier, declarator));
         }
+        // Parse structs
+        while(have(Token.STRUCT)){
+            int line = nextSymbol.line();
+            types.add(nextSymbol.image());
+            Expression identifier = expression();
+            Block block = block();
+            structs.add(new StructDeclaration(line,identifier,block));
+        }
+        // Parse Globals
+        // TODO: function parameter parsing problem
+        // TODO: The problem is [] operator and precedence
+        //def Point copyPoints(Point[] p) {
+        //    return Point(p[0].x+p[1].x, p[0].y+p[1].y);
+        //}
+        while(isType()){
+            int line = nextSymbol.line();
+            TypeDeclaration type = type();
+            Expression idExpression = expression();
+            if(have(Token.ASSIGN)){
+                Expression declarator = expression();
+                globals.add(new Variable(line, type, idExpression,declarator));
+                have(Token.SEMI_COLON);
+                continue;
+            }
+            globals.add(new UninitVariable(line, type, idExpression));
+            have(Token.SEMI_COLON);
+        }
+
         // Parse procedures
         while(have(Token.DEF)){
             int line = nextSymbol.line();
-            Symbol type = type();
+            TypeDeclaration type = type();
             Symbol identifier = qualifiedIdentifier();
             if(!have(Token.LPARAN)){
                 // problem
             }
-            ArrayList<Parameter> params = parseParameters();
+            ArrayList<Expression> params = parseParameters();
             Block block = block();
             ProcedureDeclarator dec = new ProcedureDeclarator(line,params,block);
             procedures.add(new Procedure(line,dec,type, identifier));
@@ -70,7 +91,7 @@ public class Parser {
             System.out.println("That's rough buddy");
         }
 
-        return new Program(lexer.getFileName(),constantVariables, procedures);
+        return new Program(lexer.getFileName(),constantVariables,globals, structs, procedures);
     }
     private Block block(){
         boolean start = have(Token.LCURLY);
@@ -110,18 +131,19 @@ public class Parser {
                 have(Token.SEMI_COLON);
             }else{
                 statements.add(statement());
+                have(Token.SEMI_COLON);
             }
 
         }
 
         return new Block(blockLine,statements);
     }
-    private ArrayList<Parameter> parseParameters(){
-        ArrayList<Parameter> params = new ArrayList<>();
+    private ArrayList<Expression> parseParameters(){
+        ArrayList<Expression> params = new ArrayList<>();
         boolean more = true;
         while(!have(Token.RPARAN) && more){
             int line = nextSymbol.line();
-            Symbol type = type();
+            TypeDeclaration type = type();
             Expression e = expression();
             params.add(new Parameter(line,type,e));
             if(!have(Token.COMMA)){
@@ -136,23 +158,19 @@ public class Parser {
     private Statement assignmentStatement(){
         int line = nextSymbol.line();
         if(isType()){
-            Symbol type = type();
+            TypeDeclaration type = type();
             Expression idExpression = expression();
             if(have(Token.ASSIGN)){
                 Expression declarator = expression();
-                have(Token.SEMI_COLON);
-                return new LocalVariable(line,type,idExpression,declarator);
+                return new Variable(line,type,idExpression,declarator);
             }
-            have(Token.SEMI_COLON);
             return new UninitVariable(line,type,idExpression);
         }else{
             Expression expression = expression();
             if(have(Token.ASSIGN)){
                 Expression declarator = expression();
-                have(Token.SEMI_COLON);
                 return new ScopeVariable(line,expression,declarator);
             }
-            have(Token.SEMI_COLON);
             return expression;
         }
     }
@@ -242,10 +260,18 @@ public class Parser {
             Symbol id = qualifiedIdentifier();
             if(have(Token.LPARAN)){
                 return new FunctionCallExpression(line,id,parseExpressions());
-            }else{
+            }
+            else{
                 return new IdentifierExpression(line,id);
             }
-        }else{
+        } else if(isType()){
+            TypeDeclaration type = type();
+            have(Token.LBRAC);
+            Expression size = expression();
+            have(Token.RBRAC);
+            return new ArrayInitializer(line,type,size);
+        }
+        else{
             Symbol lit =  literal();
             return new LiteralExpression(line,lit);
         }
@@ -261,7 +287,6 @@ public class Parser {
         return null;
     }
     private ArrayList<Expression> parseExpressions(){
-        // TODO: CHECK A BIT SHADY
         ArrayList<Expression> expressions = new ArrayList<>();
         boolean more = true;
         while(!have(Token.RPARAN) && more ){
@@ -276,18 +301,29 @@ public class Parser {
         //TODO: DOT
         return match(Token.IDENTIFIER);
     }
-    private Symbol type()  {
-        if(isType()){
-            return match(nextSymbol.token());
-        }else if(check(Token.IDENTIFIER)){
-            return match(nextSymbol.token());
-        }else{
-            return null;
+    private boolean isArray(){
+        if(have(Token.LBRAC)){
+            return have(Token.RBRAC);
         }
+        return false;
+    }
+    private TypeDeclaration type()  {
+        int line = nextSymbol.line();
+        Symbol type = match(nextSymbol.token());
+        if(isArray()){
+            return new TypeDeclaration(line,type,true);
+        }
+        return new TypeDeclaration(line, type,false);
     }
     private Boolean isType(){
         // TODO: Add check for struct types defined before as well
-        return basicTypes.contains(nextSymbol.token());
+        for(String image : types){
+            if(Objects.equals(image, nextSymbol.image())){
+                return true;
+            }
+
+        }
+        return false;
     }
 
     private Symbol match(Token token) {

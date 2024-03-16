@@ -21,6 +21,10 @@ abstract class Expression extends Statement{
 
     public abstract String getRep();
 
+    @Override
+    public String toString() {
+        return  lhs + " '" + operator +"' "+ rhs;
+    }
 }
 /*--------------------------------------------------------------------------------------------------------------------*/
 /** LOGICAL EXPRESSION:
@@ -49,6 +53,11 @@ class LogicalAnd extends LogicalExpression{
     public void printNode() {
 
     }
+
+    @Override
+    public void prettyPrint(String indentation) {
+
+    }
 }
 class LogicalOr extends LogicalExpression{
     public LogicalOr(int line, Expression lhs, Expression rhs) {
@@ -57,6 +66,11 @@ class LogicalOr extends LogicalExpression{
 
     @Override
     public void printNode() {
+
+    }
+
+    @Override
+    public void prettyPrint(String indentation) {
 
     }
 }
@@ -85,6 +99,10 @@ class NotEqualComparison extends EqualityExpression{
         super(line, lhs, rhs, "!=");
     }
 
+    @Override
+    public void prettyPrint(String indentation) {
+
+    }
 }
 class EqualComparison extends EqualityExpression{
 
@@ -92,6 +110,10 @@ class EqualComparison extends EqualityExpression{
         super(line, lhs, rhs, "==");
     }
 
+    @Override
+    public void prettyPrint(String indentation) {
+
+    }
 }
 /*--------------------------------------------------------------------------------------------------------------------*/
 /** COMPARISON EXPRESSION:
@@ -116,24 +138,40 @@ class LTComparison extends ComparisionExpression{
         super(line, lhs, rhs, "<");
     }
 
+    @Override
+    public void prettyPrint(String indentation) {
+
+    }
 }
 class GTComparison extends ComparisionExpression{
     public GTComparison(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, ">");
     }
 
+    @Override
+    public void prettyPrint(String indentation) {
+
+    }
 }
 class LEComparison extends ComparisionExpression{
     public LEComparison(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "<=");
     }
 
+    @Override
+    public void prettyPrint(String indentation) {
+
+    }
 }
 class GEComparison extends ComparisionExpression{
     public GEComparison(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, ">=");
     }
 
+    @Override
+    public void prettyPrint(String indentation) {
+
+    }
 }
 /*--------------------------------------------------------------------------------------------------------------------*/
 /** TERM EXPRESSION:
@@ -152,18 +190,27 @@ abstract class TermExpression extends Expression{
     public String getRep() {
         return lhs.getRep() + operator + rhs.getRep();
     }
+
 }
 class MinusOperation extends TermExpression{
     public MinusOperation(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "-");
     }
 
+    @Override
+    public void prettyPrint(String indentation) {
+
+    }
 }
 class PlusOperation extends TermExpression{
     public PlusOperation(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "+");
     }
 
+    @Override
+    public void prettyPrint(String indentation) {
+
+    }
 }
 /*--------------------------------------------------------------------------------------------------------------------*/
 /** UNARY EXPRESSION:
@@ -188,12 +235,20 @@ class UnaryNegateOperation extends UnaryExpression{
         super(line, lhs, rhs, "!");
     }
 
+    @Override
+    public void prettyPrint(String indentation) {
+
+    }
 }
 class UnaryMinusOperation extends UnaryExpression{
     public UnaryMinusOperation(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "-");
     }
 
+    @Override
+    public void prettyPrint(String indentation) {
+
+    }
 }
 /*--------------------------------------------------------------------------------------------------------------------*/
 /** FACTOR EXPRESSION:
@@ -215,16 +270,31 @@ class MultiplyOperation extends FactorExpression{
     public MultiplyOperation(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "*");
     }
+
+    @Override
+    public void prettyPrint(String indentation) {
+
+    }
 }
 
 class DivideOperation extends FactorExpression{
     public DivideOperation(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "/");
     }
+
+    @Override
+    public void prettyPrint(String indentation) {
+
+    }
 }
 class ModuloOperation extends FactorExpression{
     public ModuloOperation(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "%");
+    }
+
+    @Override
+    public void prettyPrint(String indentation) {
+
     }
 }
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -250,25 +320,38 @@ class FunctionCallExpression extends PrimaryExpression{
 
     @Override
     public void printNode() {
-        System.out.printf("\nFunction call: %s(", identifier.image());
+        System.out.printf("\tFunction call exp: %s(", identifier.image());
         String string = "";
         for(Expression e : expressionParams){
             string = string.concat(e.getRep());
             string = string.concat(" ");
         }
-        string = string.concat(")");
+        string = string.concat(")\n");
         System.out.print(string);
     }
 
     @Override
     public String getRep() {
+        System.out.printf("%s(", identifier.image());
         String string = "";
         for(Expression e : expressionParams){
             string = string.concat(e.getRep());
         }
-        return string;
+        return string + ")";
     }
 
+    @Override
+    public void prettyPrint(String indentation) {
+
+    }
+
+    @Override
+    public String toString() {
+        return "FunctionCallExpression{" +
+                "identifier=" + identifier +
+                ", expressionParams=" + expressionParams +
+                '}';
+    }
 }
 
 class LiteralExpression extends PrimaryExpression{
@@ -286,6 +369,17 @@ class LiteralExpression extends PrimaryExpression{
     @Override
     public String getRep() {
         return literal.image();
+    }
+
+    @Override
+    public void prettyPrint(String indentation) {
+
+    }
+
+    @Override
+    public String toString() {
+        return "LiteralExp("+ literal.image() +
+                ')';
     }
 }
 class ParanExpression extends PrimaryExpression{
@@ -312,6 +406,18 @@ class ParanExpression extends PrimaryExpression{
         }
         return string + ")";
     }
+
+    @Override
+    public void prettyPrint(String indentation) {
+
+    }
+
+    @Override
+    public String toString() {
+        return "ParanExps{ " +
+                 expressions +
+                " }";
+    }
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -330,6 +436,18 @@ class IdentifierExpression extends Expression{
     @Override
     public String getRep() {
         return id.image();
+    }
+
+    @Override
+    public void prettyPrint(String indentation) {
+
+    }
+
+    @Override
+    public String toString() {
+        return "IdentifierExp{" +
+                 id.image() +
+                '}';
     }
 }
 
