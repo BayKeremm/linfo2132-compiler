@@ -223,7 +223,7 @@ class ArrayInitializer extends Expression {
 
     @Override
     public String toString() {
-        return "ArrayDeclaration{" +
+        return "ArrayInitializer{" +
                  type +
                 ", " + size +
                 '}';

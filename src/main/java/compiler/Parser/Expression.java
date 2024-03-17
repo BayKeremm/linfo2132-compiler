@@ -450,4 +450,59 @@ class IdentifierExpression extends Expression{
                 '}';
     }
 }
+class IndexExpression extends Expression {
+    Symbol identifier;
+    Expression index;
+
+    public IndexExpression(int line, Symbol identifier, Expression index) {
+        super(line);
+        this.identifier = identifier;
+        this.index = index;
+    }
+
+    @Override
+    public void printNode() {
+
+    }
+
+    @Override
+    public String getRep() {
+        return null;
+    }
+
+    @Override
+    public void prettyPrint(String indentation) {
+
+    }
+
+    @Override
+    public String toString() {
+        return "IndexExpression{" +
+                "identifier=" + identifier +
+                ", index=" + index +
+                '}';
+    }
+}
+
+class DotOperation extends Expression{
+
+    public DotOperation(int line, Expression lhs, Expression rhs) {
+        super(line, lhs, rhs, ".");
+    }
+
+    @Override
+    public void printNode() {
+
+    }
+
+    @Override
+    public String getRep() {
+        return null;
+    }
+
+    @Override
+    public void prettyPrint(String indentation) {
+
+    }
+}
 

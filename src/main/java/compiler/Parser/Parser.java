@@ -260,6 +260,17 @@ public class Parser {
             Symbol id = qualifiedIdentifier();
             if(have(Token.LPARAN)){
                 return new FunctionCallExpression(line,id,parseExpressions());
+            }else if(have(Token.LBRAC)){
+                Expression index = expression();
+                have(Token.RBRAC);
+                if(have(Token.DOT)){
+                    Expression afterDot = expression();
+                    return new DotOperation(line,new IndexExpression(line, id, index),afterDot );
+                }
+                return new IndexExpression(line, id, index);
+            } else if(have(Token.DOT)){
+                Expression afterDot = expression();
+                return new DotOperation(line,new IdentifierExpression(line,id), afterDot);
             }
             else{
                 return new IdentifierExpression(line,id);

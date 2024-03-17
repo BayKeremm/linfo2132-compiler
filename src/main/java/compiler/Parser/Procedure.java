@@ -227,5 +227,12 @@ class ReturnStatement extends Statement {
     public void prettyPrint(String indentation) {
 
     }
+
+    @Override
+    public String toString() {
+        return "ReturnStatement{ " +
+                 expression +
+                " }";
+    }
 }
 
