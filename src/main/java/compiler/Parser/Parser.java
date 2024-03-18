@@ -14,7 +14,7 @@ public class Parser {
     private ArrayList<String> types;
     private ArrayList<Token> literals;
 
-    public Parser(Lexer lexer) throws Exception {
+    public Parser(Lexer lexer) {
         this.lexer = lexer;
         lexer.advanceLexer();
         this.nextSymbol = lexer.nextSymbol();
@@ -54,11 +54,6 @@ public class Parser {
             structs.add(new StructDeclaration(line,identifier,block));
         }
         // Parse Globals
-        // TODO: function parameter parsing problem
-        // TODO: The problem is [] operator and precedence
-        //def Point copyPoints(Point[] p) {
-        //    return Point(p[0].x+p[1].x, p[0].y+p[1].y);
-        //}
         while(isType()){
             int line = nextSymbol.line();
             TypeDeclaration type = type();
@@ -268,7 +263,7 @@ public class Parser {
                     return new DotOperation(line,new IndexExpression(line, id, index),afterDot );
                 }
                 return new IndexExpression(line, id, index);
-            } else if(have(Token.DOT)){
+            }else if(have(Token.DOT)){
                 Expression afterDot = expression();
                 return new DotOperation(line,new IdentifierExpression(line,id), afterDot);
             }
@@ -309,7 +304,6 @@ public class Parser {
         return expressions;
     }
     private Symbol qualifiedIdentifier() {
-        //TODO: DOT
         return match(Token.IDENTIFIER);
     }
     private boolean isArray(){
@@ -327,12 +321,10 @@ public class Parser {
         return new TypeDeclaration(line, type,false);
     }
     private Boolean isType(){
-        // TODO: Add check for struct types defined before as well
         for(String image : types){
             if(Objects.equals(image, nextSymbol.image())){
                 return true;
             }
-
         }
         return false;
     }

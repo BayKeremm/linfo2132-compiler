@@ -1,3 +1,4 @@
+final int a = 3;
 
 final int a = (((2+2)-4)*2) / 3;
 final int i = 2*2+4;
@@ -26,6 +27,22 @@ int abc = 5;
 int[] c = int[5];  // new array of length 5
 int x = c[5];
 
+
+def int square(int x, int y, int x ) {
+    int i = 4;
+    while(i<100){
+        if(i > 3){
+            int x = 5;
+            return 1;
+        }else{
+            int y = 5;
+            return 2;
+        }
+        i = i+1;
+    }
+}
+
+
 def int square(int x, int y, int x ) {
     int i;
     while(i < 3){
@@ -48,16 +65,16 @@ def int square(int x, int y, int x ) {
         i = i + 1;
     }
 }
-
-
+//
+//
 def int square(int v) {
     return v*v;
 }
-
+//
 def Point copyPoints(Point[] p) {
     return Point(p[0].x+p[1].x, p[0].y+p[1].y);
 }
-
+//
 def void main() {
     int value = readInt();
     writeln(square(value));
@@ -65,12 +82,12 @@ def void main() {
     for (i=1, i<100, i = i+1) {
         while (value!=3) {
             if (i > 10){
-                // ....
-            } else {
-                // ....
+                int x = i;
             }
+            else {
+                int y = i;
+            }
+            i = i+1;
         }
     }
-
-    i = (i+2)*2;
 }

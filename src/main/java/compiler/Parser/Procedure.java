@@ -59,7 +59,8 @@ class ProcedureDeclarator extends Statement {
     @Override
     public void prettyPrint(String indentation) {
         System.out.printf(indentation + "- Parameters: %s\n", parameters);
-        System.out.printf(indentation+"- Block: %s\n",block.toString());
+        System.out.printf(indentation+"- Block:\n");
+        block.prettyPrint(indentation+"    ");
 
     }
 }
@@ -113,14 +114,21 @@ class Block extends Statement{
 
     @Override
     public String toString() {
-        return "Block{" +
-                "statements=" + statements +
-                '}';
+        StringBuilder ret = new StringBuilder("Block{");
+        for(Statement s : statements){
+            ret.append(s.toString());
+        }
+        return ret.toString();
+        //return "Block{" +
+        //        "statements=" + statements +
+        //        '}';
     }
 
     @Override
     public void prettyPrint(String indentation) {
-
+        for(Statement s : statements){
+            s.prettyPrint(indentation+"  ");
+        }
     }
 }
 
@@ -146,7 +154,20 @@ class IfElseStatement extends Statement {
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.printf(indentation+"If: %s\n", ifCondition);
+        ifBlock.prettyPrint(indentation+"  ");
+        System.out.print(indentation+"Else:\n");
+        elseBlock.prettyPrint(indentation+"  ");
 
+    }
+
+    @Override
+    public String toString() {
+        return "IfElseStatement{" +
+                "ifCondition=" + ifCondition +
+                ",ifBlock=" + ifBlock +
+                ",elseBlock=" + elseBlock +
+                "}";
     }
 }
 
@@ -168,6 +189,9 @@ class WhileStatement extends Statement {
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.println(indentation+"While Statement");
+        condition.prettyPrint(indentation+" ");
+        block.prettyPrint(indentation+" ");
 
     }
 
@@ -175,7 +199,7 @@ class WhileStatement extends Statement {
     public String toString() {
         return "WhileStatement{ " +
                 "( " + condition + " )"+
-                ", " + block +
+                "," + block +
                 " }";
     }
 }
@@ -203,7 +227,20 @@ class ForStatement extends Statement{
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.print(indentation+"For statement: \n");
+        System.out.printf(indentation+"- expressions:( %s, %s, %s )\n",pos0,pos1,pos2);
+        block.prettyPrint(indentation+" ");
 
+    }
+
+    @Override
+    public String toString() {
+        return "ForStatement{" +
+                 block +
+                pos0 +
+                 pos2 +
+                  pos1 +
+                '}';
     }
 }
 
@@ -225,6 +262,7 @@ class ReturnStatement extends Statement {
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.printf(indentation+"Return statement: %s\n", expression);
 
     }
 

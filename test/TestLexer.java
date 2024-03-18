@@ -2,6 +2,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import compiler.Lexer.Symbol;
+import compiler.Parser.Program;
 import org.junit.Test;
 
 import java.io.*;

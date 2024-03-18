@@ -342,6 +342,9 @@ class FunctionCallExpression extends PrimaryExpression{
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.print(indentation+"Function call:\n");
+        System.out.printf(indentation+"- identifier:%s\n",identifier);
+        System.out.printf(indentation+"- parameters:%s\n",expressionParams);
 
     }
 
