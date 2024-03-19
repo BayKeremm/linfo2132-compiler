@@ -55,12 +55,7 @@ public class Program extends ASTNode{
         System.out.print(ANSI_RESET);
         int i = 0;
         for(Procedure p : procedures){
-            if(i%2==0){
-                System.out.print(ANSI_RESET);
-            }else{
-                System.out.print(ANSI_RESET);
-                System.out.print(ANSI_YELLOW);
-            }
+            System.out.print(ANSI_RESET);
             p.prettyPrint(" ");
             i++;
         }
