@@ -36,9 +36,11 @@ class Variable extends Statement {
     @Override
     public void prettyPrint(String indentation) {
         System.out.println(indentation+"Variable: ");
-        System.out.printf(indentation+"- type: %s\n", type.toString());
-        System.out.printf(indentation+"- identifier: %s\n", identifier.toString());
-        System.out.printf(indentation+"- declaration: %s\n", declarator.toString());
+        System.out.printf(indentation+"  - type: %s\n", type.toString());
+        System.out.printf(indentation+"  - identifier: %s\n", identifier.toString());
+        //System.out.printf(indentation+"- declaration: %s\n", declarator.toString());
+        System.out.println(indentation+"  - declaration:");
+        declarator.prettyPrint(indentation+"    ");
 
 
     }
@@ -79,7 +81,9 @@ class ConstantVariable extends Statement {
         System.out.print("Constant variable: \n");
         System.out.printf(indentation+"- type: %s\n", type.toString());
         System.out.printf(indentation+"- identifier: %s\n", identifier.toString());
-        System.out.printf(indentation+"- declarator: %s\n", declarator.toString());
+        System.out.print(indentation+"- declaration:\n");
+        declarator.prettyPrint(indentation+"  ");
+        //System.out.printf(indentation+"- declarator: %s\n", declarator.toString());
     }
 }
 class ScopeVariable extends Statement {
@@ -104,7 +108,7 @@ class ScopeVariable extends Statement {
     public void prettyPrint(String indentation) {
         System.out.print(indentation+"Scope variable: \n");
         System.out.printf(indentation+"- identifier: %s\n", identifier.toString());
-        System.out.printf(indentation+"- declarator: %s\n", declarator.toString());
+        System.out.printf(indentation+"- declaration: %s\n", declarator.toString());
     }
 
     @Override
@@ -135,8 +139,8 @@ class UninitVariable extends Statement {
     @Override
     public void prettyPrint(String indentation) {
         System.out.println(indentation+"UninitVariable: ");
-        System.out.printf(indentation+"- type: %s\n", type.toString());
-        System.out.printf(indentation+"- identifier: %s\n", identifier.toString());
+        System.out.printf(indentation+"  - type: %s\n", type.toString());
+        System.out.printf(indentation+"  - identifier: %s\n", identifier.toString());
     }
 
     @Override
@@ -169,7 +173,9 @@ class StructDeclaration extends Statement {
     public void prettyPrint(String indentation) {
         System.out.println("Struct Declaration: ");
         System.out.printf(indentation+"- identifier: %s\n",identifier.toString());
-        System.out.printf(indentation+"- block: %s\n",block.toString());
+        //System.out.printf(indentation+"- block: %s\n",block.toString());
+
+        block.prettyPrint(indentation+" ");
 
 
     }
@@ -198,6 +204,10 @@ class TypeDeclaration extends Statement {
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.printf(indentation+"Type dec: %s",type.image());
+        if(isArray){
+            System.out.print("[]\n");
+        }
 
     }
 }
@@ -223,6 +233,12 @@ class ArrayInitializer extends Expression {
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.print(indentation+"- Array init:\n");
+
+        System.out.print(indentation+"   - type:\n");
+        type.prettyPrint(indentation+"      ");
+        System.out.print(indentation+"   - size:\n");
+        size.prettyPrint(indentation+"      ");
 
     }
 

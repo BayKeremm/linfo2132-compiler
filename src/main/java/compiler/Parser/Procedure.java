@@ -58,7 +58,13 @@ class ProcedureDeclarator extends Statement {
 
     @Override
     public void prettyPrint(String indentation) {
-        System.out.printf(indentation + "- Parameters: %s\n", parameters);
+        System.out.print(indentation+"- Parameters:\n");
+        int i = 1;
+        for(Expression p: parameters){
+            System.out.printf(indentation+"  Param %d:\n",i);
+            p.prettyPrint(indentation+"  ");
+            i++;
+        }
         System.out.printf(indentation+"- Block:\n");
         block.prettyPrint(indentation+"    ");
 
@@ -86,6 +92,9 @@ class Parameter extends Expression {
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.printf(indentation+"- type:   %s\n",type);
+        System.out.print(indentation+"- name:");
+        expression.prettyPrint(indentation);
 
     }
 
@@ -119,9 +128,6 @@ class Block extends Statement{
             ret.append(s.toString());
         }
         return ret.toString();
-        //return "Block{" +
-        //        "statements=" + statements +
-        //        '}';
     }
 
     @Override
@@ -190,8 +196,10 @@ class WhileStatement extends Statement {
     @Override
     public void prettyPrint(String indentation) {
         System.out.println(indentation+"While Statement");
-        condition.prettyPrint(indentation+" ");
-        block.prettyPrint(indentation+" ");
+        System.out.println(indentation+"  - While condition:");
+        condition.prettyPrint(indentation+"    ");
+        System.out.println(indentation+"  - While block:");
+        block.prettyPrint(indentation+"     ");
 
     }
 
@@ -228,8 +236,15 @@ class ForStatement extends Statement{
     @Override
     public void prettyPrint(String indentation) {
         System.out.print(indentation+"For statement: \n");
-        System.out.printf(indentation+"- expressions:( %s, %s, %s )\n",pos0,pos1,pos2);
-        block.prettyPrint(indentation+" ");
+        System.out.print(indentation+"  - Expressions:\n");
+        System.out.print(indentation+"     - Pos1:\n");
+        pos0.prettyPrint(indentation+"      ");
+        System.out.print(indentation+"     - Pos2:\n");
+        pos1.prettyPrint(indentation+"      ");
+        System.out.print(indentation+"     - Pos3:\n");
+        pos2.prettyPrint(indentation+"      ");
+        System.out.println(indentation+"  - For block:");
+        block.prettyPrint(indentation+"     ");
 
     }
 
@@ -262,7 +277,8 @@ class ReturnStatement extends Statement {
 
     @Override
     public void prettyPrint(String indentation) {
-        System.out.printf(indentation+"Return statement: %s\n", expression);
+        System.out.print(indentation+"Return statement:\n");
+        expression.prettyPrint(indentation+"  ");
 
     }
 

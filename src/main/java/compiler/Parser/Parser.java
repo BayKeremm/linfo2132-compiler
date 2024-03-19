@@ -8,6 +8,17 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 
+/**
+* TODO:
+ * - printing the expressions with hierarchy
+ * - report
+ *      - what does not work
+ *      - what was hard to do
+ *      - implementation choices
+ *      - UML diagram
+ *  - checks for mustbes
+* */
+
 public class Parser {
     private Lexer lexer;
     private Symbol nextSymbol;
@@ -234,17 +245,30 @@ public class Parser {
     }
     private Expression factorExpression(){
         int line = nextSymbol.line();
-        Expression lhs = primary();
+        Expression lhs = dumbDot();
         if(have(Token.STAR)){
             return new MultiplyOperation(line,lhs, factorExpression());
         }else if(have(Token.MODULO)){
             return new ModuloOperation(line,lhs, factorExpression());
         }else if(have(Token.SLASH)){
             return new DivideOperation(line,lhs, factorExpression());
-        }else{
+        }
+        else{
             return lhs;
         }
     }
+
+    private Expression dumbDot(){
+        int line = nextSymbol.line();
+        Expression lhs = primary();
+        if(have(Token.DOT)){
+            return new DotOperation(line,lhs,dumbDot());
+        }else{
+            return lhs;
+        }
+
+    }
+
     private Expression primary(){
         int line = nextSymbol.line();
         if(have(Token.LPARAN)){
@@ -256,14 +280,7 @@ public class Parser {
             }else if(have(Token.LBRAC)){
                 Expression index = expression();
                 mustbe(Token.RBRAC);
-                if(have(Token.DOT)){
-                    Expression afterDot = expression();
-                    return new DotOperation(line,new IndexExpression(line, id, index),afterDot );
-                }
-                return new IndexExpression(line, id, index);
-            }else if(have(Token.DOT)){
-                Expression afterDot = expression();
-                return new DotOperation(line,new IdentifierExpression(line,id), afterDot);
+                return new IndexOp(line, id, index);
             }
             else{
                 return new IdentifierExpression(line,id);
