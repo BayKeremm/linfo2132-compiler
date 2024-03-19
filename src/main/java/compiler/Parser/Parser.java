@@ -10,7 +10,7 @@ import java.util.Objects;
 
 /**
 * TODO:
- * - printing the expressions with hierarchy
+ * - [x] printing the expressions with hierarchy
  * - report
  *      - what does not work
  *      - what was hard to do
