@@ -4,23 +4,16 @@
 package compiler;
 
 import compiler.Lexer.Lexer;
-import compiler.Lexer.Symbol;
-import compiler.Lexer.Token;
 import compiler.Parser.Parser;
-import compiler.Parser.ParserException;
 import compiler.Parser.Program;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.LineNumberReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
 public class Compiler {
-    public static void main(String[] args) throws Exception, ParserException {
+    public static void main(String[] args) throws Exception {
 
         LineNumberReader reader;
 
@@ -28,7 +21,7 @@ public class Compiler {
         String fileName;
 
         if(args.length > 1){
-            if(args[0].equals("-lexer")){
+            if(args[0].equals("-parser")){
                 debug = true;
             }
             fileName = args[1];
@@ -42,31 +35,23 @@ public class Compiler {
         lexer.setFileName(fileName);
 
         Parser parser = new Parser(lexer);
-
-        /*
-        Symbol s = parser.match(Token.FINAL);
-        s = parser.match(Token.INTEGER);
-        s = parser.match(Token.IDENTIFIER);
-        s = parser.match(Token.ASSIGN);
-        s = parser.match(Token.NATURAL_LITERAL);
-        s = parser.match(Token.SEMI_COLON);
-         */
         Program p = parser.program();
-        p.printProgram();
+        p.printNode();
 
-//        lexer.advanceLexer();
-//        Symbol s = lexer.nextSymbol();
-//        while(!(s.image().isEmpty())){
-//            if(debug){
-//                System.out.println(s.symbolRep());
-//            }
-//            lexer.advanceLexer();
-//            s = lexer.nextSymbol();
-//        }
-//        try{
-//            lexer.finish();
-//        }catch (Exception e){
-//            System.err.println("Error finishing the lexer");
-//        }
+
+        //lexer.advanceLexer();
+        //Symbol s = lexer.nextSymbol();
+        //while(!(s.image().isEmpty())){
+        //    if(debug){
+        //        System.out.println(s.symbolRep());
+        //    }
+        //    lexer.advanceLexer();
+        //    s = lexer.nextSymbol();
+        //}
+        //try{
+        //    lexer.finish();
+        //}catch (Exception e){
+        //    System.err.println("Error finishing the lexer");
+        //}
     }
 }
