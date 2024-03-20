@@ -8,13 +8,26 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 
+/**
+* TODO:
+ * - [x] printing the expressions with hierarchy
+ * - report
+ *      - what does not work
+ *      - what was hard to do
+ *      - implementation choices
+ *      - UML diagram
+ *  - checks for mustbes
+* */
+
 public class Parser {
     private Lexer lexer;
     private Symbol nextSymbol;
     private ArrayList<String> types;
     private ArrayList<Token> literals;
+    static private final String ANSI_RED = "\u001B[31m";
+    static private final String ANSI_RESET = "\u001B[0m";
 
-    public Parser(Lexer lexer) throws Exception {
+    public Parser(Lexer lexer) {
         this.lexer = lexer;
         lexer.advanceLexer();
         this.nextSymbol = lexer.nextSymbol();
@@ -40,9 +53,9 @@ public class Parser {
             int line = nextSymbol.line();
             TypeDeclaration type = type();
             Expression identifier = expression();
-            have(Token.ASSIGN);
+            mustbe(Token.ASSIGN);
             Expression declarator = expression();
-            have(Token.SEMI_COLON);
+            mustbe(Token.SEMI_COLON);
             constantVariables.add(new ConstantVariable(line,type,identifier, declarator));
         }
         // Parse structs
@@ -54,11 +67,6 @@ public class Parser {
             structs.add(new StructDeclaration(line,identifier,block));
         }
         // Parse Globals
-        // TODO: function parameter parsing problem
-        // TODO: The problem is [] operator and precedence
-        //def Point copyPoints(Point[] p) {
-        //    return Point(p[0].x+p[1].x, p[0].y+p[1].y);
-        //}
         while(isType()){
             int line = nextSymbol.line();
             TypeDeclaration type = type();
@@ -78,9 +86,7 @@ public class Parser {
             int line = nextSymbol.line();
             TypeDeclaration type = type();
             Symbol identifier = qualifiedIdentifier();
-            if(!have(Token.LPARAN)){
-                // problem
-            }
+            mustbe(Token.LPARAN);
             ArrayList<Expression> params = parseParameters();
             Block block = block();
             ProcedureDeclarator dec = new ProcedureDeclarator(line,params,block);
@@ -100,9 +106,9 @@ public class Parser {
         while(!have(Token.RCURLY )&& start){
             int line = nextSymbol.line();
             if(have(Token.IF)){
-                have(Token.LPARAN);
+                mustbe(Token.LPARAN);
                 Expression ifCondition = expression();
-                have(Token.RPARAN);
+                mustbe(Token.RPARAN);
                 Block ifBlock = block();
                 if(have(Token.ELSE)){
                     Block elseBlock = block();
@@ -111,31 +117,29 @@ public class Parser {
                 }
                 statements.add(new IfElseStatement(line,ifCondition,ifBlock,null));
             }else if(have(Token.WHILE)){
-                have(Token.LPARAN);
+                mustbe(Token.LPARAN);
                 Expression whileCondition = expression();
-                have(Token.RPARAN);
+                mustbe(Token.RPARAN);
                 Block whileBlock = block();
                 statements.add(new WhileStatement(line,whileCondition,whileBlock));
             }else if(have(Token.FOR)){
-                have(Token.LPARAN);
+                mustbe(Token.LPARAN);
                 Statement p0 = statement();
-                have(Token.COMMA);
+                mustbe(Token.COMMA);
                 Expression p1 = expression();
-                have(Token.COMMA);
+                mustbe(Token.COMMA);
                 Statement p2 = statement();
-                have(Token.RPARAN);
+                mustbe(Token.RPARAN);
                 statements.add(new ForStatement(line,p0,p1,p2,block()));
             }else if(have(Token.RETURN)){
                 Expression exp = expression();
                 statements.add(new ReturnStatement(line,exp));
-                have(Token.SEMI_COLON);
+                mustbe(Token.SEMI_COLON);
             }else{
                 statements.add(statement());
-                have(Token.SEMI_COLON);
+                mustbe(Token.SEMI_COLON);
             }
-
         }
-
         return new Block(blockLine,statements);
     }
     private ArrayList<Expression> parseParameters(){
@@ -241,17 +245,30 @@ public class Parser {
     }
     private Expression factorExpression(){
         int line = nextSymbol.line();
-        Expression lhs = primary();
+        Expression lhs = dotExpression();
         if(have(Token.STAR)){
             return new MultiplyOperation(line,lhs, factorExpression());
         }else if(have(Token.MODULO)){
             return new ModuloOperation(line,lhs, factorExpression());
         }else if(have(Token.SLASH)){
             return new DivideOperation(line,lhs, factorExpression());
-        }else{
+        }
+        else{
             return lhs;
         }
     }
+
+    private Expression dotExpression(){
+        int line = nextSymbol.line();
+        Expression lhs = primary();
+        if(have(Token.DOT)){
+            return new DotOperation(line,lhs, dotExpression());
+        }else{
+            return lhs;
+        }
+
+    }
+
     private Expression primary(){
         int line = nextSymbol.line();
         if(have(Token.LPARAN)){
@@ -262,24 +279,16 @@ public class Parser {
                 return new FunctionCallExpression(line,id,parseExpressions());
             }else if(have(Token.LBRAC)){
                 Expression index = expression();
-                have(Token.RBRAC);
-                if(have(Token.DOT)){
-                    Expression afterDot = expression();
-                    return new DotOperation(line,new IndexExpression(line, id, index),afterDot );
-                }
-                return new IndexExpression(line, id, index);
-            } else if(have(Token.DOT)){
-                Expression afterDot = expression();
-                return new DotOperation(line,new IdentifierExpression(line,id), afterDot);
+                mustbe(Token.RBRAC);
+                return new IndexOp(line, id, index);
             }
             else{
                 return new IdentifierExpression(line,id);
             }
         } else if(isType()){
             TypeDeclaration type = type();
-            have(Token.LBRAC);
             Expression size = expression();
-            have(Token.RBRAC);
+            mustbe(Token.RBRAC);
             return new ArrayInitializer(line,type,size);
         }
         else{
@@ -309,30 +318,31 @@ public class Parser {
         return expressions;
     }
     private Symbol qualifiedIdentifier() {
-        //TODO: DOT
         return match(Token.IDENTIFIER);
     }
-    private boolean isArray(){
+    private boolean isArrayType(){
         if(have(Token.LBRAC)){
-            return have(Token.RBRAC);
+            if(check(Token.RBRAC)){
+                return have(Token.RBRAC);
+            }else{
+                return true;
+            }
         }
         return false;
     }
     private TypeDeclaration type()  {
         int line = nextSymbol.line();
         Symbol type = match(nextSymbol.token());
-        if(isArray()){
+        if(isArrayType()){
             return new TypeDeclaration(line,type,true);
         }
         return new TypeDeclaration(line, type,false);
     }
     private Boolean isType(){
-        // TODO: Add check for struct types defined before as well
         for(String image : types){
             if(Objects.equals(image, nextSymbol.image())){
                 return true;
             }
-
         }
         return false;
     }
@@ -355,8 +365,24 @@ public class Parser {
             return false;
         }
     }
+    private void mustbe(Token token){
+        if(check(token)){
+            match(token);
+        }else{
+            // Report Error
+            reportParserError(" -> Token mismatch error -> expected: %s", token);
+        }
+    }
 
-    private Boolean check(Token token){
+    private void reportParserError(String message, Object... args)  {
+        System.err.print(ANSI_RED);
+        System.err.printf("Parser error: %s:%d ", lexer.getFileName(), nextSymbol.line());
+        System.err.printf(message, args[0]);
+        System.err.printf(" got: %s\n", nextSymbol);
+        System.err.println("Continuing parsing ...\n ");
+        System.err.print(ANSI_RESET);
+        System.exit(1);
+    }private Boolean check(Token token){
         return nextSymbol.token() == token;
     }
 

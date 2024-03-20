@@ -69,8 +69,15 @@ class ProcedureDeclarator extends Statement {
 
     @Override
     public void prettyPrint(String indentation) {
-        System.out.printf(indentation + "- Parameters: %s\n", parameters);
-        System.out.printf(indentation+"- Block: %s\n",block.toString());
+        System.out.print(indentation+"- Parameters:\n");
+        int i = 1;
+        for(Expression p: parameters){
+            System.out.printf(indentation+"  Param %d:\n",i);
+            p.prettyPrint(indentation+"  ");
+            i++;
+        }
+        System.out.printf(indentation+"- Block:\n");
+        block.prettyPrint(indentation+"    ");
 
     }
 
@@ -106,6 +113,9 @@ class Parameter extends Expression {
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.printf(indentation+"- type:   %s\n",type);
+        System.out.print(indentation+"- name:");
+        expression.prettyPrint(indentation);
 
     }
 
@@ -144,14 +154,18 @@ class Block extends Statement{
 
     @Override
     public String toString() {
-        return "Block{" +
-                "statements=" + statements +
-                '}';
+        StringBuilder ret = new StringBuilder("Block{");
+        for(Statement s : statements){
+            ret.append(s.toString());
+        }
+        return ret.toString();
     }
 
     @Override
     public void prettyPrint(String indentation) {
-
+        for(Statement s : statements){
+            s.prettyPrint(indentation+"  ");
+        }
     }
     @Override
     public boolean equals(Object o) {
@@ -181,6 +195,10 @@ class IfElseStatement extends Statement {
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.printf(indentation+"If: %s\n", ifCondition);
+        ifBlock.prettyPrint(indentation+"  ");
+        System.out.print(indentation+"Else:\n");
+        elseBlock.prettyPrint(indentation+"  ");
 
     }
 
@@ -193,6 +211,13 @@ class IfElseStatement extends Statement {
         else if(!this.elseBlock.equals(i.elseBlock)) return false;
         
         return true;
+
+    public String toString() {
+        return "IfElseStatement{" +
+                "ifCondition=" + ifCondition +
+                ",ifBlock=" + ifBlock +
+                ",elseBlock=" + elseBlock +
+                "}";
     }
 }
 
@@ -214,6 +239,11 @@ class WhileStatement extends Statement {
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.println(indentation+"While Statement");
+        System.out.println(indentation+"  - While condition:");
+        condition.prettyPrint(indentation+"    ");
+        System.out.println(indentation+"  - While block:");
+        block.prettyPrint(indentation+"     ");
 
     }
 
@@ -221,7 +251,7 @@ class WhileStatement extends Statement {
     public String toString() {
         return "WhileStatement{ " +
                 "( " + condition + " )"+
-                ", " + block +
+                "," + block +
                 " }";
     }
 
@@ -259,7 +289,27 @@ class ForStatement extends Statement{
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.print(indentation+"For statement: \n");
+        System.out.print(indentation+"  - Expressions:\n");
+        System.out.print(indentation+"     - Pos1:\n");
+        pos0.prettyPrint(indentation+"      ");
+        System.out.print(indentation+"     - Pos2:\n");
+        pos1.prettyPrint(indentation+"      ");
+        System.out.print(indentation+"     - Pos3:\n");
+        pos2.prettyPrint(indentation+"      ");
+        System.out.println(indentation+"  - For block:");
+        block.prettyPrint(indentation+"     ");
 
+    }
+
+    @Override
+    public String toString() {
+        return "ForStatement{" +
+                 block +
+                pos0 +
+                 pos2 +
+                  pos1 +
+                '}';
     }
 
     @Override
@@ -293,6 +343,8 @@ class ReturnStatement extends Statement {
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.print(indentation+"Return statement:\n");
+        expression.prettyPrint(indentation+"  ");
 
     }
 

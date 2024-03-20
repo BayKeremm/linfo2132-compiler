@@ -21,7 +21,7 @@ public class Compiler {
         String fileName;
 
         if(args.length > 1){
-            if(args[0].equals("-lexer")){
+            if(args[0].equals("-parser")){
                 debug = true;
             }
             fileName = args[1];

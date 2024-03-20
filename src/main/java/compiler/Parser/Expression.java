@@ -25,6 +25,20 @@ public abstract class Expression extends Statement{
     public String toString() {
         return  lhs + " '" + operator +"' "+ rhs;
     }
+
+    @Override
+    public void prettyPrint(String indentation) {
+        if(lhs != null){
+            System.out.printf(indentation+"  LHS:\n");
+            lhs.prettyPrint(indentation+"   ");
+        }
+        if(rhs != null){
+            System.out.printf(indentation+"  RHS:\n");
+            rhs.prettyPrint(indentation+"   ");
+        }
+
+
+    }
 }
 /*--------------------------------------------------------------------------------------------------------------------*/
 /** LOGICAL EXPRESSION:
@@ -56,6 +70,8 @@ class LogicalAnd extends LogicalExpression{
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.print(indentation+"AND op:\n");
+        super.prettyPrint(indentation+" ");
 
     }
 
@@ -82,6 +98,8 @@ class LogicalOr extends LogicalExpression{
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.print(indentation+"OR op:\n");
+        super.prettyPrint(indentation+" ");
 
     }
 
@@ -100,9 +118,9 @@ class LogicalOr extends LogicalExpression{
 /** EQUALITY EXPRESSION:
  *             equalityExpression -> comparisonExpression ( ( NOT_EQUAL | EQUAL ) comparisonExpression  )*
  * */
-abstract class EqualityExpression extends Expression{
+abstract class EqualityCheckExpression extends Expression{
 
-    public EqualityExpression(int line, Expression lhs, Expression rhs, String operator) {
+    public EqualityCheckExpression(int line, Expression lhs, Expression rhs, String operator) {
         super( line,  lhs,  rhs,  operator);
     }
     @Override
@@ -114,8 +132,13 @@ abstract class EqualityExpression extends Expression{
     public String getRep() {
         return lhs.getRep() + operator + rhs.getRep();
     }
+    @Override
+    public void prettyPrint(String indentation) {
+        super.prettyPrint(indentation);
+
+    }
 }
-class NotEqualComparison extends EqualityExpression{
+class NotEqualComparison extends EqualityCheckExpression {
 
     public NotEqualComparison(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "!=");
@@ -123,6 +146,8 @@ class NotEqualComparison extends EqualityExpression{
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.print(indentation+"Not equal comp:\n");
+        super.prettyPrint(indentation+" ");
 
     }
 
@@ -137,7 +162,7 @@ class NotEqualComparison extends EqualityExpression{
         return true;
     }
 }
-class EqualComparison extends EqualityExpression{
+class EqualComparison extends EqualityCheckExpression {
 
     public EqualComparison(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "==");
@@ -145,7 +170,8 @@ class EqualComparison extends EqualityExpression{
 
     @Override
     public void prettyPrint(String indentation) {
-
+        System.out.print(indentation+"Equality comp:\n");
+        super.prettyPrint(indentation+" ");
     }
 
     @Override
@@ -176,6 +202,12 @@ abstract class ComparisionExpression extends Expression {
     public String getRep() {
         return lhs.getRep() + operator + rhs.getRep();
     }
+
+    @Override
+    public void prettyPrint(String indentation) {
+        super.prettyPrint(indentation);
+
+    }
 }
 class LTComparison extends ComparisionExpression{
     public LTComparison(int line, Expression lhs, Expression rhs) {
@@ -184,6 +216,8 @@ class LTComparison extends ComparisionExpression{
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.print(indentation+"LT comp:\n");
+        super.prettyPrint(indentation+" ");
 
     }
 
@@ -205,6 +239,8 @@ class GTComparison extends ComparisionExpression{
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.print(indentation+"GT comp:\n");
+        super.prettyPrint(indentation+" ");
 
     }
 
@@ -226,6 +262,8 @@ class LEComparison extends ComparisionExpression{
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.print(indentation+"LE comp:\n");
+        super.prettyPrint(indentation+" ");
 
     }
 
@@ -247,6 +285,8 @@ class GEComparison extends ComparisionExpression{
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.print(indentation+"GE comp:\n");
+        super.prettyPrint(indentation+" ");
 
     }
 
@@ -279,6 +319,11 @@ abstract class TermExpression extends Expression{
         return lhs.getRep() + operator + rhs.getRep();
     }
 
+    @Override
+    public void prettyPrint(String indentation) {
+        super.prettyPrint(indentation);
+
+    }
 }
 class MinusOperation extends TermExpression{
     public MinusOperation(int line, Expression lhs, Expression rhs) {
@@ -287,6 +332,8 @@ class MinusOperation extends TermExpression{
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.print(indentation+"Minus op:\n");
+        super.prettyPrint(indentation+" ");
 
     }
 
@@ -308,6 +355,8 @@ class PlusOperation extends TermExpression{
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.print(indentation+"Plus op:\n");
+        super.prettyPrint(indentation+" ");
 
     }
 
@@ -339,6 +388,12 @@ abstract class UnaryExpression extends Expression{
     public String getRep() {
         return lhs.getRep() + operator + rhs.getRep();
     }
+
+    @Override
+    public void prettyPrint(String indentation) {
+        super.prettyPrint(indentation);
+
+    }
 }
 class UnaryNegateOperation extends UnaryExpression{
     public UnaryNegateOperation(int line, Expression lhs, Expression rhs) {
@@ -347,7 +402,7 @@ class UnaryNegateOperation extends UnaryExpression{
 
     @Override
     public void prettyPrint(String indentation) {
-
+        super.prettyPrint(indentation);
     }
 
     @Override
@@ -368,7 +423,8 @@ class UnaryMinusOperation extends UnaryExpression{
 
     @Override
     public void prettyPrint(String indentation) {
-
+        System.out.print(indentation+"Unary minus op:\n");
+        super.prettyPrint(indentation+" ");
     }
 
     @Override
@@ -397,6 +453,12 @@ abstract class FactorExpression extends Expression{
     public String getRep() {
         return lhs.getRep() + operator + rhs.getRep();
     }
+
+    @Override
+    public void prettyPrint(String indentation) {
+        super.prettyPrint(indentation);
+
+    }
 }
 class MultiplyOperation extends FactorExpression{
     public MultiplyOperation(int line, Expression lhs, Expression rhs) {
@@ -405,6 +467,8 @@ class MultiplyOperation extends FactorExpression{
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.print(indentation+"Multiply op:\n");
+        super.prettyPrint(indentation+" ");
 
     }
 
@@ -427,6 +491,8 @@ class DivideOperation extends FactorExpression{
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.print(indentation+"Division:\n");
+        super.prettyPrint(indentation+" ");
 
     }
 
@@ -448,6 +514,8 @@ class ModuloOperation extends FactorExpression{
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.print(indentation+"Modulo op:\n");
+        super.prettyPrint(indentation+" ");
 
     }
 
@@ -471,6 +539,11 @@ class ModuloOperation extends FactorExpression{
 abstract class PrimaryExpression extends Expression{
     public PrimaryExpression(int line) {
         super( line);
+    }
+    @Override
+    public void prettyPrint(String indentation) {
+        super.prettyPrint(indentation);
+
     }
 }
 class FunctionCallExpression extends PrimaryExpression{
@@ -507,6 +580,15 @@ class FunctionCallExpression extends PrimaryExpression{
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.print(indentation+"Function call:\n");
+        System.out.printf(indentation+"  - identifier:%s\n",identifier);
+        int i = 1;
+        for(Expression e : expressionParams){
+            System.out.printf(indentation+"  parameter %d:\n",i);
+            e.prettyPrint(indentation+"     ");
+            i++;
+        }
+        System.out.println();
 
     }
 
@@ -548,6 +630,8 @@ class LiteralExpression extends PrimaryExpression{
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.println(indentation+literal);
+        super.prettyPrint(indentation);
 
     }
 
@@ -589,6 +673,11 @@ class ParanExpression extends PrimaryExpression{
 
     @Override
     public void prettyPrint(String indentation) {
+        super.prettyPrint(indentation);
+        for(Expression e : expressions){
+            e.prettyPrint(indentation);
+        }
+
 
     }
 
@@ -625,6 +714,7 @@ class IdentifierExpression extends Expression{
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.printf(indentation+"Identifier exp: %s\n", id);
 
     }
 
@@ -640,11 +730,11 @@ class IdentifierExpression extends Expression{
         return this.id.equals(((IdentifierExpression) o).id);
     }
 }
-class IndexExpression extends Expression {
+class IndexOp extends Expression {
     Symbol identifier;
     Expression index;
 
-    public IndexExpression(int line, Symbol identifier, Expression index) {
+    public IndexOp(int line, Symbol identifier, Expression index) {
         super(line);
         this.identifier = identifier;
         this.index = index;
@@ -662,12 +752,17 @@ class IndexExpression extends Expression {
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.print(indentation+"Index op:\n");
+        System.out.printf(indentation+"- identifier: %s\n", identifier);
+        System.out.printf(indentation+"- index:\n");
+        index.prettyPrint(indentation+"  ");
+
 
     }
 
     @Override
     public String toString() {
-        return "IndexExpression{" +
+        return "IndexOp{" +
                 "identifier=" + identifier +
                 ", index=" + index +
                 '}';
@@ -702,6 +797,39 @@ class DotOperation extends Expression{
 
     @Override
     public void prettyPrint(String indentation) {
+        System.out.print(indentation+"Dot op:\n");
+        super.prettyPrint(indentation+" ");
+
+    }
+}
+
+class DotOperation2 extends Expression{
+    Symbol field;
+    Expression lhs;
+
+    public DotOperation2(int line, Expression lhs, Symbol field) {
+        super(line);
+        this.field = field;
+    }
+
+    @Override
+    public void printNode() {
+
+    }
+
+    @Override
+    public String getRep() {
+        return null;
+    }
+
+    @Override
+    public void prettyPrint(String indentation) {
+        System.out.print(indentation+"Dot op:\n");
+        if(lhs != null)
+            lhs.prettyPrint(indentation+" " );
+        //super.prettyPrint(indentation+" ");
+        System.out.printf(indentation+" %s",field);
+
 
     }
 
