@@ -4,7 +4,7 @@ import compiler.Lexer.Symbol;
 
 import java.util.ArrayList;
 
-abstract class Statement extends ASTNode {
+public abstract class Statement extends ASTNode {
     int line;
     protected Statement(int line) {
         this.line = line;
@@ -53,6 +53,17 @@ class Variable extends Statement {
                 ", (" + declarator+
                 ") }";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        Variable v = (Variable) o;
+
+        if(!this.type.equals(v.type)) return false;
+        else if(!this.declarator.equals(v.declarator)) return false;
+        else if(!this.identifier.equals(v.identifier)) return false;
+        
+        return true;
+    }
 }
 class ConstantVariable extends Statement {
     TypeDeclaration type;
@@ -84,6 +95,17 @@ class ConstantVariable extends Statement {
         System.out.print(indentation+"- declaration:\n");
         declarator.prettyPrint(indentation+"  ");
         //System.out.printf(indentation+"- declarator: %s\n", declarator.toString());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        ConstantVariable c = (ConstantVariable) o;
+
+        if(!this.type.equals(c.type)) return false;
+        else if(!this.identifier.equals(c.identifier)) return false;
+        else if(!this.declarator.equals(c.declarator)) return false;
+        
+        return true;
     }
 }
 class ScopeVariable extends Statement {
@@ -118,6 +140,16 @@ class ScopeVariable extends Statement {
                 "," + "( "+ declarator + " )"+
                 " }";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        ScopeVariable s = (ScopeVariable) o;
+
+        if(!this.identifier.equals(s.identifier)) return false;
+        else if(!this.declarator.equals(s.declarator)) return false;
+
+        return true;
+    }
 }
 class UninitVariable extends Statement {
     TypeDeclaration type;
@@ -150,6 +182,16 @@ class UninitVariable extends Statement {
                  ", " + identifier +
                 " }";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        UninitVariable u = (UninitVariable) o;
+        
+        if(!this.type.equals(u.type)) return false;
+        else if(!this.identifier.equals(u.identifier)) return false;
+        
+        return true;
+    }
 }
 
 class StructDeclaration extends Statement {
@@ -178,6 +220,16 @@ class StructDeclaration extends Statement {
         block.prettyPrint(indentation+" ");
 
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        StructDeclaration s = (StructDeclaration) o;
+
+        if(!this.block.equals(s.block)) return false;
+        else if(!this.identifier.equals(s.identifier)) return false;
+        
+        return true;
     }
 }
 
@@ -209,6 +261,16 @@ class TypeDeclaration extends Statement {
             System.out.print("[]\n");
         }
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        TypeDeclaration t = (TypeDeclaration) o;
+
+        if(!this.type.equals(t.type)) return false;
+        else if(!(this.isArray == t.isArray)) return false;
+
+        return true;
     }
 }
 
@@ -248,6 +310,19 @@ class ArrayInitializer extends Expression {
                  type +
                 ", " + size +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        ArrayInitializer a = (ArrayInitializer) o;
+
+        if(!this.size.equals(a.size)) return false;
+        else if(!this.type.equals(a.type)) return false;
+        else if (!this.operator.equals(a.operator)) return false;
+        else if (!this.lhs.equals(a.lhs)) return false;
+        else if (!this.rhs.equals(a.rhs)) return false;    
+    
+        return true;
     }
 }
 

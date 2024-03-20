@@ -1,0 +1,3 @@
+final int a = 3;
+final string k = "test2";
+final float i = 3.4*2*4;

@@ -5,12 +5,12 @@ import compiler.Lexer.Symbol;
 
 import java.util.ArrayList;
 
-class Procedure extends Statement {
+public class Procedure extends Statement {
     ProcedureDeclarator declarator;
     TypeDeclaration returnType;
     Symbol identifier;
 
-    protected Procedure(int line,ProcedureDeclarator declarator, TypeDeclaration returnType, Symbol identifier) {
+    public Procedure(int line,ProcedureDeclarator declarator, TypeDeclaration returnType, Symbol identifier) {
         super(line);
         this.returnType = returnType;
         this.identifier = identifier;
@@ -33,6 +33,17 @@ class Procedure extends Statement {
         System.out.printf(indentation+"- name: %s\n", identifier.toString());
         declarator.prettyPrint(indentation);
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        Procedure p = (Procedure) o;
+
+        if(!this.returnType.equals(p.returnType)) return false;
+        else if(!this.identifier.equals(p.identifier)) return false;
+        else if(!this.declarator.equals(p.declarator)) return false;
+        
+        return true;
     }
 }
 class ProcedureDeclarator extends Statement {
@@ -68,6 +79,16 @@ class ProcedureDeclarator extends Statement {
         System.out.printf(indentation+"- Block:\n");
         block.prettyPrint(indentation+"    ");
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        ProcedureDeclarator p = (ProcedureDeclarator) o;
+
+        if(!this.parameters.equals(p.parameters)) return false;
+        else if(!this.block.equals(p.block)) return false;
+        
+        return true;
     }
 }
 class Parameter extends Expression {
@@ -105,6 +126,16 @@ class Parameter extends Expression {
                 ", " + expression +
                 " }";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        Parameter p = (Parameter) o;
+
+        if(!this.type.equals(p.type)) return false;
+        else if(!this.expression.equals(p.expression)) return false;
+        
+        return true;
+    }
 }
 class Block extends Statement{
     ArrayList<Statement> statements;
@@ -135,6 +166,10 @@ class Block extends Statement{
         for(Statement s : statements){
             s.prettyPrint(indentation+"  ");
         }
+    }
+    @Override
+    public boolean equals(Object o) {
+        return this.statements.equals(((Block) o ).statements);
     }
 }
 
@@ -168,6 +203,15 @@ class IfElseStatement extends Statement {
     }
 
     @Override
+    public boolean equals(Object o) {
+        IfElseStatement i = (IfElseStatement) o;
+
+        if(!this.ifCondition.equals(i.ifCondition)) return false;
+        else if(!this.ifBlock.equals(i.ifBlock)) return false;
+        else if(!this.elseBlock.equals(i.elseBlock)) return false;
+        
+        return true;
+
     public String toString() {
         return "IfElseStatement{" +
                 "ifCondition=" + ifCondition +
@@ -209,6 +253,16 @@ class WhileStatement extends Statement {
                 "( " + condition + " )"+
                 "," + block +
                 " }";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        WhileStatement w = (WhileStatement) o;
+
+        if(!this.condition.equals(w.condition)) return false;
+        else if(!this.block.equals(w.block)) return false;
+        
+        return true;
     }
 }
 
@@ -257,6 +311,18 @@ class ForStatement extends Statement{
                   pos1 +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        ForStatement f = (ForStatement) o;
+
+        if(!this.block.equals(f.block)) return false;
+        else if(!this.pos0.equals(f.pos0)) return false;
+        else if(!this.pos1.equals(f.pos1)) return false;
+        else if(!this.pos2.equals(f.pos2)) return false;
+        
+        return true;
+    }
 }
 
 class ReturnStatement extends Statement {
@@ -287,6 +353,15 @@ class ReturnStatement extends Statement {
         return "ReturnStatement{ " +
                  expression +
                 " }";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        ReturnStatement r = (ReturnStatement) o;
+
+        if(!this.expression.equals(r.expression)) return false;
+        
+        return true;
     }
 }
 
