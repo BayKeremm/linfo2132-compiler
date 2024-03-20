@@ -1,10 +1,12 @@
-final int a = 3;
+final int a = -3;
 
 final int a = 3 % 2;
 
-final int a = 3 * 2;
+final int a = 3 % 2 + 10;
 
-final int a = 3 == 2;
+final int a = 3 * 2000;
+
+final int a = 3 == 2+1;
 
 final int a = 3 != 2;
 
@@ -14,7 +16,7 @@ final int a = (((2+2)-4)*2) / 3;
 
 final int i = 2*2+4;
 final float j = 3.2*5.0;
-final int k = (i+2)*3;
+final int k = (i+2)*3 == 1;
 final string message = "Hello";
 final bool isEmpty = true;
 
@@ -31,13 +33,14 @@ struct Person {
     int[] history;
 }
 
-int abc = 5;
-
-
 
 Person d = Person("me", Point(3,7,string[5]), int[i*2]);  // new structure
 
 int i = d.location.names[0];
+int j = d.location.x;
+
+Point p = Point(3,7,string[5]);
+int x = p.name[0];
 
 int[] c = int[5];  // new array of length 5
 int x = c[5];
@@ -97,7 +100,7 @@ def void main() {
     writeln(square(value));
     int i;
     for (i=1, i<100, i = i+1) {
-        while (value!=3) {
+        while (value!=square(3)) {
             if (i > 10){
                 int x = i;
             }

@@ -96,9 +96,9 @@ class LogicalOr extends LogicalExpression{
 /** EQUALITY EXPRESSION:
  *             equalityExpression -> comparisonExpression ( ( NOT_EQUAL | EQUAL ) comparisonExpression  )*
  * */
-abstract class EqualityExpression extends Expression{
+abstract class EqualityCheckExpression extends Expression{
 
-    public EqualityExpression(int line, Expression lhs, Expression rhs, String operator) {
+    public EqualityCheckExpression(int line, Expression lhs, Expression rhs, String operator) {
         super( line,  lhs,  rhs,  operator);
     }
     @Override
@@ -116,7 +116,7 @@ abstract class EqualityExpression extends Expression{
 
     }
 }
-class NotEqualComparison extends EqualityExpression{
+class NotEqualComparison extends EqualityCheckExpression {
 
     public NotEqualComparison(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "!=");
@@ -129,7 +129,7 @@ class NotEqualComparison extends EqualityExpression{
 
     }
 }
-class EqualComparison extends EqualityExpression{
+class EqualComparison extends EqualityCheckExpression {
 
     public EqualComparison(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "==");

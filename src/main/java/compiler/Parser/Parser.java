@@ -245,7 +245,7 @@ public class Parser {
     }
     private Expression factorExpression(){
         int line = nextSymbol.line();
-        Expression lhs = dumbDot();
+        Expression lhs = dotExpression();
         if(have(Token.STAR)){
             return new MultiplyOperation(line,lhs, factorExpression());
         }else if(have(Token.MODULO)){
@@ -258,11 +258,11 @@ public class Parser {
         }
     }
 
-    private Expression dumbDot(){
+    private Expression dotExpression(){
         int line = nextSymbol.line();
         Expression lhs = primary();
         if(have(Token.DOT)){
-            return new DotOperation(line,lhs,dumbDot());
+            return new DotOperation(line,lhs, dotExpression());
         }else{
             return lhs;
         }
