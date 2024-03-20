@@ -206,12 +206,12 @@ class IfElseStatement extends Statement {
     public boolean equals(Object o) {
         IfElseStatement i = (IfElseStatement) o;
 
-        if(!this.ifCondition.equals(i.ifCondition)) return false;
-        else if(!this.ifBlock.equals(i.ifBlock)) return false;
-        else if(!this.elseBlock.equals(i.elseBlock)) return false;
-        
-        return true;
+        if (!this.ifCondition.equals(i.ifCondition)) return false;
+        else if (!this.ifBlock.equals(i.ifBlock)) return false;
+        else if (!this.elseBlock.equals(i.elseBlock)) return false;
 
+        return true;
+    }
     public String toString() {
         return "IfElseStatement{" +
                 "ifCondition=" + ifCondition +

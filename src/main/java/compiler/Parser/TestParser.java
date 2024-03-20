@@ -128,6 +128,7 @@ public class TestParser {
 
         ProcedureDeclarator testDeclarator = new ProcedureDeclarator(0, parameters, block);
         Procedure testProcedure = new Procedure(0, testDeclarator, retType, new Symbol(Token.IDENTIFIER,"func", 0));
+        testProcedure.prettyPrint(" ");
 
         Test.addProcedure(testProcedure);
 

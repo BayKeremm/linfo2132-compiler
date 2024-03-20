@@ -770,7 +770,7 @@ class IndexOp extends Expression {
 
     @Override
     public boolean equals(Object o) {
-        IndexExpression a = (IndexExpression) o;
+        IndexOp a = (IndexOp) o;
         
         if(!this.identifier.equals(a.identifier)) return false;
         else if(!this.index.equals(a.index)) return false;
@@ -788,6 +788,11 @@ class DotOperation extends Expression{
     @Override
     public void printNode() {
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return false;
     }
 
     @Override
