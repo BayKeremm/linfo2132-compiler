@@ -4,7 +4,7 @@ import compiler.Lexer.Symbol;
 
 import java.util.ArrayList;
 
-abstract class Expression extends Statement{
+public abstract class Expression extends Statement{
     Expression lhs;
     Expression rhs;
     String operator;
@@ -58,6 +58,17 @@ class LogicalAnd extends LogicalExpression{
     public void prettyPrint(String indentation) {
 
     }
+
+    @Override
+    public boolean equals(Object o) {
+        LogicalAnd a = (LogicalAnd) o;
+        
+        if(!this.lhs.equals(a.lhs)) return false;
+        else if(!this.rhs.equals(a.rhs)) return false;
+        else if (!this.operator.equals(a.operator)) return false;
+
+        return true;
+    }
 }
 class LogicalOr extends LogicalExpression{
     public LogicalOr(int line, Expression lhs, Expression rhs) {
@@ -72,6 +83,17 @@ class LogicalOr extends LogicalExpression{
     @Override
     public void prettyPrint(String indentation) {
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        LogicalOr a = (LogicalOr) o;
+        
+        if(!this.lhs.equals(a.lhs)) return false;
+        else if(!this.rhs.equals(a.rhs)) return false;
+        else if (!this.operator.equals(a.operator)) return false;
+
+        return true;
     }
 }
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -103,6 +125,17 @@ class NotEqualComparison extends EqualityExpression{
     public void prettyPrint(String indentation) {
 
     }
+
+    @Override
+    public boolean equals(Object o) {
+        NotEqualComparison a = (NotEqualComparison) o;
+        
+        if(!this.lhs.equals(a.lhs)) return false;
+        else if(!this.rhs.equals(a.rhs)) return false;
+        else if (!this.operator.equals(a.operator)) return false;
+
+        return true;
+    }
 }
 class EqualComparison extends EqualityExpression{
 
@@ -113,6 +146,17 @@ class EqualComparison extends EqualityExpression{
     @Override
     public void prettyPrint(String indentation) {
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        EqualComparison a = (EqualComparison) o;
+        
+        if(!this.lhs.equals(a.lhs)) return false;
+        else if(!this.rhs.equals(a.rhs)) return false;
+        else if (!this.operator.equals(a.operator)) return false;
+
+        return true;
     }
 }
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -142,6 +186,17 @@ class LTComparison extends ComparisionExpression{
     public void prettyPrint(String indentation) {
 
     }
+
+    @Override
+    public boolean equals(Object o) {
+        LTComparison a = (LTComparison) o;
+        
+        if(!this.lhs.equals(a.lhs)) return false;
+        else if(!this.rhs.equals(a.rhs)) return false;
+        else if (!this.operator.equals(a.operator)) return false;
+
+        return true;
+    }
 }
 class GTComparison extends ComparisionExpression{
     public GTComparison(int line, Expression lhs, Expression rhs) {
@@ -151,6 +206,17 @@ class GTComparison extends ComparisionExpression{
     @Override
     public void prettyPrint(String indentation) {
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        GTComparison a = (GTComparison) o;
+        
+        if(!this.lhs.equals(a.lhs)) return false;
+        else if(!this.rhs.equals(a.rhs)) return false;
+        else if (!this.operator.equals(a.operator)) return false;
+
+        return true;
     }
 }
 class LEComparison extends ComparisionExpression{
@@ -162,6 +228,17 @@ class LEComparison extends ComparisionExpression{
     public void prettyPrint(String indentation) {
 
     }
+
+    @Override
+    public boolean equals(Object o) {
+        LEComparison a = (LEComparison) o;
+        
+        if(!this.lhs.equals(a.lhs)) return false;
+        else if(!this.rhs.equals(a.rhs)) return false;
+        else if (!this.operator.equals(a.operator)) return false;
+
+        return true;
+    }
 }
 class GEComparison extends ComparisionExpression{
     public GEComparison(int line, Expression lhs, Expression rhs) {
@@ -171,6 +248,17 @@ class GEComparison extends ComparisionExpression{
     @Override
     public void prettyPrint(String indentation) {
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        GEComparison a = (GEComparison) o;
+        
+        if(!this.lhs.equals(a.lhs)) return false;
+        else if(!this.rhs.equals(a.rhs)) return false;
+        else if (!this.operator.equals(a.operator)) return false;
+
+        return true;
     }
 }
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -201,6 +289,17 @@ class MinusOperation extends TermExpression{
     public void prettyPrint(String indentation) {
 
     }
+
+    @Override
+    public boolean equals(Object o) {
+        MinusOperation a = (MinusOperation) o;
+        
+        if(!this.lhs.equals(a.lhs)) return false;
+        else if(!this.rhs.equals(a.rhs)) return false;
+        else if (!this.operator.equals(a.operator)) return false;
+
+        return true;
+    }
 }
 class PlusOperation extends TermExpression{
     public PlusOperation(int line, Expression lhs, Expression rhs) {
@@ -210,6 +309,17 @@ class PlusOperation extends TermExpression{
     @Override
     public void prettyPrint(String indentation) {
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        PlusOperation a = (PlusOperation) o;
+        
+        if(!this.lhs.equals(a.lhs)) return false;
+        else if(!this.rhs.equals(a.rhs)) return false;
+        else if (!this.operator.equals(a.operator)) return false;
+
+        return true;
     }
 }
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -239,6 +349,17 @@ class UnaryNegateOperation extends UnaryExpression{
     public void prettyPrint(String indentation) {
 
     }
+
+    @Override
+    public boolean equals(Object o) {
+        UnaryNegateOperation a = (UnaryNegateOperation) o;
+        
+        if(!this.lhs.equals(a.lhs)) return false;
+        else if(!this.rhs.equals(a.rhs)) return false;
+        else if (!this.operator.equals(a.operator)) return false;
+
+        return true;
+    }
 }
 class UnaryMinusOperation extends UnaryExpression{
     public UnaryMinusOperation(int line, Expression lhs, Expression rhs) {
@@ -248,6 +369,17 @@ class UnaryMinusOperation extends UnaryExpression{
     @Override
     public void prettyPrint(String indentation) {
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        UnaryMinusOperation a = (UnaryMinusOperation) o;
+        
+        if(!this.lhs.equals(a.lhs)) return false;
+        else if(!this.rhs.equals(a.rhs)) return false;
+        else if (!this.operator.equals(a.operator)) return false;
+
+        return true;
     }
 }
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -275,6 +407,17 @@ class MultiplyOperation extends FactorExpression{
     public void prettyPrint(String indentation) {
 
     }
+
+    @Override
+    public boolean equals(Object o) {
+        MultiplyOperation a = (MultiplyOperation) o;
+        
+        if(!this.lhs.equals(a.lhs)) return false;
+        else if(!this.rhs.equals(a.rhs)) return false;
+        else if (!this.operator.equals(a.operator)) return false;
+
+        return true;
+    }
 }
 
 class DivideOperation extends FactorExpression{
@@ -286,6 +429,17 @@ class DivideOperation extends FactorExpression{
     public void prettyPrint(String indentation) {
 
     }
+
+    @Override
+    public boolean equals(Object o) {
+        DivideOperation a = (DivideOperation) o;
+        
+        if(!this.lhs.equals(a.lhs)) return false;
+        else if(!this.rhs.equals(a.rhs)) return false;
+        else if (!this.operator.equals(a.operator)) return false;
+
+        return true;
+    }
 }
 class ModuloOperation extends FactorExpression{
     public ModuloOperation(int line, Expression lhs, Expression rhs) {
@@ -295,6 +449,17 @@ class ModuloOperation extends FactorExpression{
     @Override
     public void prettyPrint(String indentation) {
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        ModuloOperation a = (ModuloOperation) o;
+        
+        if(!this.lhs.equals(a.lhs)) return false;
+        else if(!this.rhs.equals(a.rhs)) return false;
+        else if (!this.operator.equals(a.operator)) return false;
+
+        return true;
     }
 }
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -352,6 +517,16 @@ class FunctionCallExpression extends PrimaryExpression{
                 ", expressionParams=" + expressionParams +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        FunctionCallExpression a = (FunctionCallExpression) o;
+        
+        if(!this.identifier.equals(a.identifier)) return false;
+        else if(!this.expressionParams.equals(a.expressionParams)) return false;
+
+        return true;
+    }
 }
 
 class LiteralExpression extends PrimaryExpression{
@@ -380,6 +555,11 @@ class LiteralExpression extends PrimaryExpression{
     public String toString() {
         return "LiteralExp("+ literal.image() +
                 ')';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return this.literal.equals(((LiteralExpression) o).literal);
     }
 }
 class ParanExpression extends PrimaryExpression{
@@ -418,6 +598,11 @@ class ParanExpression extends PrimaryExpression{
                  expressions +
                 " }";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        return this.expressions.equals(((ParanExpression) o).expressions);
+    }
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -448,6 +633,11 @@ class IdentifierExpression extends Expression{
         return "IdentifierExp{" +
                  id.image() +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return this.id.equals(((IdentifierExpression) o).id);
     }
 }
 class IndexExpression extends Expression {
@@ -482,6 +672,16 @@ class IndexExpression extends Expression {
                 ", index=" + index +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        IndexExpression a = (IndexExpression) o;
+        
+        if(!this.identifier.equals(a.identifier)) return false;
+        else if(!this.index.equals(a.index)) return false;
+
+        return true;
+    }
 }
 
 class DotOperation extends Expression{
@@ -503,6 +703,17 @@ class DotOperation extends Expression{
     @Override
     public void prettyPrint(String indentation) {
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        DotOperation a = (DotOperation) o;
+        
+        if(!this.lhs.equals(a.lhs)) return false;
+        else if(!this.rhs.equals(a.rhs)) return false;
+        else if (!this.operator.equals(a.operator)) return false;
+
+        return true;
     }
 }
 

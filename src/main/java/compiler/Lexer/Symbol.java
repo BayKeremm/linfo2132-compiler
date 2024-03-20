@@ -45,4 +45,9 @@ public class Symbol {
                 attribute +
                 '}';
     }
+
+    public boolean equals(Object o){
+        Symbol t = (Symbol) o;
+        return this.attribute.equals(t.attribute);
+    }
 }
