@@ -1,6 +1,16 @@
 def float func(int x, int y, int z ) {
     int i;
-    while(i < 3){
+    while(i == 3){
         i = i + 1;
     }
+    for(i = 0, i <= 3, i = i + 1){
+        i = i + 1;
+    }
+    if (i != 5){
+        int x = i + 1;
+    }
+    else {
+        int y = i + 2;
+    }
+    return x + y + z;
 }

@@ -211,7 +211,8 @@ class IfElseStatement extends Statement {
         else if(!this.elseBlock.equals(i.elseBlock)) return false;
         
         return true;
-
+    }
+    
     public String toString() {
         return "IfElseStatement{" +
                 "ifCondition=" + ifCondition +

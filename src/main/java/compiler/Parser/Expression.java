@@ -770,7 +770,7 @@ class IndexOp extends Expression {
 
     @Override
     public boolean equals(Object o) {
-        IndexExpression a = (IndexExpression) o;
+        IndexOp a = (IndexOp) o;
         
         if(!this.identifier.equals(a.identifier)) return false;
         else if(!this.index.equals(a.index)) return false;
@@ -800,6 +800,17 @@ class DotOperation extends Expression{
         System.out.print(indentation+"Dot op:\n");
         super.prettyPrint(indentation+" ");
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        DotOperation a = (DotOperation) o;
+        
+        if(!this.lhs.equals(a.lhs)) return false;
+        else if(!this.rhs.equals(a.rhs)) return false;
+        else if (!this.operator.equals(a.operator)) return false;
+
+        return true;
     }
 }
 

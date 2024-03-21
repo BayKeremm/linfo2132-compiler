@@ -1,0 +1,8 @@
+struct Point{
+    int a;
+    int[] c = int[3];
+}
+Point p = Point(3);
+int[] arr = int[5];
+int b = p.a;
+int c = p.c[0];

@@ -10,7 +10,7 @@ public class Program extends ASTNode{
     private ArrayList<ConstantVariable> constantVariables;
     private ArrayList<Procedure> procedures;
     private ArrayList<StructDeclaration> structDeclarations;
-    private ArrayList<Statement> globals;
+    public ArrayList<Statement> globals;
 
     public Program(String fileName, ArrayList<ConstantVariable> constantVariables, ArrayList<Statement> globals, ArrayList<StructDeclaration> structDeclarations, ArrayList<Procedure> procedures) {
         this.fileName = fileName;
@@ -87,5 +87,9 @@ public class Program extends ASTNode{
 
     public void addProcedure(Procedure p){
         procedures.add(p);
+    }
+
+    public void addGlobal(Statement s){
+        globals.add(s);
     }
 }

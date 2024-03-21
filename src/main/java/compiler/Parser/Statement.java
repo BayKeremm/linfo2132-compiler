@@ -318,10 +318,7 @@ class ArrayInitializer extends Expression {
 
         if(!this.size.equals(a.size)) return false;
         else if(!this.type.equals(a.type)) return false;
-        else if (!this.operator.equals(a.operator)) return false;
-        else if (!this.lhs.equals(a.lhs)) return false;
-        else if (!this.rhs.equals(a.rhs)) return false;    
-    
+
         return true;
     }
 }
