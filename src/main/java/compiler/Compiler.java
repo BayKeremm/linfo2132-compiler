@@ -6,6 +6,7 @@ package compiler;
 import compiler.Lexer.Lexer;
 import compiler.Parser.Parser;
 import compiler.Parser.Program;
+import compiler.Parser.TestParser;
 
 import java.io.FileReader;
 import java.io.LineNumberReader;
@@ -18,25 +19,40 @@ public class Compiler {
         LineNumberReader reader;
 
         boolean debug = false;
+        boolean test = false;
         String fileName;
 
         if(args.length > 1){
             if(args[0].equals("-parser")){
                 debug = true;
             }
+            else if(args[0].equals("-test")){
+                test = true;
+
+            }
             fileName = args[1];
         }else{
             fileName = args[0];
+
         }
 
-        reader = new LineNumberReader(new FileReader(fileName));
+        if(test){
+            TestParser testParser = new TestParser();
+            testParser.testConstantVariable();
+            testParser.testProcedure();
+            testParser.testStructGlobals();
+        }
 
-        Lexer lexer = new Lexer(reader);
-        lexer.setFileName(fileName);
+        else{
+            reader = new LineNumberReader(new FileReader(fileName));
 
-        Parser parser = new Parser(lexer);
-        Program p = parser.program();
-        p.printNode();
+            Lexer lexer = new Lexer(reader);
+            lexer.setFileName(fileName);
+
+            Parser parser = new Parser(lexer);
+            Program p = parser.program();
+            p.printNode();
+        }
 
 
         //lexer.advanceLexer();
