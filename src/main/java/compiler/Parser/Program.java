@@ -7,9 +7,9 @@ import compiler.Lexer.Token;
 * */
 public class Program extends ASTNode{
     private String fileName;
-    private ArrayList<ConstantVariable> constantVariables;
-    private ArrayList<Procedure> procedures;
-    private ArrayList<StructDeclaration> structDeclarations;
+    public ArrayList<ConstantVariable> constantVariables;
+    public ArrayList<Procedure> procedures;
+    public ArrayList<StructDeclaration> structDeclarations;
     public ArrayList<Statement> globals;
 
     public Program(String fileName, ArrayList<ConstantVariable> constantVariables, ArrayList<Statement> globals, ArrayList<StructDeclaration> structDeclarations, ArrayList<Procedure> procedures) {
@@ -21,7 +21,6 @@ public class Program extends ASTNode{
         program = this;
 
     }
-    @Override
     public void printNode() {
         final String ANSI_RESET = "\u001B[0m";
         final String ANSI_BLACK = "\u001B[30m";

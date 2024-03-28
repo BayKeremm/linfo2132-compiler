@@ -23,15 +23,6 @@ class Variable extends Statement {
         this.identifier = identifier;
     }
 
-    @Override
-    public void printNode() {
-        System.out.println("\nVariable:");
-        System.out.printf("    - type: %s \n", type.toString());
-        System.out.print("    - identifier:");
-        identifier.printNode();
-        declarator.printNode();
-
-    }
 
     @Override
     public void prettyPrint(String indentation) {
@@ -76,16 +67,6 @@ class ConstantVariable extends Statement {
         this.identifier = identifier;
     }
 
-    @Override
-    public void printNode() {
-        System.out.println("\nConstant variable:");
-        System.out.print("    - type:");
-        type.printNode();
-        System.out.print("    - identifier:");
-        identifier.printNode();
-        declarator.printNode();
-
-    }
 
     @Override
     public void prettyPrint(String indentation) {
@@ -117,14 +98,6 @@ class ScopeVariable extends Statement {
         this.identifier = identifier;
     }
 
-    @Override
-    public void printNode() {
-        System.out.println("\nScope variable:");
-        System.out.print("    - identifier:");
-        identifier.printNode();
-        declarator.printNode();
-
-    }
 
     @Override
     public void prettyPrint(String indentation) {
@@ -160,13 +133,6 @@ class UninitVariable extends Statement {
         this.identifier = identifier;
     }
 
-    @Override
-    public void printNode() {
-        System.out.println(" \nUninit variable:");
-        System.out.printf("    - type: %s \n", type.toString());
-        System.out.print("    - identifier:");
-        identifier.printNode();
-    }
 
     @Override
     public void prettyPrint(String indentation) {
@@ -205,13 +171,6 @@ class StructDeclaration extends Statement {
     }
 
     @Override
-    public void printNode() {
-        System.out.println("\nStruct Declaration:");
-        identifier.printNode();
-        block.printNode();
-    }
-
-    @Override
     public void prettyPrint(String indentation) {
         System.out.println("Struct Declaration: ");
         System.out.printf(indentation+"- identifier: %s\n",identifier.toString());
@@ -243,11 +202,6 @@ class TypeDeclaration extends Statement {
         this.isArray = isArray;
     }
 
-    @Override
-    public void printNode() {
-        System.out.printf("%s%s",type.image(),(isArray ? "[]":""));
-
-    }
 
     @Override
     public String toString() {
@@ -289,9 +243,10 @@ class ArrayInitializer extends Expression {
     }
 
     @Override
-    public void printNode() {
-
+    public void typeAnalyse(NodeVisitor v) {
+        v.visitArrayInitializer(this);
     }
+
 
     @Override
     public void prettyPrint(String indentation) {
@@ -323,30 +278,3 @@ class ArrayInitializer extends Expression {
     }
 }
 
-/*
-class StructInitializer extends Expression{
-    Expression identifier;
-    ArrayList<Expression> structParams;
-
-    public StructInitializer(int line, Expression identifier, ArrayList<Expression> structParams) {
-        super(line);
-        this.identifier = identifier;
-        this.structParams = structParams;
-    }
-
-    @Override
-    public void printNode() {
-
-    }
-
-    @Override
-    public String getRep() {
-        return null;
-    }
-
-    @Override
-    public void prettyPrint(String indentation) {
-        System.out.print("Unimplemented pretty print struct init");
-    }
-}
- */

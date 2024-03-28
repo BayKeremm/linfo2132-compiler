@@ -8,7 +8,5 @@ abstract class ASTNode {
 
     }
 
-    public abstract void printNode();
-
     public abstract boolean equals(Object o);
 }

@@ -7,11 +7,11 @@ import compiler.Lexer.Lexer;
 import compiler.Parser.Parser;
 import compiler.Parser.Program;
 import compiler.Parser.TestParser;
+import compiler.Parser.TypeChecker;
 
 import java.io.FileReader;
 import java.io.LineNumberReader;
 
-import static org.junit.Assert.assertEquals;
 
 public class Compiler {
     public static void main(String[] args) throws Exception {
@@ -52,7 +52,10 @@ public class Compiler {
             Parser parser = new Parser(lexer);
             Program p = parser.program();
             p.printNode();
+            TypeChecker semantics = new TypeChecker(p);
+            semantics.typeCheck();
         }
+
 
 
         //lexer.advanceLexer();

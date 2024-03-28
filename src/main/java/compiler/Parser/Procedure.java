@@ -17,14 +17,6 @@ public class Procedure extends Statement {
         this.declarator = declarator;
     }
 
-    @Override
-    public void printNode() {
-        System.out.println("\n Procedure:");
-        System.out.printf("     - procedure name: %s\n", identifier.image());
-        System.out.print("     - return type: ");
-        returnType.printNode();
-        declarator.printNode();
-    }
 
     @Override
     public void prettyPrint(String indentation) {
@@ -56,16 +48,6 @@ class ProcedureDeclarator extends Statement {
         this.block = block;
     }
 
-    @Override
-    public void printNode() {
-        System.out.print("     - Parameters: ");
-        for(Expression p: parameters){
-            System.out.printf(" %s ",p.getRep());
-        }
-        System.out.print("\n     - Block: ");
-        block.printNode();
-
-    }
 
     @Override
     public void prettyPrint(String indentation) {
@@ -106,9 +88,10 @@ class Parameter extends Expression {
     }
 
     @Override
-    public void printNode() {
-
+    public void typeAnalyse(NodeVisitor v) {
+        v.visitParameter(this);
     }
+
 
 
     @Override
@@ -144,13 +127,6 @@ class Block extends Statement{
         super(line);
         this.statements = statements;
     }
-    @Override
-    public void printNode() {
-        for(Statement s : statements){
-            s.printNode();
-        }
-
-    }
 
     @Override
     public String toString() {
@@ -185,13 +161,6 @@ class IfElseStatement extends Statement {
         this.elseBlock = elseBlock;
     }
 
-    @Override
-    public void printNode() {
-        System.out.printf("\nIf %s:\n", ifCondition.getRep());
-        ifBlock.printNode();
-        System.out.print("\nElse:\n");
-        elseBlock.printNode();
-    }
 
     @Override
     public void prettyPrint(String indentation) {
@@ -232,12 +201,6 @@ class WhileStatement extends Statement {
         this.block = block;
     }
 
-    @Override
-    public void printNode() {
-        System.out.printf("\nwhile %s:\n", condition.getRep());
-        block.printNode();
-
-    }
 
     @Override
     public void prettyPrint(String indentation) {
@@ -280,14 +243,6 @@ class ForStatement extends Statement{
         this.pos2 = pos2;
     }
 
-    @Override
-    public void printNode() {
-        System.out.print("For statement: ");
-        pos0.printNode();
-        pos1.printNode();
-        pos2.printNode();
-        block.printNode();
-    }
 
     @Override
     public void prettyPrint(String indentation) {
@@ -333,14 +288,6 @@ class ReturnStatement extends Statement {
     protected ReturnStatement(int line, Expression expression) {
         super(line);
         this.expression = expression;
-    }
-
-    @Override
-    public void printNode() {
-        System.out.print("\n\tReturn: ");
-        expression.printNode();
-
-
     }
 
     @Override
