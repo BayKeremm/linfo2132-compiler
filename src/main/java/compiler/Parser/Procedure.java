@@ -36,11 +36,6 @@ public class Procedure extends Statement {
     }
 
     @Override
-    public void analyze(NodeVisitor v) {
-
-    }
-
-    @Override
     public boolean equals(Object o) {
         Procedure p = (Procedure) o;
 
@@ -87,11 +82,6 @@ class ProcedureDeclarator extends Statement {
     }
 
     @Override
-    public void analyze(NodeVisitor v) {
-
-    }
-
-    @Override
     public boolean equals(Object o) {
         ProcedureDeclarator p = (ProcedureDeclarator) o;
 
@@ -126,11 +116,6 @@ class Parameter extends Expression {
         System.out.printf(indentation+"- type:   %s\n",type);
         System.out.print(indentation+"- name:");
         expression.prettyPrint(indentation);
-
-    }
-
-    @Override
-    public void analyze(NodeVisitor v) {
 
     }
 
@@ -182,12 +167,6 @@ class Block extends Statement{
             s.prettyPrint(indentation+"  ");
         }
     }
-
-    @Override
-    public void analyze(NodeVisitor v) {
-
-    }
-
     @Override
     public boolean equals(Object o) {
         return this.statements.equals(((Block) o ).statements);
@@ -220,11 +199,6 @@ class IfElseStatement extends Statement {
         ifBlock.prettyPrint(indentation+"  ");
         System.out.print(indentation+"Else:\n");
         elseBlock.prettyPrint(indentation+"  ");
-
-    }
-
-    @Override
-    public void analyze(NodeVisitor v) {
 
     }
 
@@ -272,11 +246,6 @@ class WhileStatement extends Statement {
         condition.prettyPrint(indentation+"    ");
         System.out.println(indentation+"  - While block:");
         block.prettyPrint(indentation+"     ");
-
-    }
-
-    @Override
-    public void analyze(NodeVisitor v) {
 
     }
 
@@ -336,11 +305,6 @@ class ForStatement extends Statement{
     }
 
     @Override
-    public void analyze(NodeVisitor v) {
-
-    }
-
-    @Override
     public String toString() {
         return "ForStatement{" +
                  block +
@@ -383,11 +347,6 @@ class ReturnStatement extends Statement {
     public void prettyPrint(String indentation) {
         System.out.print(indentation+"Return statement:\n");
         expression.prettyPrint(indentation+"  ");
-
-    }
-
-    @Override
-    public void analyze(NodeVisitor v) {
 
     }
 

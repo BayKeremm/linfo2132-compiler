@@ -41,7 +41,7 @@ public class Symbol {
 
     @Override
     public String toString() {
-        return "Symbol{" + token + ", " +
+        return "Symbol{" +
                 attribute +
                 '}';
     }

@@ -1,6 +1,7 @@
 package compiler.Parser;
 import java.util.ArrayList;
-
+import compiler.Lexer.Symbol;
+import compiler.Lexer.Token;
 /**
 * This is the root of the AST produced by the parser
 * */
@@ -90,8 +91,5 @@ public class Program extends ASTNode{
 
     public void addGlobal(Statement s){
         globals.add(s);
-    }
-    public ArrayList<ConstantVariable> getConstantVariables(){
-        return this.constantVariables;
     }
 }

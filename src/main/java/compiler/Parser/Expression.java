@@ -69,11 +69,6 @@ class LogicalAnd extends LogicalExpression{
     }
 
     @Override
-    public void analyze(NodeVisitor v) {
-
-    }
-
-    @Override
     public void prettyPrint(String indentation) {
         System.out.print(indentation+"AND op:\n");
         super.prettyPrint(indentation+" ");
@@ -98,11 +93,6 @@ class LogicalOr extends LogicalExpression{
 
     @Override
     public void printNode() {
-
-    }
-
-    @Override
-    public void analyze(NodeVisitor v) {
 
     }
 
@@ -155,11 +145,6 @@ class NotEqualComparison extends EqualityCheckExpression {
     }
 
     @Override
-    public void analyze(NodeVisitor v) {
-
-    }
-
-    @Override
     public void prettyPrint(String indentation) {
         System.out.print(indentation+"Not equal comp:\n");
         super.prettyPrint(indentation+" ");
@@ -181,11 +166,6 @@ class EqualComparison extends EqualityCheckExpression {
 
     public EqualComparison(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "==");
-    }
-
-    @Override
-    public void analyze(NodeVisitor v) {
-
     }
 
     @Override
@@ -235,11 +215,6 @@ class LTComparison extends ComparisionExpression{
     }
 
     @Override
-    public void analyze(NodeVisitor v) {
-
-    }
-
-    @Override
     public void prettyPrint(String indentation) {
         System.out.print(indentation+"LT comp:\n");
         super.prettyPrint(indentation+" ");
@@ -260,11 +235,6 @@ class LTComparison extends ComparisionExpression{
 class GTComparison extends ComparisionExpression{
     public GTComparison(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, ">");
-    }
-
-    @Override
-    public void analyze(NodeVisitor v) {
-
     }
 
     @Override
@@ -291,11 +261,6 @@ class LEComparison extends ComparisionExpression{
     }
 
     @Override
-    public void analyze(NodeVisitor v) {
-
-    }
-
-    @Override
     public void prettyPrint(String indentation) {
         System.out.print(indentation+"LE comp:\n");
         super.prettyPrint(indentation+" ");
@@ -316,11 +281,6 @@ class LEComparison extends ComparisionExpression{
 class GEComparison extends ComparisionExpression{
     public GEComparison(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, ">=");
-    }
-
-    @Override
-    public void analyze(NodeVisitor v) {
-
     }
 
     @Override
@@ -371,11 +331,6 @@ class MinusOperation extends TermExpression{
     }
 
     @Override
-    public void analyze(NodeVisitor v) {
-
-    }
-
-    @Override
     public void prettyPrint(String indentation) {
         System.out.print(indentation+"Minus op:\n");
         super.prettyPrint(indentation+" ");
@@ -415,11 +370,6 @@ class PlusOperation extends TermExpression{
 
         return true;
     }
-
-    @Override
-    public void analyze(NodeVisitor v) {
-        v.visitPlusExp(this);
-    }
 }
 /*--------------------------------------------------------------------------------------------------------------------*/
 /** UNARY EXPRESSION:
@@ -451,11 +401,6 @@ class UnaryNegateOperation extends UnaryExpression{
     }
 
     @Override
-    public void analyze(NodeVisitor v) {
-
-    }
-
-    @Override
     public void prettyPrint(String indentation) {
         super.prettyPrint(indentation);
     }
@@ -474,11 +419,6 @@ class UnaryNegateOperation extends UnaryExpression{
 class UnaryMinusOperation extends UnaryExpression{
     public UnaryMinusOperation(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "-");
-    }
-
-    @Override
-    public void analyze(NodeVisitor v) {
-
     }
 
     @Override
@@ -526,11 +466,6 @@ class MultiplyOperation extends FactorExpression{
     }
 
     @Override
-    public void analyze(NodeVisitor v) {
-
-    }
-
-    @Override
     public void prettyPrint(String indentation) {
         System.out.print(indentation+"Multiply op:\n");
         super.prettyPrint(indentation+" ");
@@ -555,11 +490,6 @@ class DivideOperation extends FactorExpression{
     }
 
     @Override
-    public void analyze(NodeVisitor v) {
-
-    }
-
-    @Override
     public void prettyPrint(String indentation) {
         System.out.print(indentation+"Division:\n");
         super.prettyPrint(indentation+" ");
@@ -580,11 +510,6 @@ class DivideOperation extends FactorExpression{
 class ModuloOperation extends FactorExpression{
     public ModuloOperation(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "%");
-    }
-
-    @Override
-    public void analyze(NodeVisitor v) {
-
     }
 
     @Override
@@ -654,11 +579,6 @@ class FunctionCallExpression extends PrimaryExpression{
     }
 
     @Override
-    public void analyze(NodeVisitor v) {
-
-    }
-
-    @Override
     public void prettyPrint(String indentation) {
         System.out.print(indentation+"Function call:\n");
         System.out.printf(indentation+"  - identifier:%s\n",identifier);
@@ -705,12 +625,7 @@ class LiteralExpression extends PrimaryExpression{
 
     @Override
     public String getRep() {
-        return literal.toString();//literal.image();
-    }
-
-    @Override
-    public void analyze(NodeVisitor v) {
-
+        return literal.image();
     }
 
     @Override
@@ -757,11 +672,6 @@ class ParanExpression extends PrimaryExpression{
     }
 
     @Override
-    public void analyze(NodeVisitor v) {
-
-    }
-
-    @Override
     public void prettyPrint(String indentation) {
         super.prettyPrint(indentation);
         for(Expression e : expressions){
@@ -803,11 +713,6 @@ class IdentifierExpression extends Expression{
     }
 
     @Override
-    public void analyze(NodeVisitor v) {
-
-    }
-
-    @Override
     public void prettyPrint(String indentation) {
         System.out.printf(indentation+"Identifier exp: %s\n", id);
 
@@ -843,11 +748,6 @@ class IndexOp extends Expression {
     @Override
     public String getRep() {
         return null;
-    }
-
-    @Override
-    public void analyze(NodeVisitor v) {
-
     }
 
     @Override
@@ -897,11 +797,6 @@ class DotOperation extends Expression{
     }
 
     @Override
-    public void analyze(NodeVisitor v) {
-
-    }
-
-    @Override
     public void prettyPrint(String indentation) {
         System.out.print(indentation+"Dot op:\n");
         super.prettyPrint(indentation+" ");
@@ -937,11 +832,6 @@ class DotOperation2 extends Expression{
     @Override
     public String getRep() {
         return null;
-    }
-
-    @Override
-    public void analyze(NodeVisitor v) {
-
     }
 
     @Override
