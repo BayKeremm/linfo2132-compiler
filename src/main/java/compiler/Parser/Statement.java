@@ -10,6 +10,7 @@ public abstract class Statement extends ASTNode {
         this.line = line;
     }
     public abstract void prettyPrint(String indentation);
+    public abstract void analyze(NodeVisitor v);
 
 }
 class Variable extends Statement {
@@ -46,6 +47,11 @@ class Variable extends Statement {
     }
 
     @Override
+    public void analyze(NodeVisitor v) {
+
+    }
+
+    @Override
     public String toString() {
         return "Variable{" +
                  type +
@@ -77,13 +83,13 @@ class ConstantVariable extends Statement {
     }
 
     @Override
+    public void analyze(NodeVisitor v) {
+        identifier.analyze(v);
+        declarator.analyze(v);
+    }
+
+    @Override
     public void printNode() {
-        System.out.println("\nConstant variable:");
-        System.out.print("    - type:");
-        type.printNode();
-        System.out.print("    - identifier:");
-        identifier.printNode();
-        declarator.printNode();
 
     }
 
@@ -96,6 +102,7 @@ class ConstantVariable extends Statement {
         declarator.prettyPrint(indentation+"  ");
         //System.out.printf(indentation+"- declarator: %s\n", declarator.toString());
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -131,6 +138,11 @@ class ScopeVariable extends Statement {
         System.out.print(indentation+"Scope variable: \n");
         System.out.printf(indentation+"- identifier: %s\n", identifier.toString());
         System.out.printf(indentation+"- declaration: %s\n", declarator.toString());
+    }
+
+    @Override
+    public void analyze(NodeVisitor v) {
+
     }
 
     @Override
@@ -173,6 +185,11 @@ class UninitVariable extends Statement {
         System.out.println(indentation+"UninitVariable: ");
         System.out.printf(indentation+"  - type: %s\n", type.toString());
         System.out.printf(indentation+"  - identifier: %s\n", identifier.toString());
+    }
+
+    @Override
+    public void analyze(NodeVisitor v) {
+
     }
 
     @Override
@@ -223,6 +240,11 @@ class StructDeclaration extends Statement {
     }
 
     @Override
+    public void analyze(NodeVisitor v) {
+
+    }
+
+    @Override
     public boolean equals(Object o) {
         StructDeclaration s = (StructDeclaration) o;
 
@@ -264,6 +286,11 @@ class TypeDeclaration extends Statement {
     }
 
     @Override
+    public void analyze(NodeVisitor v) {
+
+    }
+
+    @Override
     public boolean equals(Object o) {
         TypeDeclaration t = (TypeDeclaration) o;
 
@@ -286,6 +313,11 @@ class ArrayInitializer extends Expression {
     @Override
     public String getRep() {
         return null;
+    }
+
+    @Override
+    public void analyze(NodeVisitor v) {
+
     }
 
     @Override
