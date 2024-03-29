@@ -13,4 +13,8 @@ public interface NodeVisitor {
     void visitEqualityCheckExpression(EqualityCheckExpression op);
     void visitParameter(Parameter p );
     void visitArrayInitializer(ArrayInitializer p );
+    void visitParanExpression(ParanExpression p );
+
+
+    void visitConstantVariable(ConstantVariable var);
 }

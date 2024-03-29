@@ -1,27 +1,51 @@
-final int a = 3+2;
-final int b = 3-"magpie";
+//final string a = 3+2;
+//final int b = 3-"kaka";
+//final int i = 1 + ((2+10)/1 - (4*5.0));
+
+
+//final int k = true && "A";
+//final int i = (2+2/(3*"s"));
+//
+//final bool a = true == true;
+//final bool b = 2 == 3;
+//
+//final bool c = 2 == "aa";
+
+
+
+
+//final bool k = true && 2;
 
 //final int a = 3 % 2;
 //
 //final int a = 3 % 2 + 10;
 //
 //final int a = 3 * 2000;
-//
-//final int a = 3 == 2+1;
-//
-//final int a = 3 != 2;
+
+final bool a = 3 == 2+1;
+
+final bool a = 3 != 2;
 //
 //final int a = (((2+2)-4)*2) / 3;
-//
-//
-//
-//final int i = 2*2+4;
-//final float j = 3.2*5.0;
-//final int k = (i+2)*3 == 1;
+
+
+
+final int i = 2*2+4;
+final float j = 3.2*5.0;
+
+// IDENTIFIER SYMBOL TABLE NEEDS
+//final bool k = (i+2)*3 == 1;
 //final string message = "Hello";
 //final bool isEmpty = true;
 //
 //
+
+
+
+
+
+
+
 //struct Point {
 //    int x;
 //    int y;

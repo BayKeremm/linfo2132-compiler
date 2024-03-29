@@ -1,6 +1,7 @@
 package compiler.Parser;
 
 import compiler.Lexer.Symbol;
+import compiler.Lexer.Token;
 
 import java.util.ArrayList;
 
@@ -21,10 +22,20 @@ public abstract class Expression extends Statement{
 
     public abstract String getRep();
     public abstract void typeAnalyse(NodeVisitor v);
-    public Type getType(){
 
-        System.out.println("Returning null ...");
-        return new Type("NOT IMPLEMENTED");
+
+    // TODO: Recursively get types !!!
+    public Type getType(){
+        Type tl = this.lhs.getType();
+        Type tr = this.rhs.getType();
+        if(tl.type.equals(tr.type)){
+            return tl;
+        } else if (tl.type.equals("<FLOAT_LITERAL>") && tr.type.equals("<NATURAL_LITERAL>")) {
+            return tl;
+        } else if (tr.type.equals("<FLOAT_LITERAL>") && tl.type.equals("<NATURAL_LITERAL>")) {
+            return tr;
+        }
+        return new Type("With attempted type of:" + lhs.getType() + " "+ operator+" "+  rhs.getType());
     }
     @Override
     public String toString() {
@@ -57,6 +68,16 @@ abstract  class LogicalExpression extends Expression{
     @Override
     public String getRep() {
         return lhs.getRep() + operator + rhs.getRep();
+    }
+
+    @Override
+    public Type getType() {
+        Type before_type = super.getType();
+        if(before_type.type.equals("ERROR")){
+            return before_type;
+        }else{
+            return new Type(Token.BOOLEAN_LITERAL.image());
+        }
     }
 
     @Override
@@ -126,6 +147,17 @@ abstract class EqualityCheckExpression extends Expression{
     public String getRep() {
         return lhs.getRep() + operator + rhs.getRep();
     }
+
+    @Override
+    public Type getType() {
+        Type before_type = super.getType();
+        if(before_type.type.equals("ERROR")){
+            return before_type;
+        }else{
+            return new Type(Token.BOOLEAN_LITERAL.image());
+        }
+    }
+
     @Override
     public void prettyPrint(String indentation) {
         super.prettyPrint(indentation);
@@ -202,6 +234,16 @@ abstract class ComparisionExpression extends Expression {
     public void prettyPrint(String indentation) {
         super.prettyPrint(indentation);
 
+    }
+
+    @Override
+    public Type getType() {
+        Type before_type = super.getType();
+        if(before_type.type.equals("ERROR")){
+            return before_type;
+        }else{
+            return new Type(Token.BOOLEAN.image());
+        }
     }
 
     @Override
@@ -319,6 +361,8 @@ abstract class TermExpression extends Expression{
         super.prettyPrint(indentation);
 
     }
+
+
     @Override
     public void typeAnalyse(NodeVisitor v) {
         v.visitTermExpression(this);
@@ -384,6 +428,12 @@ abstract class UnaryExpression extends Expression{
     @Override
     public String getRep() {
         return lhs.getRep() + operator + rhs.getRep();
+    }
+
+    @Override
+    public Type getType() {
+        assert lhs == null;
+        return rhs.getType();
     }
 
     @Override
@@ -646,12 +696,23 @@ class LiteralExpression extends PrimaryExpression{
     }
 }
 class ParanExpression extends PrimaryExpression{
+    // expression size is always 1
     ArrayList<Expression> expressions;
     public ParanExpression(int line, ArrayList<Expression> expressions) {
         super(line);
         this.expressions = expressions;
     }
 
+    @Override
+    public Type getType() {
+        assert expressions.size() == 1;
+        return expressions.get(0).getType();
+    }
+
+    @Override
+    public void typeAnalyse(NodeVisitor v) {
+        v.visitParanExpression(this);
+    }
 
     @Override
     public String getRep() {
@@ -707,6 +768,11 @@ class IdentifierExpression extends Expression{
     public void prettyPrint(String indentation) {
         System.out.printf(indentation+"Identifier exp: %s\n", id);
 
+    }
+
+    @Override
+    public Type getType() {
+        return new Type(id.token().image());
     }
 
     @Override

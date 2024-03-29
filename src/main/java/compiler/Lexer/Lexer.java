@@ -79,7 +79,6 @@ public class Lexer {
                         nextCh();
                     }
                 } else { // RE = /
-                    nextCh();
                     return new Symbol(SLASH, this.lineNumber());
                 }
             }else{

@@ -56,7 +56,7 @@ class Variable extends Statement {
         return true;
     }
 }
-class ConstantVariable extends Statement {
+class ConstantVariable extends Statement implements StatementChecker {
     TypeDeclaration type;
     Expression identifier;
     Expression declarator;
@@ -87,6 +87,11 @@ class ConstantVariable extends Statement {
         else if(!this.declarator.equals(c.declarator)) return false;
         
         return true;
+    }
+
+    @Override
+    public void typeAnalyse(NodeVisitor v) {
+        v.visitConstantVariable(this);
     }
 }
 class ScopeVariable extends Statement {

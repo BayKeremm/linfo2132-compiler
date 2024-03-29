@@ -8,9 +8,7 @@ public class Type {
 
     @Override
     public String toString() {
-        return "Type{" +
-                "type='" + type + '\'' +
-                '}';
+        return type;
     }
 }
 

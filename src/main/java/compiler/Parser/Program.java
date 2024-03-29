@@ -21,6 +21,11 @@ public class Program extends ASTNode{
         program = this;
 
     }
+
+    public String getFileName() {
+        return fileName;
+    }
+
     public void printNode() {
         final String ANSI_RESET = "\u001B[0m";
         final String ANSI_BLACK = "\u001B[30m";
