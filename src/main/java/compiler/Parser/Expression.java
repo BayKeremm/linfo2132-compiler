@@ -25,14 +25,20 @@ public abstract class Expression extends Statement{
 
 
     // TODO: Recursively get types !!!
+    // TODO: How to get identifierExpression type?????????????
     public Type getType(){
+        //if(this.lhs == null){
+        //    return this.rhs.getType();
+        //}else if(this.rhs==null){
+        //    return this.lhs.getType();
+        //}
         Type tl = this.lhs.getType();
         Type tr = this.rhs.getType();
         if(tl.type.equals(tr.type)){
             return tl;
-        } else if (tl.type.equals("<FLOAT_LITERAL>") && tr.type.equals("<NATURAL_LITERAL>")) {
+        } else if (tl.type.equals(Token.FLOAT.image()) && tr.type.equals(Token.INTEGER.image())) {
             return tl;
-        } else if (tr.type.equals("<FLOAT_LITERAL>") && tl.type.equals("<NATURAL_LITERAL>")) {
+        } else if (tr.type.equals(Token.FLOAT.image()) && tl.type.equals(Token.INTEGER.image())) {
             return tr;
         }
         return new Type("With attempted type of:" + lhs.getType() + " "+ operator+" "+  rhs.getType());
@@ -154,15 +160,10 @@ abstract class EqualityCheckExpression extends Expression{
         if(before_type.type.equals("ERROR")){
             return before_type;
         }else{
-            return new Type(Token.BOOLEAN_LITERAL.image());
+            return new Type(Token.BOOLEAN.image());
         }
     }
 
-    @Override
-    public void prettyPrint(String indentation) {
-        super.prettyPrint(indentation);
-
-    }
 
     @Override
     public void typeAnalyse(NodeVisitor v) {
@@ -230,11 +231,6 @@ abstract class ComparisionExpression extends Expression {
         return lhs.getRep() + operator + rhs.getRep();
     }
 
-    @Override
-    public void prettyPrint(String indentation) {
-        super.prettyPrint(indentation);
-
-    }
 
     @Override
     public Type getType() {
@@ -356,11 +352,6 @@ abstract class TermExpression extends Expression{
         return lhs.getRep() + operator + rhs.getRep();
     }
 
-    @Override
-    public void prettyPrint(String indentation) {
-        super.prettyPrint(indentation);
-
-    }
 
 
     @Override
@@ -436,26 +427,13 @@ abstract class UnaryExpression extends Expression{
         return rhs.getType();
     }
 
-    @Override
-    public void prettyPrint(String indentation) {
-        super.prettyPrint(indentation);
-
-    }
-    @Override
-    public void typeAnalyse(NodeVisitor v) {
-        v.visitUnaryExpression(this);
-
-    }
 }
 class UnaryNegateOperation extends UnaryExpression{
     public UnaryNegateOperation(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "!");
     }
 
-    @Override
-    public void prettyPrint(String indentation) {
-        super.prettyPrint(indentation);
-    }
+
 
     @Override
     public boolean equals(Object o) {
@@ -466,6 +444,16 @@ class UnaryNegateOperation extends UnaryExpression{
         else if (!this.operator.equals(a.operator)) return false;
 
         return true;
+    }
+    @Override
+    public void typeAnalyse(NodeVisitor v) {
+        v.visitUnaryNegateExpression(this);
+
+    }
+    @Override
+    public void prettyPrint(String indentation) {
+        System.out.print(indentation+"Unary Negate op:\n");
+        super.prettyPrint(indentation+" ");
     }
 }
 class UnaryMinusOperation extends UnaryExpression{
@@ -489,6 +477,11 @@ class UnaryMinusOperation extends UnaryExpression{
 
         return true;
     }
+    @Override
+    public void typeAnalyse(NodeVisitor v) {
+        v.visitUnaryMinusExpression(this);
+
+    }
 }
 /*--------------------------------------------------------------------------------------------------------------------*/
 /** FACTOR EXPRESSION:
@@ -504,11 +497,6 @@ abstract class FactorExpression extends Expression{
         return lhs.getRep() + operator + rhs.getRep();
     }
 
-    @Override
-    public void prettyPrint(String indentation) {
-        super.prettyPrint(indentation);
-
-    }
     @Override
     public void typeAnalyse(NodeVisitor v) {
         v.visitFactorExpression(this);
@@ -596,11 +584,6 @@ abstract class PrimaryExpression extends Expression{
         super( line);
     }
     @Override
-    public void prettyPrint(String indentation) {
-        super.prettyPrint(indentation);
-
-    }
-    @Override
     public void typeAnalyse(NodeVisitor v) {
         v.visitPrimaryExpression(this);
 
@@ -669,7 +652,28 @@ class LiteralExpression extends PrimaryExpression{
 
     @Override
     public Type getType() {
-        return new Type(literal.token().image());
+        String type = literal.token().image();
+        String t = "WEIRD THING HAPPENED IN LIT EXP";
+
+        switch (type){
+            case "<FLOAT_LITERAL>":{
+                t = "float";
+                return new Type(t);
+            }
+            case "<NATURAL_LITERAL>":{
+                t = "int";
+                return new Type(t);
+            }
+            case "<BOOLEAN_LITERAL>":{
+                t = "bool";
+                return new Type(t);
+            }
+            case "<STRING_LITERAL>":{
+                t = "string";
+                return new Type(t);
+            }
+        }
+        return new Type(t);
     }
 
     @Override
@@ -749,6 +753,7 @@ class ParanExpression extends PrimaryExpression{
 /*--------------------------------------------------------------------------------------------------------------------*/
 class IdentifierExpression extends Expression{
     Symbol id;
+    Type type;
     public IdentifierExpression(int line, Symbol id) {
         super(line);
         this.id = id;
@@ -760,8 +765,13 @@ class IdentifierExpression extends Expression{
     }
 
     @Override
+    public Type getType() {
+        return this.type;
+    }
+
+    @Override
     public void typeAnalyse(NodeVisitor v) {
-        v.visitIdentifierExpression(this);
+        this.type = v.visitIdentifierExpression(this);
     }
 
     @Override
@@ -770,10 +780,6 @@ class IdentifierExpression extends Expression{
 
     }
 
-    @Override
-    public Type getType() {
-        return new Type(id.token().image());
-    }
 
     @Override
     public String toString() {

@@ -42,6 +42,7 @@ public enum Token {
         return "\"" + image + "\"";
     }
 
+
     public String image() {
         return image;
     }

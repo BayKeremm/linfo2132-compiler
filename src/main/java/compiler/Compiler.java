@@ -54,6 +54,7 @@ public class Compiler {
             p.printNode();
             TypeChecker semantics = new TypeChecker(p);
             semantics.typeCheck();
+            semantics.debug();
         }
 
 
