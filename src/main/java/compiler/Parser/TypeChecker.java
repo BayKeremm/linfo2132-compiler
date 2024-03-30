@@ -6,22 +6,19 @@ import static java.lang.System.exit;
 
 /**
 * TODO:
- * Next step: Structs
+ * Next step: Structs to user defined types
  * Procedures:
  *  - Child contexts
  *  - how to update context
  *
  * What I did last:
+ * -
+ * - refactored types to GenericType and extended more specific ones
+ * - added array declarations
  * - declaration type changes the TypeDec type
  * - RootContext gives info about a variable so you can use idenexpressions
 *
 * */
-
-
-
-
-
-
 
 
 public class TypeChecker implements NodeVisitor{
@@ -37,31 +34,36 @@ public class TypeChecker implements NodeVisitor{
             lhs.typeAnalyse(this);
             rhs.typeAnalyse(this);
 
-            Type tl = lhs.getType();
-            Type tr = rhs.getType();
+            GenericType tl = lhs.getType();
+            GenericType tr = rhs.getType();
 
-            if(tl.type.equals(tr.type)){
+            if(tl.type().equals(tr.type())){
                 return true;
-            } else if (tl.type.equals(Token.FLOAT.image()) && tr.type.equals(Token.INTEGER.image())) {
+            } else if (tl.type().equals(Token.FLOAT.image()) && tr.type().equals(Token.INTEGER.image())) {
                 return true;
-            } else if (tr.type.equals(Token.FLOAT.image()) && tl.type.equals(Token.INTEGER.image())) {
+            } else if (tr.type().equals(Token.FLOAT.image()) && tl.type().equals(Token.INTEGER.image())) {
                 return true;
             }
             return false;
         }
         return true;
     }
-    private Boolean checkStatementTypes(TypeDeclaration idType, Type dec_type){
+    private Boolean checkStatementTypes(TypeDeclaration idType, GenericType dec_type){
         String type = idType.type.token().image();
+        final boolean equals = idType.toString().equals(dec_type.toString());
         switch (type) {
             case "int", "float" -> {
-                return dec_type.toString().equals(Token.INTEGER.image()) || dec_type.toString().equals(Token.FLOAT.image());
+                return dec_type.toString().equals(Token.INTEGER.image())
+                        || dec_type.toString().equals(Token.FLOAT.image())
+                        || equals;
             }
             case "string" -> {
-                return dec_type.toString().equals(Token.STRING.image());
+                return dec_type.toString().equals(Token.STRING.image())
+                        || equals;
             }
             case "bool" -> {
-                return dec_type.toString().equals(Token.BOOLEAN.image());
+                return dec_type.toString().equals(Token.BOOLEAN.image())
+                        || equals;
             }
         }
         return false;
@@ -92,8 +94,8 @@ public class TypeChecker implements NodeVisitor{
     public void visitUnaryNegateExpression(UnaryExpression op) {
         // Only boolean
         assert op.lhs == null;
-        Type tr = op.rhs.getType();
-        if(!tr.type.equals("bool")){
+        GenericType tr = op.rhs.getType();
+        if(!tr.type().equals("bool")){
             reportSemanticError("Unary Negate Type Error: Cannot negate type %s ",op.rhs.line,tr);
         }
     }
@@ -102,8 +104,8 @@ public class TypeChecker implements NodeVisitor{
     public void visitUnaryMinusExpression(UnaryExpression op) {
         // Only float and int
         assert op.lhs == null;
-        Type tr = op.rhs.getType();
-        if(!tr.type.equals("float") && !tr.type.equals("int")){
+        GenericType tr = op.rhs.getType();
+        if(!tr.type().equals("float") && !tr.type().equals("int")){
             reportSemanticError("Unary Minus Type Error: Cannot make minus type %s ",op.rhs.line,tr);
         }
     }
@@ -136,7 +138,7 @@ public class TypeChecker implements NodeVisitor{
     }
 
     @Override
-    public Type visitIdentifierExpression(IdentifierExpression identifier) {
+    public GenericType visitIdentifierExpression(IdentifierExpression identifier) {
         String id = identifier.id.image();
         if(rootContext.containsId(id)){
             return rootContext.getVarType(id);
@@ -203,19 +205,31 @@ public class TypeChecker implements NodeVisitor{
         // first analyse if the declaration is okay
         var.declarator.typeAnalyse(this);
         // then check if the declaration type matches the id type
-        Type decType = var.declarator.getType();
+        GenericType decType = var.declarator.getType();
         if(!checkStatementTypes(var.typeDecl,decType)){
             reportSemanticError("Constant Variable type does not match the declaration type: %s",
                     var.line,  var.typeDecl.toString() + " != " + var.declarator.getType() );
         }
         // add to the context
         // TODO: What to when the same variable is already in the context
-        rootContext.addVariable(var.identifier.getRep(), new Type(decType.type));
+        rootContext.addVariable(var.identifier.getRep(), new Type(decType.type(),var.typeDecl.isArray));
+    }
+
+    @Override
+    public void visitStructDeclaration(StructDeclaration s) {
+        Expression identifier = s.identifier;
+        Block block = s.block;
+        // TODO: Put it into user defined types
+        rootContext.addVariable(identifier.getRep(),new UserType(block));
     }
 
     public void typeCheck(){
         for(ConstantVariable c : program.constantVariables){
             c.typeAnalyse(this);
+        }
+
+        for(StructDeclaration sd : program.structDeclarations){
+            sd.typeAnalyse(this);
         }
     }
 

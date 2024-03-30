@@ -24,24 +24,17 @@ public abstract class Expression extends Statement{
     public abstract void typeAnalyse(NodeVisitor v);
 
 
-    // TODO: Recursively get types !!!
-    // TODO: How to get identifierExpression type?????????????
-    public Type getType(){
-        //if(this.lhs == null){
-        //    return this.rhs.getType();
-        //}else if(this.rhs==null){
-        //    return this.lhs.getType();
-        //}
-        Type tl = this.lhs.getType();
-        Type tr = this.rhs.getType();
-        if(tl.type.equals(tr.type)){
+    public GenericType getType(){
+        GenericType tl = this.lhs.getType();
+        GenericType tr = this.rhs.getType();
+        if(tl.type().equals(tr.type())){
             return tl;
-        } else if (tl.type.equals(Token.FLOAT.image()) && tr.type.equals(Token.INTEGER.image())) {
+        } else if (tl.type().equals(Token.FLOAT.image()) && tr.type().equals(Token.INTEGER.image())) {
             return tl;
-        } else if (tr.type.equals(Token.FLOAT.image()) && tl.type.equals(Token.INTEGER.image())) {
+        } else if (tr.type().equals(Token.FLOAT.image()) && tl.type().equals(Token.INTEGER.image())) {
             return tr;
         }
-        return new Type("With attempted type of:" + lhs.getType() + " "+ operator+" "+  rhs.getType());
+        return new Type("With attempted type of:" + lhs.getType() + " "+ operator+" "+  rhs.getType(), false);
     }
     @Override
     public String toString() {
@@ -77,12 +70,12 @@ abstract  class LogicalExpression extends Expression{
     }
 
     @Override
-    public Type getType() {
-        Type before_type = super.getType();
-        if(before_type.type.equals("ERROR")){
+    public GenericType getType() {
+        GenericType before_type = super.getType();
+        if(before_type.type().contains("With")){
             return before_type;
         }else{
-            return new Type(Token.BOOLEAN_LITERAL.image());
+            return new Type(Token.BOOLEAN.image(), false);
         }
     }
 
@@ -155,12 +148,12 @@ abstract class EqualityCheckExpression extends Expression{
     }
 
     @Override
-    public Type getType() {
-        Type before_type = super.getType();
-        if(before_type.type.equals("ERROR")){
+    public GenericType getType() {
+        GenericType before_type = super.getType();
+        if(before_type.type().equals("ERROR")){
             return before_type;
         }else{
-            return new Type(Token.BOOLEAN.image());
+            return new Type(Token.BOOLEAN.image(),false);
         }
     }
 
@@ -233,12 +226,12 @@ abstract class ComparisionExpression extends Expression {
 
 
     @Override
-    public Type getType() {
-        Type before_type = super.getType();
-        if(before_type.type.equals("ERROR")){
+    public GenericType getType() {
+        GenericType before_type = super.getType();
+        if(before_type.type().equals("ERROR")){
             return before_type;
         }else{
-            return new Type(Token.BOOLEAN.image());
+            return new Type(Token.BOOLEAN.image(),false);
         }
     }
 
@@ -422,7 +415,7 @@ abstract class UnaryExpression extends Expression{
     }
 
     @Override
-    public Type getType() {
+    public GenericType getType() {
         assert lhs == null;
         return rhs.getType();
     }
@@ -658,22 +651,22 @@ class LiteralExpression extends PrimaryExpression{
         switch (type){
             case "<FLOAT_LITERAL>":{
                 t = "float";
-                return new Type(t);
+                return new Type(t,false);
             }
             case "<NATURAL_LITERAL>":{
                 t = "int";
-                return new Type(t);
+                return new Type(t,false);
             }
             case "<BOOLEAN_LITERAL>":{
                 t = "bool";
-                return new Type(t);
+                return new Type(t,false);
             }
             case "<STRING_LITERAL>":{
                 t = "string";
-                return new Type(t);
+                return new Type(t,false);
             }
         }
-        return new Type(t);
+        return new Type(t,false);
     }
 
     @Override
@@ -708,7 +701,7 @@ class ParanExpression extends PrimaryExpression{
     }
 
     @Override
-    public Type getType() {
+    public GenericType getType() {
         assert expressions.size() == 1;
         return expressions.get(0).getType();
     }
@@ -753,7 +746,7 @@ class ParanExpression extends PrimaryExpression{
 /*--------------------------------------------------------------------------------------------------------------------*/
 class IdentifierExpression extends Expression{
     Symbol id;
-    Type type;
+    GenericType type;
     public IdentifierExpression(int line, Symbol id) {
         super(line);
         this.id = id;
@@ -765,7 +758,7 @@ class IdentifierExpression extends Expression{
     }
 
     @Override
-    public Type getType() {
+    public GenericType getType() {
         return this.type;
     }
 

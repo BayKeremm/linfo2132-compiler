@@ -3,10 +3,10 @@ package compiler.Parser;
 import java.util.HashMap;
 
 public class Context {
-    HashMap<String,Type> symbolTable;
+    HashMap<String,GenericType> symbolTable;
     Context prevContext;
     public Context(Context prev){
-        this.symbolTable = new HashMap<String, Type>();
+        this.symbolTable = new HashMap<String, GenericType>();
         this.prevContext = prev;
     }
 
@@ -14,7 +14,7 @@ public class Context {
         return symbolTable.containsKey(id);
     }
 
-    public boolean addVariable(String id, Type type){
+    public boolean addVariable(String id, GenericType type){
         if(containsId(id)){
             return false;
         }else{
@@ -24,7 +24,7 @@ public class Context {
     }
 
 
-    public Type getVarType(String id){
+    public GenericType getVarType(String id){
         if(containsId(id)){
             return symbolTable.get(id);
         }else if(prevContext != null){

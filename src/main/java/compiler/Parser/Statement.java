@@ -9,6 +9,10 @@ public abstract class Statement extends ASTNode {
     }
     public abstract void prettyPrint(String indentation);
 
+    public GenericType getType(){
+        return null;
+    }
+
 }
 class Variable extends Statement {
     TypeDeclaration type;
@@ -91,6 +95,7 @@ class ConstantVariable extends Statement implements StatementChecker {
     public void typeAnalyse(NodeVisitor v) {
         v.visitConstantVariable(this);
     }
+
 }
 class ScopeVariable extends Statement {
     Expression identifier;
@@ -153,6 +158,11 @@ class UninitVariable extends Statement {
     }
 
     @Override
+    public Type getType() {
+        return new Type(type.type.token().image(),type.isArray);
+    }
+
+    @Override
     public boolean equals(Object o) {
         UninitVariable u = (UninitVariable) o;
         
@@ -163,7 +173,7 @@ class UninitVariable extends Statement {
     }
 }
 
-class StructDeclaration extends Statement {
+class StructDeclaration extends Statement implements StatementChecker {
     Expression identifier;
     Block block;
 
@@ -193,6 +203,12 @@ class StructDeclaration extends Statement {
         
         return true;
     }
+
+    @Override
+    public void typeAnalyse(NodeVisitor v) {
+        v.visitStructDeclaration(this);
+    }
+
 }
 
 class TypeDeclaration extends Statement {
@@ -250,6 +266,10 @@ class ArrayInitializer extends Expression {
         v.visitArrayInitializer(this);
     }
 
+    @Override
+    public GenericType getType() {
+        return new Type(type.type.token().image(),type.isArray);
+    }
 
     @Override
     public void prettyPrint(String indentation) {
