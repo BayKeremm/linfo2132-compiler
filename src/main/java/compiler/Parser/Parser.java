@@ -43,12 +43,17 @@ public class Parser {
         literals.add(Token.STRING_LITERAL);
         literals.add(Token.NATURAL_LITERAL);
     }
+
+    public ArrayList<String> getTypes() {
+        return types;
+    }
+
     public Program program()  {
         // Parse constants
         ArrayList<ConstantVariable> constantVariables = new ArrayList<>();
         ArrayList<StructDeclaration> structs = new ArrayList<>();
         ArrayList<Procedure> procedures = new ArrayList<>();
-        ArrayList<Statement> globals = new ArrayList<>();
+        ArrayList<VariableGod> globals = new ArrayList<>();
         while(have(Token.FINAL)){
             int line = nextSymbol.line();
             TypeDeclaration type = type();
@@ -62,7 +67,9 @@ public class Parser {
         while(have(Token.STRUCT)){
             int line = nextSymbol.line();
             types.add(nextSymbol.image());
-            Expression identifier = expression();
+            //Expression identifier = expression();
+            IdentifierExpression identifier = new IdentifierExpression(line,nextSymbol);
+            match(nextSymbol.token());
             Block block = block();
             structs.add(new StructDeclaration(line,identifier,block));
         }
@@ -97,7 +104,7 @@ public class Parser {
             System.out.println("That's rough buddy");
         }
 
-        return new Program(lexer.getFileName(),constantVariables,globals, structs, procedures);
+        return new Program(lexer.getFileName(),constantVariables,globals, structs, procedures,this.types);
     }
     private Block block(){
         boolean start = have(Token.LCURLY);

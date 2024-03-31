@@ -585,6 +585,7 @@ abstract class PrimaryExpression extends Expression{
 class FunctionCallExpression extends PrimaryExpression{
     Symbol identifier;
     ArrayList<Expression> expressionParams;
+    GenericType type;
 
     public FunctionCallExpression(int line, Symbol identifier,ArrayList<Expression> expressionParams ) {
         super(line);
@@ -592,6 +593,16 @@ class FunctionCallExpression extends PrimaryExpression{
         this.expressionParams = expressionParams;
     }
 
+    @Override
+    public void typeAnalyse(NodeVisitor v) {
+        this.type = v.visitSymbolTableFunction(this);
+        v.visitFunctionCallExpression(this);
+    }
+
+    @Override
+    public GenericType getType() {
+        return this.type;
+    }
 
     @Override
     public String getRep() {
@@ -764,7 +775,7 @@ class IdentifierExpression extends Expression{
 
     @Override
     public void typeAnalyse(NodeVisitor v) {
-        this.type = v.visitIdentifierExpression(this);
+        this.type = v.visitSymbolTableIdentifier(this);
     }
 
     @Override
@@ -789,6 +800,7 @@ class IdentifierExpression extends Expression{
 class IndexOp extends Expression {
     Symbol identifier;
     Expression index;
+    GenericType type;
 
     public IndexOp(int line, Symbol identifier, Expression index) {
         super(line);
@@ -804,7 +816,14 @@ class IndexOp extends Expression {
 
     @Override
     public void typeAnalyse(NodeVisitor v) {
+        // add a call to symboltable
+        this.type = v.visitSymbolTableIndexOp(this);
         v.visitIndexOperation(this);
+    }
+
+    @Override
+    public GenericType getType() {
+        return type;
     }
 
     @Override
@@ -837,6 +856,7 @@ class IndexOp extends Expression {
 }
 
 class DotOperation extends Expression{
+    GenericType type;
 
     public DotOperation(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, ".");
@@ -851,7 +871,13 @@ class DotOperation extends Expression{
 
     @Override
     public void typeAnalyse(NodeVisitor v) {
-            v.visitDotOperation(this);
+        this.type = v.visitSymbolTableDotOp(this);
+        v.visitDotOperation(this);
+    }
+
+    @Override
+    public GenericType getType() {
+        return type;
     }
 
     @Override

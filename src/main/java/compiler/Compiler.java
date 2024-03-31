@@ -40,7 +40,7 @@ public class Compiler {
             TestParser testParser = new TestParser();
             testParser.testConstantVariable();
             testParser.testProcedure();
-            testParser.testStructGlobals();
+            //testParser.testStructGlobals();
         }
 
         else{

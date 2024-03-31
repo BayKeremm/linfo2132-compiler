@@ -1,10 +1,10 @@
 //final int b = 3-"kaka";
-
-
+//
+//
 //final int k = true && "A";
 //final int i = (2+2/(3*"s"));
 //
-
+//
 //final int i = 1*2.0;
 //final int j = i + 1;
 //final int j = 1 + ((2+10)/1 - (4*5.0));
@@ -12,48 +12,38 @@
 //final bool b = true == true;
 //final bool c = 2 == 3;
 //final int ab = 3 % 2;
-
-
-
-
+//
+//
+//
+//
 //final bool k = true && 2;
-
+//
 //
 //final int a = 3 % 2 + 10;
 //
 //final int a = 3 * 2000;
-
+//
 //final bool a = 3 == 2+1;
-
+//
 //final bool a = 3 != 2;
 //
-
-
-
+//
+//
+//
 //final float j = 3.2*5.0;
-
+//
 //final int i = -9;
-
-//final int j = -"a";;
-
+//
+//final int j = -"a";
+//
 //final bool a = ! true;
 
 
 
 
 
-// IDENTIFIER SYMBOL TABLE NEEDS
 
-//final int i = 3;
-
-//final int j = i + 2;
-
-//
-//final bool b = true;
-//
-
-
-
+// ---------------------------------------------------------------
 final int a = (((2+2)-4)*2) / 3.0;
 final int i = 2*2+4;
 final string k = "kerem";
@@ -65,25 +55,52 @@ final int j = f*2;
 
 
 
+final bool b = true;
 final int[] arr = int[5];
 
 
-
 struct Point {
-    int x;
-    int y;
-    string[] names;
+  int x;
+  int y;
+  string[] names;
 }
 
-//struct Person {
-//    int x;
-//    string name;
-//    Point location;
-//    int[] history;
-//}
-//
-//
-//Person d = Person("me", Point(3,7,string[5]), int[i*2]);  // new structure
+
+struct Person {
+  string name;
+  Point location;
+  int[] history;
+
+}
+
+Point p = Point(3,7,string[5]);
+
+Point[] please = Point[5];
+
+Point aaa = please[0];
+
+int[] kerem = int[10];
+
+int elfje = kerem[i];
+
+
+Person d = Person("KEREM", Point(3,7,string[5]), int[i*2]);  // new structure
+
+// ---------------------------------------------------------------
+
+int[] history = d.history;
+string name = d.name;
+
+
+
+// The following does not work yet:
+// also composite struct accesses do not work
+//int history = d.history[1];
+
+
+
+
+//int aaa = 3;
 //
 //int i = d.location.names[0];
 //int j = d.location.x;

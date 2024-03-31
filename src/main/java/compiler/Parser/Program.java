@@ -10,16 +10,24 @@ public class Program extends ASTNode{
     public ArrayList<ConstantVariable> constantVariables;
     public ArrayList<Procedure> procedures;
     public ArrayList<StructDeclaration> structDeclarations;
-    public ArrayList<Statement> globals;
+    public ArrayList<VariableGod> globals;
+    private ArrayList<String> types;
 
-    public Program(String fileName, ArrayList<ConstantVariable> constantVariables, ArrayList<Statement> globals, ArrayList<StructDeclaration> structDeclarations, ArrayList<Procedure> procedures) {
+    public Program(String fileName, ArrayList<ConstantVariable> constantVariables, ArrayList<VariableGod> globals,
+                   ArrayList<StructDeclaration> structDeclarations, ArrayList<Procedure> procedures, ArrayList<String> types) {
+
         this.fileName = fileName;
         this.constantVariables = constantVariables;
         this.procedures = procedures;
         this.structDeclarations = structDeclarations;
         this.globals = globals;
         program = this;
+        this.types = types;
 
+    }
+
+    public ArrayList<String> getTypes() {
+        return types;
     }
 
     public String getFileName() {
@@ -93,7 +101,7 @@ public class Program extends ASTNode{
         procedures.add(p);
     }
 
-    public void addGlobal(Statement s){
+    public void addGlobal(Variable s){
         globals.add(s);
     }
 }

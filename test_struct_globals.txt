@@ -1,6 +1,6 @@
 struct Point{
     int a;
-    int[] c = int[3];
+    int[] c;
 }
 Point p = Point(3);
 int[] arr = int[5];

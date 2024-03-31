@@ -2,19 +2,31 @@ package compiler.Parser;
 
 import java.util.HashMap;
 
-public class Context {
-    HashMap<String,GenericType> symbolTable;
-    Context prevContext;
-    public Context(Context prev){
-        this.symbolTable = new HashMap<String, GenericType>();
+abstract class ContextGod {
+    ContextGod prevContext;
+    public ContextGod(ContextGod prev){
         this.prevContext = prev;
+    }
+    public abstract boolean containsId(String id);
+    public abstract boolean addToContext(String id, GenericType t);
+    public abstract GenericType getVarType(String id);
+    public abstract void debugContext(String indentation);
+
+}
+
+public class Context extends ContextGod {
+    HashMap<String,GenericType> symbolTable;
+    public Context(ContextGod prev){
+        super(prev);
+        this.symbolTable = new HashMap<String, GenericType>();
     }
 
     public boolean containsId(String id){
         return symbolTable.containsKey(id);
     }
 
-    public boolean addVariable(String id, GenericType type){
+    @Override
+    public boolean addToContext(String id, GenericType type) {
         if(containsId(id)){
             return false;
         }else{
@@ -22,7 +34,6 @@ public class Context {
             return true;
         }
     }
-
 
     public GenericType getVarType(String id){
         if(containsId(id)){
@@ -34,12 +45,14 @@ public class Context {
         }
     }
     public void debugContext(String indentation){
-        System.out.println(indentation + "Context start:");
-        System.out.println(indentation + "SymbolTable:");
-        System.out.println(indentation + symbolTable.toString());
-        System.out.println(indentation + "Previous Context");
+        System.out.println(indentation + "File Context start:");
+        System.out.println(indentation + " - SymbolTable:");
+        System.out.println(indentation +"  "+ symbolTable.toString());
+        System.out.println(indentation + " - Previous Context");
         if(prevContext != null){
             prevContext.debugContext(indentation+"   ");
+        }else{
+            System.out.println(indentation+" - It is null;");
         }
     }
 }

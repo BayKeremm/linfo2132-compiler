@@ -13,23 +13,41 @@ public abstract class Statement extends ASTNode {
         return null;
     }
 
+    public String getVariableName(){
+        return "Not a variable...";
+    }
+
 }
-class Variable extends Statement {
-    TypeDeclaration type;
+abstract class  VariableGod extends Statement  implements StatementChecker {
+
+    protected VariableGod(int line) {
+        super(line);
+    }
+    public abstract TypeDeclaration typeDeclaration();
+    public abstract Expression identifier();
+    public abstract Expression declarator();
+}
+class Variable extends VariableGod {
+    TypeDeclaration typeDeclaration;
     Expression identifier;
     Expression declarator;
-    public Variable(int line, TypeDeclaration type, Expression identifier, Expression declarator) {
+    public Variable(int line, TypeDeclaration typeDeclaration, Expression identifier, Expression declarator) {
         super(line);
         this.declarator = declarator;
-        this.type = type;
+        this.typeDeclaration = typeDeclaration;
         this.identifier = identifier;
+    }
+
+    @Override
+    public void typeAnalyse(NodeVisitor v) {
+        v.visitGlobalVariable(this);
     }
 
 
     @Override
     public void prettyPrint(String indentation) {
         System.out.println(indentation+"Variable: ");
-        System.out.printf(indentation+"  - type: %s\n", type.toString());
+        System.out.printf(indentation+"  - type: %s\n", typeDeclaration.toString());
         System.out.printf(indentation+"  - identifier: %s\n", identifier.toString());
         //System.out.printf(indentation+"- declaration: %s\n", declarator.toString());
         System.out.println(indentation+"  - declaration:");
@@ -41,7 +59,7 @@ class Variable extends Statement {
     @Override
     public String toString() {
         return "Variable{" +
-                 type +
+                typeDeclaration +
                 ", " + identifier +
                 ", (" + declarator+
                 ") }";
@@ -51,14 +69,30 @@ class Variable extends Statement {
     public boolean equals(Object o) {
         Variable v = (Variable) o;
 
-        if(!this.type.equals(v.type)) return false;
+        if(!this.typeDeclaration.equals(v.typeDeclaration)) return false;
         else if(!this.declarator.equals(v.declarator)) return false;
         else if(!this.identifier.equals(v.identifier)) return false;
         
         return true;
     }
+
+
+    @Override
+    public TypeDeclaration typeDeclaration() {
+        return this.typeDeclaration;
+    }
+
+    @Override
+    public Expression identifier() {
+        return this.identifier;
+    }
+
+    @Override
+    public Expression declarator() {
+        return this.declarator;
+    }
 }
-class ConstantVariable extends Statement implements StatementChecker {
+class ConstantVariable extends VariableGod implements StatementChecker {
     TypeDeclaration typeDecl;
     Expression identifier;
     Expression declarator;
@@ -69,6 +103,10 @@ class ConstantVariable extends Statement implements StatementChecker {
         this.identifier = identifier;
     }
 
+    @Override
+    public String getVariableName() {
+        return identifier().getRep();
+    }
 
     @Override
     public void prettyPrint(String indentation) {
@@ -91,13 +129,28 @@ class ConstantVariable extends Statement implements StatementChecker {
         return true;
     }
 
+
     @Override
     public void typeAnalyse(NodeVisitor v) {
         v.visitConstantVariable(this);
     }
 
+    @Override
+    public TypeDeclaration typeDeclaration() {
+        return this.typeDecl;
+    }
+
+    @Override
+    public Expression identifier() {
+        return this.identifier;
+    }
+
+    @Override
+    public Expression declarator() {
+        return this.declarator;
+    }
 }
-class ScopeVariable extends Statement {
+class ScopeVariable extends VariableGod {
     Expression identifier;
     Expression declarator;
     public ScopeVariable(int line, Expression identifier, Expression declarator) {
@@ -106,6 +159,10 @@ class ScopeVariable extends Statement {
         this.identifier = identifier;
     }
 
+    @Override
+    public String getVariableName() {
+        return identifier().getRep();
+    }
 
     @Override
     public void prettyPrint(String indentation) {
@@ -131,8 +188,28 @@ class ScopeVariable extends Statement {
 
         return true;
     }
+
+    @Override
+    public TypeDeclaration typeDeclaration() {
+        return null;
+    }
+
+    @Override
+    public Expression identifier() {
+        return this.identifier;
+    }
+
+    @Override
+    public Expression declarator() {
+        return this.declarator;
+    }
+
+    @Override
+    public void typeAnalyse(NodeVisitor v) {
+
+    }
 }
-class UninitVariable extends Statement {
+class UninitVariable extends VariableGod {
     TypeDeclaration type;
     Expression identifier;
     public UninitVariable(int line, TypeDeclaration type,Expression identifier) {
@@ -141,6 +218,10 @@ class UninitVariable extends Statement {
         this.identifier = identifier;
     }
 
+    @Override
+    public String getVariableName() {
+        return identifier().getRep();
+    }
 
     @Override
     public void prettyPrint(String indentation) {
@@ -159,7 +240,7 @@ class UninitVariable extends Statement {
 
     @Override
     public Type getType() {
-        return new Type(type.type.token().image(),type.isArray);
+        return new Type(type.type.image(),type.isArray);
     }
 
     @Override
@@ -170,6 +251,25 @@ class UninitVariable extends Statement {
         else if(!this.identifier.equals(u.identifier)) return false;
         
         return true;
+    }
+    @Override
+    public TypeDeclaration typeDeclaration() {
+        return null;
+    }
+
+    @Override
+    public Expression identifier() {
+        return this.identifier;
+    }
+
+    @Override
+    public Expression declarator() {
+        return null;
+    }
+
+    @Override
+    public void typeAnalyse(NodeVisitor v) {
+
     }
 }
 
