@@ -37,6 +37,11 @@ public class Procedure extends Statement {
         
         return true;
     }
+
+    @Override
+    public void typeAnalyse(NodeVisitor v) {
+        v.visitProcedure(this);
+    }
 }
 class ProcedureDeclarator extends Statement {
     ArrayList<Expression> parameters;
@@ -72,6 +77,11 @@ class ProcedureDeclarator extends Statement {
         
         return true;
     }
+
+    @Override
+    public void typeAnalyse(NodeVisitor v) {
+
+    }
 }
 class Parameter extends Expression {
     TypeDeclaration type;
@@ -92,7 +102,15 @@ class Parameter extends Expression {
         v.visitParameter(this);
     }
 
+    @Override
+    public GenericType getType() {
+        return new Type(type.type.image(),type.isArray);
+    }
 
+    @Override
+    public String getVariableName() {
+        return expression.getRep();
+    }
 
     @Override
     public void prettyPrint(String indentation) {
@@ -147,6 +165,11 @@ class Block extends Statement{
     public boolean equals(Object o) {
         return this.statements.equals(((Block) o ).statements);
     }
+
+    @Override
+    public void typeAnalyse(NodeVisitor v) {
+
+    }
 }
 
 class IfElseStatement extends Statement {
@@ -190,6 +213,11 @@ class IfElseStatement extends Statement {
                 ",elseBlock=" + elseBlock +
                 "}";
     }
+
+    @Override
+    public void typeAnalyse(NodeVisitor v) {
+
+    }
 }
 
 class WhileStatement extends Statement {
@@ -228,6 +256,12 @@ class WhileStatement extends Statement {
         else if(!this.block.equals(w.block)) return false;
         
         return true;
+    }
+
+    @Override
+    public void typeAnalyse(NodeVisitor v) {
+        v.visitWhile(this);
+
     }
 }
 
@@ -280,6 +314,11 @@ class ForStatement extends Statement{
         
         return true;
     }
+
+    @Override
+    public void typeAnalyse(NodeVisitor v) {
+
+    }
 }
 
 class ReturnStatement extends Statement {
@@ -311,6 +350,11 @@ class ReturnStatement extends Statement {
         if(!this.expression.equals(r.expression)) return false;
         
         return true;
+    }
+
+    @Override
+    public void typeAnalyse(NodeVisitor v) {
+
     }
 }
 

@@ -2,7 +2,7 @@ package compiler.Parser;
 
 import compiler.Lexer.Symbol;
 
-public abstract class Statement extends ASTNode {
+public abstract class Statement extends ASTNode implements StatementChecker {
     int line;
     protected Statement(int line) {
         this.line = line;
@@ -18,7 +18,7 @@ public abstract class Statement extends ASTNode {
     }
 
 }
-abstract class  VariableGod extends Statement  implements StatementChecker {
+abstract class  VariableGod extends Statement  {
 
     protected VariableGod(int line) {
         super(line);
@@ -92,7 +92,7 @@ class Variable extends VariableGod {
         return this.declarator;
     }
 }
-class ConstantVariable extends VariableGod implements StatementChecker {
+class ConstantVariable extends VariableGod {
     TypeDeclaration typeDecl;
     Expression identifier;
     Expression declarator;
@@ -206,6 +206,7 @@ class ScopeVariable extends VariableGod {
 
     @Override
     public void typeAnalyse(NodeVisitor v) {
+        v.visitScopeVariable(this);
 
     }
 }
@@ -273,7 +274,7 @@ class UninitVariable extends VariableGod {
     }
 }
 
-class StructDeclaration extends Statement implements StatementChecker {
+class StructDeclaration extends Statement  {
     Expression identifier;
     Block block;
 
@@ -344,6 +345,11 @@ class TypeDeclaration extends Statement {
         else if(!(this.isArray == t.isArray)) return false;
 
         return true;
+    }
+
+    @Override
+    public void typeAnalyse(NodeVisitor v) {
+
     }
 }
 

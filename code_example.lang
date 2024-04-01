@@ -73,31 +73,39 @@ struct Person {
 
 }
 
-Point p = Point(3,7,string[5]);
+//Point p = Point(3,7,string[5]);
+//
+//Point[] please = Point[5];
+//
+//int aaa = please[0].x;
+//
+//
+//
+//
+//int[] kerem = int[10];
+//
+//int elfje = kerem[i];
 
-Point[] please = Point[5];
-
-Point aaa = please[0];
-
-int[] kerem = int[10];
-
-int elfje = kerem[i];
-
-
-Person d = Person("KEREM", Point(3,7,string[5]), int[i*2]);  // new structure
 
 // ---------------------------------------------------------------
 
-int[] history = d.history;
-string name = d.name;
+//Person d = Person("KEREM", Point(3,7,string[5]), int[i*2]);  // new structure
+
+
+//string[] bbb = d.location.names;
 
 
 
-// The following does not work yet:
-// also composite struct accesses do not work
-//int history = d.history[1];
-
-
+//string name = d.name;
+//
+//
+//
+//int[] history = d.history;
+//int one = history[1];
+//
+//Point location = d.location;
+//string[] names = location.names;
+//string one_name = names[0];
 
 
 //int aaa = 3;
@@ -110,13 +118,19 @@ string name = d.name;
 //
 //int[] c = int[5];  // new array of length 5
 //int x = c[5];
-//
-//def int square(int x, int y, int x ) {
-//    int i;
-//    while(i < 3){
-//        i = i + 1;
-//    }
-//}
+
+
+
+def int square(int x, int y, int x ) {
+    while(i < 3){
+        i = i + 1;
+    }
+    return "a";
+}
+
+
+
+
 //
 //def Point copyPoints(Point[] p) {
 //    return Point(p[0].x+p[1].x, p[0].y+p[1].y);

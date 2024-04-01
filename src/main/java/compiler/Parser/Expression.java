@@ -21,8 +21,6 @@ public abstract class Expression extends Statement{
     }
 
     public abstract String getRep();
-    public abstract void typeAnalyse(NodeVisitor v);
-
 
     public GenericType getType(){
         GenericType tl = this.lhs.getType();
@@ -811,8 +809,9 @@ class IndexOp extends Expression {
 
     @Override
     public String getRep() {
-        return null;
+        return identifier.image()+"["+index.getRep()+"]";
     }
+
 
     @Override
     public void typeAnalyse(NodeVisitor v) {

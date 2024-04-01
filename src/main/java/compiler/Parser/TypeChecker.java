@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import static java.lang.System.exit;
-import static java.lang.System.in;
 
 
 /**
@@ -32,17 +31,23 @@ import static java.lang.System.in;
 public class TypeChecker implements NodeVisitor{
     Program program;
     ContextGod currContext;
-    ContextGod prevContext;
     HashMap<String, UserType> userTypes;
+    HashMap<String, ProcedureContext> procedureContextHashMap;
     public TypeChecker(Program p ){
         this.program = p;
-        this.currContext = new Context(null);
+        this.currContext = new Context();
+        this.currContext.setPrev(null);
         this.userTypes = new HashMap<>();
-        prevContext = null;
+        this.procedureContextHashMap = new HashMap<>();
     }
-    // TODO:
-    private void updateContext(){
+    private void pushContext(ContextGod newContext){
+        currContext.setNext(newContext);
+        newContext.setPrev(currContext);
+        currContext = newContext;
+    }
 
+    private void popContext(){
+        currContext = currContext.getPrev();
     }
 
     public void typeCheck(){
@@ -55,6 +60,9 @@ public class TypeChecker implements NodeVisitor{
         }
         for(VariableGod v : program.globals){
             v.typeAnalyse(this);
+        }
+        for (Procedure p : program.procedures){
+            p.typeAnalyse(this);
         }
     }
 
@@ -194,7 +202,8 @@ public class TypeChecker implements NodeVisitor{
                 String typeGiven = e.getType().toString();
                 String typeActual = fields.get(i).toString();
                 if(!typeActual.equals(typeGiven)){
-                    reportSemanticError("StructError: Argument type mismatch: %s",exp.line, typeActual + "!=" + typeGiven );
+                    reportSemanticError("StructError: Argument type mismatch: %s",exp.line,
+                            typeActual + "!=" + typeGiven );
                 }
                 i++;
 
@@ -213,6 +222,13 @@ public class TypeChecker implements NodeVisitor{
             return currContext.getVarType(id);
         }
         // TODO: what to do when the variable does not exist in the current context
+        ContextGod prev = currContext.getPrev();
+        while(prev != null){
+            if(prev.containsId(id)){
+                return prev.getVarType(id);
+            }
+            prev = prev.getPrev();
+        }
         return null;
 
     }
@@ -227,6 +243,13 @@ public class TypeChecker implements NodeVisitor{
             return new Type(id,false);
         }
         // TODO: what to do when the variable does not exist in the current context
+        ContextGod prev = currContext.getPrev();
+        while(prev != null){
+            if(prev.containsId(id)){
+                return prev.getVarType(id);
+            }
+            prev = prev.getPrev();
+        }
         return null;
     }
 
@@ -246,8 +269,20 @@ public class TypeChecker implements NodeVisitor{
         return null;
     }
 
+    private DotOperation processDotOp(DotOperation op){
+        // TODO LATER: process a dot operation, invert the expressions
+        // dot operation could end with another dot operation
+        // could end with array access
+        Expression lhs = op.lhs;
+        Expression rhs = op.rhs;
+
+        return null;
+    }
+
     @Override
     public GenericType visitSymbolTableDotOp(DotOperation op) {
+        op.prettyPrint("");
+        //DotOperation nop = processDotOp(op);
         Expression lhs = op.lhs;
         Expression rhs = op.rhs;
         lhs.typeAnalyse(this); // gets the struct type
@@ -256,12 +291,49 @@ public class TypeChecker implements NodeVisitor{
             UserType structType = userTypes.get(lhsType.type());
             String member = rhs.getRep();
             if(!structType.members.containsKey(member)){
-                reportSemanticError("You are trying to access the member of a struct that does not exist: %s", lhs.line,member);
+                reportSemanticError("Member does not exist or composite struct access not supported: %s",
+                        lhs.line,member);
             }
             GenericType t = structType.members.get(member);
             return t;
         }
         return new Type("ERROR MORUK IN DOT OP SYMBOL TABLE", false);
+    }
+
+    @Override
+    public void visitProcedure(Procedure p) {
+        // TODO: Check return type how???
+        TypeDeclaration typeDeclaration = p.returnType;
+        Symbol identifier = p.identifier;
+        ProcedureDeclarator declarator = p.declarator;
+        ArrayList<Expression> parameters = declarator.parameters;
+
+        currContext.addToContext(identifier.image(),new Type(typeDeclaration.type.image(),typeDeclaration.isArray));
+
+        ProcedureContext procedureContext = new ProcedureContext(parameters);
+        pushContext(procedureContext);
+
+        Block block = declarator.block;
+        for(Statement s : block.statements){
+            s.typeAnalyse(this);
+        }
+        popContext();
+    }
+
+    @Override
+    public void visitWhile(WhileStatement w) {
+        // TODO: create new context
+        Expression condition = w.condition;
+        condition.typeAnalyse(this);
+        Block block = w.block;
+
+        Context whileContext = new Context();
+        pushContext(whileContext);
+
+        for(Statement s : block.statements){
+            s.typeAnalyse(this);
+        }
+        popContext();
     }
 
     @Override
@@ -282,7 +354,8 @@ public class TypeChecker implements NodeVisitor{
         //    UserType structType = userTypes.get(lhsType.type());
         //    String member = rhs.getRep();
         //    if(!structType.members.containsKey(member)){
-        //        reportSemanticError("You are trying to access the member of a struct that does not exist: %s", lhs.line,member);
+        //        reportSemanticError("You are trying to access the member of a struct that does not exist: %s",
+        //        lhs.line,member);
         //    }
 
         //}
@@ -373,6 +446,19 @@ public class TypeChecker implements NodeVisitor{
                     var.identifier().getRep());
         }
 
+    }
+
+    @Override
+    public void visitScopeVariable(ScopeVariable var) {
+        Expression declarator = var.declarator;
+        Expression identifier = var.identifier;
+        declarator.typeAnalyse(this);
+        identifier.typeAnalyse(this);
+        GenericType idType = identifier.getType();
+        if(!idType.equals(declarator.getType())){
+            reportSemanticError("TypeError: Scope Variable type does not match the declaration type: %s",
+                    var.line,  var.typeDeclaration().toString() + " != " + var.declarator().getType() );
+        }
     }
 
     @Override

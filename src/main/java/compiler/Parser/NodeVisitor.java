@@ -16,6 +16,8 @@ public interface NodeVisitor {
     GenericType visitSymbolTableIndexOp(IndexOp op);
 
     GenericType visitSymbolTableDotOp(DotOperation op);
+    void visitProcedure(Procedure p);
+    void visitWhile(WhileStatement w);
     void visitDotOperation(DotOperation op);
     void visitLogicalExpression(LogicalExpression op);
     void visitComparisonExpression(ComparisionExpression op);
@@ -27,6 +29,7 @@ public interface NodeVisitor {
 
     void visitConstantVariable(VariableGod var);
     void visitGlobalVariable(VariableGod var);
+    void visitScopeVariable(ScopeVariable var);
 
     void visitStructDeclaration(StructDeclaration s);
 }
