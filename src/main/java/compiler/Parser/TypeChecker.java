@@ -16,7 +16,8 @@ import static java.lang.System.in;
 
 /**
 * TODO:
- * -> struct accesses
+ * -> composite struct accesses in one line
+ * REFACTOR
  * <p>
  * What I did last:
  *  -> variable scopes
