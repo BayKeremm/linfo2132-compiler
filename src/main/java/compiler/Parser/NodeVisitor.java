@@ -28,8 +28,12 @@ public interface NodeVisitor {
 
 
     void visitConstantVariable(VariableGod var);
-    void visitGlobalVariable(VariableGod var);
+    void visitVariable(VariableGod var);
     void visitScopeVariable(ScopeVariable var);
 
     void visitStructDeclaration(StructDeclaration s);
+
+    void visitReturn(ReturnStatement ret);
+    void visitIfElse(IfElseStatement ifelse);
+    void visitFor(ForStatement forStatement);
 }

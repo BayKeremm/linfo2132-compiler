@@ -102,6 +102,8 @@ public class Parser {
 
         if(have(Token.EOF)){
             System.out.println("That's rough buddy");
+        }else{
+            reportParserError("Unexpected error while parsing", lexer.nextSymbol());
         }
 
         return new Program(lexer.getFileName(),constantVariables,globals, structs, procedures,this.types);

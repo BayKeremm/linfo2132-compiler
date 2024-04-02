@@ -9,7 +9,7 @@ public class ProcedureContext extends ContextGod {
     HashMap<String, GenericType> procedureBlock;
 
 
-    public ProcedureContext( ArrayList<Expression> parameters) {
+    public ProcedureContext(ArrayList<Expression> parameters) {
         this.arguments = new HashMap<>();
         this.procedureBlock = new HashMap<>();
         for(Expression e: parameters){
@@ -17,20 +17,31 @@ public class ProcedureContext extends ContextGod {
         }
     }
 
-    public boolean containsArgument(String id){
-        return arguments.containsKey(id);
-    }
-
     @Override
     public boolean containsId(String id) {
-        return procedureBlock.containsKey(id);
+        if(procedureBlock.containsKey(id)){
+            return true;
+        }
+        else if(this.arguments.containsKey(id)){
+            return true;
+        }
+        ContextGod prev = this.getPrev();
+        while(prev != null){
+            if(prev.containsId(id)){
+                return true;
+            }
+            prev = prev.getPrev();
+        }
+        return false;
     }
 
     @Override
     public boolean addToContext(String id, GenericType type) {
-        if(containsId(id)){
+        if(procedureBlock.containsKey(id)){
             return false;
-        }else{
+        } else if (arguments.containsKey(id)) {
+            return false;
+        } else{
             procedureBlock.put(id,type);
             return true;
         }
@@ -38,7 +49,7 @@ public class ProcedureContext extends ContextGod {
 
     @Override
     public GenericType getVarType(String id) {
-        if(containsId(id)){
+        if(procedureBlock.containsKey(id)){
             return this.procedureBlock.get(id);
         }
         else if(this.arguments.containsKey(id)){
@@ -61,14 +72,16 @@ public class ProcedureContext extends ContextGod {
         System.out.println(indentation +"  "+ arguments.toString());
         System.out.println(indentation + " - procedureBlock:");
         System.out.println(indentation +"  "+ procedureBlock.toString());
-        System.out.println(indentation + " - Previous Context");
-        if(this.getPrev() != null){
-            this.getPrev().debugContext(indentation+"   ");
-        }else{
-            System.out.println(indentation+" - It is null;");
-        }
-
+        System.out.println(indentation+"Prev:"+this.getPrev());
+        System.out.println(indentation+"Next:"+this.getNext());
     }
+
+    @Override
+    public HashMap<String, GenericType> getContextTable() {
+        this.arguments.putAll(this.procedureBlock);
+        return arguments;
+    }
+
 }
 
 

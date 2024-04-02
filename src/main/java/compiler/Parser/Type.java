@@ -4,6 +4,9 @@ import java.util.ArrayList;
 abstract class GenericType{
     public abstract String toString();
     public abstract String type();
+    public boolean isArray(){
+        return false;
+    }
 }
 
 public class Type extends GenericType{
@@ -20,6 +23,11 @@ public class Type extends GenericType{
     public String toString() {
         // DO NOT CHANGE
         return type+ (isArray ? "[]":"") ;
+    }
+
+    @Override
+    public boolean isArray() {
+        return isArray;
     }
 
     @Override

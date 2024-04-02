@@ -40,7 +40,7 @@ class Variable extends VariableGod {
 
     @Override
     public void typeAnalyse(NodeVisitor v) {
-        v.visitGlobalVariable(this);
+        v.visitVariable(this);
     }
 
 
@@ -255,7 +255,7 @@ class UninitVariable extends VariableGod {
     }
     @Override
     public TypeDeclaration typeDeclaration() {
-        return null;
+        return type;
     }
 
     @Override
@@ -270,6 +270,7 @@ class UninitVariable extends VariableGod {
 
     @Override
     public void typeAnalyse(NodeVisitor v) {
+        v.visitVariable(this);
 
     }
 }

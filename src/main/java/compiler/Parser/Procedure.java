@@ -189,8 +189,10 @@ class IfElseStatement extends Statement {
     public void prettyPrint(String indentation) {
         System.out.printf(indentation+"If: %s\n", ifCondition);
         ifBlock.prettyPrint(indentation+"  ");
-        System.out.print(indentation+"Else:\n");
-        elseBlock.prettyPrint(indentation+"  ");
+        if(elseBlock != null){
+            System.out.print(indentation+"Else:\n");
+            elseBlock.prettyPrint(indentation+"  ");
+        }
 
     }
 
@@ -216,6 +218,7 @@ class IfElseStatement extends Statement {
 
     @Override
     public void typeAnalyse(NodeVisitor v) {
+        v.visitIfElse(this);
 
     }
 }
@@ -317,6 +320,7 @@ class ForStatement extends Statement{
 
     @Override
     public void typeAnalyse(NodeVisitor v) {
+        v.visitFor(this);
 
     }
 }
@@ -354,6 +358,8 @@ class ReturnStatement extends Statement {
 
     @Override
     public void typeAnalyse(NodeVisitor v) {
+        // TODO: Return statement type analyse
+        v.visitReturn(this);
 
     }
 }
