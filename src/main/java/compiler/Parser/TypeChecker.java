@@ -232,33 +232,6 @@ public class TypeChecker implements NodeVisitor{
         }
         return true;
     }
-    private Boolean checkStatementTypes(TypeDeclaration idType, GenericType dec_type){
-        String type = idType.type.image();
-        if(userTypes.containsKey(type)){
-            type = userTypes.get(type).type();
-        }
-        final boolean manyak = type.equals(dec_type.toString());
-        final boolean equals = idType.toString().equals(dec_type.toString()) || manyak;
-        switch (type) {
-            case "int", "float" -> {
-                return dec_type.toString().equals(Token.INTEGER.image())
-                        || dec_type.toString().equals(Token.FLOAT.image())
-                        || equals;
-            }
-            case "string" -> {
-                return dec_type.toString().equals(Token.STRING.image())
-                        || equals;
-            }
-            case "bool" -> {
-                return dec_type.toString().equals(Token.BOOLEAN.image())
-                        || equals;
-            }
-            case "<IDENTIFIER>" -> {
-                return equals;
-            }
-        }
-        return false;
-    }
     private void reportSemanticError(String message,int line, Object... args)  {
         final String ANSI_RESET = "\u001B[0m";
         final String ANSI_RED = "\u001B[31m";
