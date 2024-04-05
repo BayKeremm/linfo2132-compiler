@@ -58,8 +58,11 @@ final int j = f*2;
 final bool b = true;
 final int[] arr = int[5];
 
-
+struct God {
+    string[] god;
+}
 struct Point {
+  God you;
   int x;
   int y;
   string[] names;
@@ -74,13 +77,20 @@ struct Person {
 }
 
 // TODO: Global Variable type does not match the declaration type: Point != [int, int, string[]]
-//string[] bbb = d.location.names;
+Person d = Person("KEREM", Point(God(string[10]),3,7,string[5]), int[i*2]);  // new structure
+string[] bbb = d.location.names;
 
-Point p = Point(3,7,string[5]);
+string[] abcd  = d.location.you.god;
 
-Person d = Person("KEREM", Point(3,7,string[5]), int[i*2]);  // new structure
+string please = d.location.names[0];
+
+string  aaaaaaaaaaaaa  = d.location.you.god[100];
+
+
 Point location = d.location;
 
+
+Point p = Point(God(string[5]),3,7,string[5]);
 Person dtwo = Person("KEREM", p, int[i*2]);  // new structure
 
 string name = d.name;
@@ -93,9 +103,9 @@ string[] names = location.names;
 string one_name = names[0];
 
 
-Point[] please = Point[5];
+Point[] please2 = Point[5];
 
-int aaa = please[0].x;
+int JESUS = please2[0].x;
 
 
 
