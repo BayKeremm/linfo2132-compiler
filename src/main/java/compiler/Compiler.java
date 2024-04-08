@@ -40,7 +40,7 @@ public class Compiler {
             TestParser testParser = new TestParser();
             testParser.testConstantVariable();
             testParser.testProcedure();
-            //testParser.testStructGlobals();
+            testParser.testStructGlobals();
         }
 
         else{
@@ -51,10 +51,12 @@ public class Compiler {
 
             Parser parser = new Parser(lexer);
             Program p = parser.program();
-            p.printNode();
+            
             TypeChecker semantics = new TypeChecker(p);
             semantics.typeCheck();
             semantics.debug();
+
+            p.printNode();
         }
 
 
