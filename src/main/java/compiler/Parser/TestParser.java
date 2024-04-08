@@ -45,7 +45,7 @@ public class TestParser {
     }
     @Test
     public void testConstantVariable() throws Exception{
-        String filename = "test_constvariables.txt";
+        String filename = "test_files/test_constvariables.txt";
         LineNumberReader reader = new LineNumberReader(new FileReader(filename));
         Lexer lexer = new Lexer(reader);
         Parser parser = new Parser(lexer);
@@ -79,7 +79,7 @@ public class TestParser {
 
     @Test
     public void testProcedure() throws Exception{
-        String filename = "test_procedure.txt";
+        String filename = "test_files/test_procedure.txt";
         LineNumberReader reader = new LineNumberReader(new FileReader(filename));
         Lexer lexer = new Lexer(reader);
         Parser parser = new Parser(lexer);
@@ -142,58 +142,55 @@ public class TestParser {
         assertEquals(Test, p);
     }
 
-    // WRONG
-    //@Test
-    //public void testStructGlobals() throws Exception{
-    //    String filename = "test_struct_globals.txt";
-    //    LineNumberReader reader = new LineNumberReader(new FileReader(filename));
-    //    Lexer lexer = new Lexer(reader);
-    //    Parser parser = new Parser(lexer);
-    //    Program p = parser.program();
+    @Test
+    public void testStructGlobals() throws Exception{
+       String filename = "test_files/test_struct_globals.txt";
+       LineNumberReader reader = new LineNumberReader(new FileReader(filename));
+       Lexer lexer = new Lexer(reader);
+       Parser parser = new Parser(lexer);
+       Program p = parser.program();
 
-    //    Program Test = new Program("test4", new ArrayList<ConstantVariable>(), new ArrayList<VariableGod>(), new ArrayList<StructDeclaration>(), new ArrayList<Procedure>(),parser.getTypes());
+       Program Test = new Program("test4", new ArrayList<ConstantVariable>(), new ArrayList<VariableGod>(), new ArrayList<StructDeclaration>(), new ArrayList<Procedure>(),parser.getTypes());
 
-    //    ArrayList<Statement> statements = new ArrayList<Statement>();
-    //    Block block = new Block(0, statements);
-    //    IdentifierExpression testIdentifier1 = id("a");
-    //    ArrayInitializer ArrC = new ArrayInitializer(0, type("int", Token.INTEGER,true), num(3));
-    //    IdentifierExpression testIdentifierPoint = id("Point");
-    //    statements.add(new UninitVariable(0, type("int",Token.INTEGER,false),testIdentifier1));
-    //    statements.add(new Variable(0, type("int",Token.INTEGER,true), id("c"), ArrC));
-    //    StructDeclaration struct1 = new StructDeclaration(0, testIdentifierPoint, block);
+       ArrayList<Statement> statements = new ArrayList<Statement>();
+       Block block = new Block(0, statements);
+       IdentifierExpression testIdentifierPoint = id("Point");
+       statements.add(new UninitVariable(0, type("int",Token.INTEGER,false),id("a")));
+       statements.add(new UninitVariable(0, type("int",Token.INTEGER,true), id("c")));
+       StructDeclaration struct1 = new StructDeclaration(0, testIdentifierPoint, block);
 
-    //    Test.addStructDeclaration(struct1);
+       Test.addStructDeclaration(struct1);
 
-    //    TypeDeclaration varType = type("Point",Token.IDENTIFIER,false);
-    //    IdentifierExpression varId = id("p");
-    //    ArrayList<Expression> expression = new ArrayList<Expression>();
-    //    FunctionCallExpression call = new FunctionCallExpression(1, new Symbol(Token.IDENTIFIER,"Point" ,0), expression);
-    //    Variable var = new Variable(1, varType, varId, call);
-    //
-    //    expression.add(num(3));
+       TypeDeclaration varType = type("Point",Token.IDENTIFIER,false);
+       IdentifierExpression varId = id("p");
+       ArrayList<Expression> expression = new ArrayList<Expression>();
+       FunctionCallExpression call = new FunctionCallExpression(1, new Symbol(Token.IDENTIFIER,"Point" ,0), expression);
+       Variable var = new Variable(1, varType, varId, call);
+    
+       expression.add(num(3));
 
-    //    Test.addGlobal(var);
+       Test.addGlobal(var);
 
-    //    ArrayInitializer arr = new ArrayInitializer(2, type("int",Token.INTEGER,true), num(5));
-    //    Variable var2 = new Variable(2, type("int",Token.INTEGER,true), id("arr"), arr);
+       ArrayInitializer arr = new ArrayInitializer(2, type("int",Token.INTEGER,true), num(5));
+       Variable var2 = new Variable(2, type("int",Token.INTEGER,true), id("arr"), arr);
 
-    //    Test.addGlobal(var2);
+       Test.addGlobal(var2);
 
-    //    TypeDeclaration varType3 = type("int",Token.INTEGER,false);
-    //    IdentifierExpression varId3 = id("b");
-    //    DotOperation dot = new DotOperation(3, id("p"), id("a"));
-    //    Variable var3 = new Variable(3, varType3, varId3, dot);
-    //
-    //    Test.addGlobal(var3);
+       TypeDeclaration varType3 = type("int",Token.INTEGER,false);
+       IdentifierExpression varId3 = id("b");
+       DotOperation dot = new DotOperation(3, id("p"), id("a"));
+       Variable var3 = new Variable(3, varType3, varId3, dot);
+    
+       Test.addGlobal(var3);
 
-    //    TypeDeclaration varType4 = type("int",Token.INTEGER,false);
-    //    IdentifierExpression varId4 = id("c");
-    //    IndexOp arr2 = new IndexOp(4, new Symbol(Token.IDENTIFIER, "c", 0), num(0));
-    //    DotOperation dot2 = new DotOperation(4, id("p"), arr2);
-    //    Variable var4 = new Variable(4, varType4, varId4, dot2);
+       TypeDeclaration varType4 = type("int",Token.INTEGER,false);
+       IdentifierExpression varId4 = id("c");
+       IndexOp arr2 = new IndexOp(4, new Symbol(Token.IDENTIFIER, "c", 0), num(0));
+       DotOperation dot2 = new DotOperation(4, id("p"), arr2);
+       Variable var4 = new Variable(4, varType4, varId4, dot2);
 
-    //    Test.addGlobal(var4);
+       Test.addGlobal(var4);
 
-    //    assertEquals(Test, p);
-    //}
+       assertEquals(Test, p);
+    }
 }

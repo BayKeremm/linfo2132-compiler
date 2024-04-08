@@ -1,0 +1,12 @@
+def int foo(){
+    return "a";
+}
+def int foo(){
+    return;
+}
+def void foo(){
+    return 1;
+}
+def int foo(){
+    print("hello");
+}
