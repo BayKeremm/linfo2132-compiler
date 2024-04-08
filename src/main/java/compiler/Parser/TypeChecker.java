@@ -17,6 +17,7 @@ import static java.lang.System.in;
 
 /**
 * TODO:
+ * !!!! checkTypes does not check array types
  * -> composite struct accesses in one line
  * REFACTOR
  * <p>
@@ -208,7 +209,7 @@ public class TypeChecker implements NodeVisitor{
         if(userTypes.containsKey(tr.type())){
             tr = userTypes.get(tr.type());
         }
-        if(tl.type().equals(tr.type())){
+        if(tl.type().equals(tr.type()) && tl.isArray() == tr.isArray()){
             return true;
         } else if (promoteInt) {
           if (tl.type().equals(Token.FLOAT.image()) && tr.type().equals(Token.INTEGER.image())) {
@@ -232,33 +233,6 @@ public class TypeChecker implements NodeVisitor{
 
         }
         return true;
-    }
-    private Boolean checkStatementTypes(TypeDeclaration idType, GenericType dec_type){
-        String type = idType.type.image();
-        if(userTypes.containsKey(type)){
-            type = userTypes.get(type).type();
-        }
-        final boolean manyak = type.equals(dec_type.toString());
-        final boolean equals = idType.toString().equals(dec_type.toString()) || manyak;
-        switch (type) {
-            case "int", "float" -> {
-                return dec_type.toString().equals(Token.INTEGER.image())
-                        || dec_type.toString().equals(Token.FLOAT.image())
-                        || equals;
-            }
-            case "string" -> {
-                return dec_type.toString().equals(Token.STRING.image())
-                        || equals;
-            }
-            case "bool" -> {
-                return dec_type.toString().equals(Token.BOOLEAN.image())
-                        || equals;
-            }
-            case "<IDENTIFIER>" -> {
-                return equals;
-            }
-        }
-        return false;
     }
     private void reportSemanticError(String message,int line, Object... args) throws Error{
         Error e = new Error(String.format("%s:%d: error: %s", program.getFileName(), line, String.format(message, args)));
@@ -470,36 +444,74 @@ public class TypeChecker implements NodeVisitor{
         return null;
     }
 
-    private DotOperation processDotOp(DotOperation op){
-        // TODO LATER: process a dot operation, invert the expressions
-        // dot operation could end with another dot operation
-        // could end with array access
-        Expression lhs = op.lhs;
-        Expression rhs = op.rhs;
-
-        return null;
-    }
 
     @Override
     public GenericType visitSymbolTableDotOp(DotOperation op) {
         op.prettyPrint("");
-        //DotOperation nop = processDotOp(op);
         Expression lhs = op.lhs;
         Expression rhs = op.rhs;
         lhs.typeAnalyse(this); // gets the struct type
         GenericType lhsType = lhs.getType();
         if(userTypes.containsKey(lhsType.type())){
             UserType structType = userTypes.get(lhsType.type());
-            String member = rhs.getRep();
-            if(!structType.members.containsKey(member)){
-                reportSemanticError("ScopeError : Member does not exist in context or composite struct access not supported: %s",
-                        lhs.line,member);
+            String member;
+            GenericType t = null;
+            if(rhs.lhs != null){
+                Expression one_level_down = rhs;
+                while(one_level_down.lhs != null && one_level_down.rhs != null){
+                    Expression level_lhs = one_level_down.lhs;
+                    GenericType member1_type = structType.members.get(level_lhs.getRep());
+                    if(userTypes.containsKey(member1_type.type())){
+                        structType = userTypes.get(member1_type.type());
+                        one_level_down = one_level_down.rhs;
+                        if(one_level_down instanceof IndexOp){
+                            ((IndexOp) one_level_down).index.typeAnalyse(this);
+                            String type =  structType.members.get(((IndexOp) one_level_down).identifier.image()).type();
+                            t = new Type(type,false);
+                        }else{
+                            t = structType.members.get(one_level_down.getRep());
+                        }
+
+                    }else{
+                        one_level_down = one_level_down.rhs;
+                        t = structType.members.get(member1_type.type());
+                    }
+
+                }
+
             }
-            GenericType t = structType.members.get(member);
+            else{
+                member = rhs.getRep();
+                t = structType.members.get(member);
+            }
+
+            //if(!structType.members.containsKey(member)){
+            //    reportSemanticError("Member does not exist or composite struct access not supported: %s",
+            //            lhs.line,member);
+            //}
             return t;
         }
         return new Type("ERROR MORUK IN DOT OP SYMBOL TABLE", false);
     }
+//    @Override
+//    public GenericType visitSymbolTableDotOp_old(DotOperation op) {
+//        op.prettyPrint("");
+//        Expression lhs = op.lhs;
+//        Expression rhs = op.rhs;
+//        lhs.typeAnalyse(this); // gets the struct type
+//        GenericType lhsType = lhs.getType();
+//        if(userTypes.containsKey(lhsType.type())){
+//            UserType structType = userTypes.get(lhsType.type());
+//            String member = rhs.getRep();
+//            if(!structType.members.containsKey(member)){
+//                reportSemanticError("Member does not exist or composite struct access not supported: %s",
+//                        lhs.line,member);
+//            }
+//            GenericType t = structType.members.get(member);
+//            return t;
+//        }
+//        return new Type("ERROR MORUK IN DOT OP SYMBOL TABLE", false);
+//    }
 
 
 
@@ -513,19 +525,6 @@ public class TypeChecker implements NodeVisitor{
          * * - throw error if not a struct
          * ...
         * */
-        //Expression lhs = op.lhs;
-        //Expression rhs = op.rhs;
-        //lhs.typeAnalyse(this); // gets the struct type
-        //GenericType lhsType = lhs.getType();
-        //if(userTypes.containsKey(lhsType.type())){
-        //    UserType structType = userTypes.get(lhsType.type());
-        //    String member = rhs.getRep();
-        //    if(!structType.members.containsKey(member)){
-        //        reportSemanticError("You are trying to access the member of a struct that does not exist: %s",
-        //        lhs.line,member);
-        //    }
-
-        //}
     }
 
     @Override
