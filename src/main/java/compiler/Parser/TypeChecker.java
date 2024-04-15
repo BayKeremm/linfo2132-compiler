@@ -221,6 +221,19 @@ public class TypeChecker implements NodeVisitor{
         return false;
     }
 
+    // Specifically for float and int
+    // previous code made the user be able to convert int declared variabel to float
+    // but this additional code only allows now ints to be used with float declared variables
+    private Boolean compareForPromotion(GenericType tl, GenericType tr){
+        if (tl.type().equals(Token.FLOAT.image()) && tr.type().equals(Token.INTEGER.image())) {
+            return true;
+        } else if (tr.type().equals(Token.FLOAT.image()) && tl.type().equals(Token.INTEGER.image())) {
+            return false;
+        }
+        return true;
+    }
+
+
     private Boolean checkExpressionTypes(Expression lhs, Expression rhs){
         if(lhs != null && rhs != null){
 
@@ -582,7 +595,7 @@ public class TypeChecker implements NodeVisitor{
         // then check if the declaration type matches the id type
         GenericType decType = var.declarator().getType();
         GenericType varType = new Type(var.typeDeclaration().type.image(),var.typeDeclaration().isArray);
-        if(!checkTypes(varType, decType,true)){
+        if(!checkTypes(varType, decType,true) || !compareForPromotion(varType,decType)){
             reportSemanticError("TypeError: Constant Variable type does not match the declaration type: %s",
                     var.line,  var.typeDeclaration().toString() + " != " + var.declarator().getType() );
         }
@@ -608,7 +621,7 @@ public class TypeChecker implements NodeVisitor{
             var.declarator().typeAnalyse(this);
             GenericType decType = var.declarator().getType();
             GenericType varType = new Type(var.typeDeclaration().type.image(),var.typeDeclaration().isArray);
-            if(!checkTypes(varType, decType,true)){
+            if(!checkTypes(varType, decType,true) || !compareForPromotion(varType,decType)){
                 reportSemanticError("TypeError: Global Variable type does not match the declaration type: %s",
                         var.line,  var.typeDeclaration().toString() + " != " + var.declarator().getType() );
             }
@@ -629,10 +642,11 @@ public class TypeChecker implements NodeVisitor{
         Expression identifier = var.identifier;
         declarator.typeAnalyse(this);
         identifier.typeAnalyse(this);
-        GenericType idType = identifier.getType();
-        if(!checkTypes(idType,declarator.getType(),true)){
+        GenericType varType = identifier.getType();
+        GenericType decType = declarator.getType();
+        if(!checkTypes(varType, decType,true) || !compareForPromotion(varType,decType)){
             reportSemanticError("TypeError: Scope Variable type does not match the declaration type: %s",
-                    var.line,  idType + " != " + var.declarator().getType() );
+                    var.line,  varType + " != " + var.declarator().getType() );
         }
     }
 

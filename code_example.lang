@@ -44,14 +44,14 @@
 
 
 // ---------------------------------------------------------------
-final int a = (((2+2)-4)*2) / 3.0;
+final float a = (((2+2)-4)*2) / 3.0;
 final int i = 2*2+4;
 final string k = "kerem";
 final bool bol = (i+2)*3 == 1;
 
 final float f = 3.2;
 
-final int j = f*2;
+final float j = f*2;
 
 
 
@@ -76,8 +76,10 @@ struct Person {
 
 }
 
-// TODO: Global Variable type does not match the declaration type: Point != [int, int, string[]]
+Point p = Point(God(string[5]),3,7,string[5]);
+
 Person d = Person("KEREM", Point(God(string[10]),3,7,string[5]), int[i*2]);  // new structure
+
 string[] bbb = d.location.names;
 
 string[] abcd  = d.location.you.god;
@@ -90,7 +92,6 @@ string  aaaaaaaaaaaaa  = d.location.you.god[100];
 Point location = d.location;
 
 
-Point p = Point(God(string[5]),3,7,string[5]);
 Person dtwo = Person("KEREM", p, int[i*2]);  // new structure
 
 string name = d.name;
@@ -115,6 +116,7 @@ int[] kerem = int[10];
 int elfje = kerem[i];
 
 def int square(int v) {
+    //int k = 5;
     return v*v;
 }
 
