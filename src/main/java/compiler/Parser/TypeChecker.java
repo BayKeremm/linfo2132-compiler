@@ -17,11 +17,12 @@ import static java.lang.System.in;
 
 /**
 * TODO:
- * !!!! checkTypes does not check array types
- * -> composite struct accesses in one line
+ * -> missing return statement error is missing
  * REFACTOR
  * <p>
  * What I did last:
+ * -> fix float int promotion
+ * -> composite struct accesses in one line
  *  -> variable scopes
  *  -> Child contexts
  *  -> how to update context
@@ -682,6 +683,16 @@ public class TypeChecker implements NodeVisitor{
         for(Statement s : block.statements){
             s.typeAnalyse(this);
         }
+        // Check the last statement, it needs to be a return if not ret is void
+        if(!ret.type().equals("void")){
+            Statement last = block.statements.get(block.statements.size()-1);
+            if(!(last instanceof ReturnStatement)){
+                reportSemanticError("ReturnError : Missing return, please return with type: %s ", block.line, ret.type());
+            }
+
+        }
+
+
         popContext();
 
         ArrayList<GenericType> types = new ArrayList<>();

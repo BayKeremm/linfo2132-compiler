@@ -55,6 +55,7 @@ final float j = f*2;
 
 
 
+
 final bool b = true;
 final int[] arr = int[5];
 
@@ -115,8 +116,12 @@ int[] kerem = int[10];
 
 int elfje = kerem[i];
 
+
+float oo = 2;
+
 def int square(int v) {
     //int k = 5;
+    oo = oo + 0.2;
     return v*v;
 }
 
