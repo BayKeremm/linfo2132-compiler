@@ -17,10 +17,10 @@ import static java.lang.System.in;
 
 /**
 * TODO:
- * -> missing return statement error is missing
- * REFACTOR
- * <p>
+ * -> proper error message for missing identifier for variable declarations instead of null pointer exception
  * What I did last:
+ * -> missing free statement handling
+ * -> missing return statement error is missing
  * -> fix float int promotion
  * -> composite struct accesses in one line
  *  -> variable scopes
@@ -33,7 +33,6 @@ import static java.lang.System.in;
  * - added array declarations
  * - declaration type changes the TypeDec type
  * - RootContext gives info about a variable so you can use idenexpressions
-* <p>
 * */
 
 
@@ -249,7 +248,7 @@ public class TypeChecker implements NodeVisitor{
         return true;
     }
     private void reportSemanticError(String message,int line, Object... args) throws Error{
-        Error e = new Error(String.format("%s:%d: error: %s", program.getFileName(), line, String.format(message, args)));
+        Error e = new Error(String.format("%s:%d: -> Semantic Analysis error: %s", program.getFileName(), line, String.format(message, args)));
         e.printStackTrace();
         try {
             throw e;
@@ -586,6 +585,21 @@ public class TypeChecker implements NodeVisitor{
     @Override
     public void visitParanExpression(ParanExpression p) {
         p.expressions.get(0).typeAnalyse(this);
+    }
+
+    @Override
+    public void visitFreeStatement(FreeStatement st) {
+        GenericType freedType = st.getType();
+        if(userTypes.containsKey(freedType.type())||freedType.isArray()){
+            return;
+        }
+        reportSemanticError("FreeError: Cannot free type: %s", st.line, freedType.type());
+        //if(userTypes.containsKey(freedType.type()) && !freedType.isArray()){
+        //    reportSemanticError("FreeError: Cannot free non-array built in type: %s", st.line, freedType.type());
+        //}
+        //else if(!userTypes.containsKey(freedType.type())){
+        //    reportSemanticError("FreeError: Cannot free user defined type: %s", st.line, freedType.type());
+        //}
     }
 
     @Override

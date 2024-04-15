@@ -26,6 +26,7 @@ public interface NodeVisitor {
     void visitArrayInitializer(ArrayInitializer p );
     void visitParanExpression(ParanExpression p );
 
+    void visitFreeStatement(FreeStatement st);
 
     void visitConstantVariable(VariableGod var);
     void visitVariable(VariableGod var);

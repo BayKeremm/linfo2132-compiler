@@ -147,7 +147,13 @@ public class Parser {
                 Expression exp = expression();
                 statements.add(new ReturnStatement(line,exp));
                 mustbe(Token.SEMI_COLON);
-            }else{
+            } else if(have(Token.FREE)){
+                Expression id = expression();
+                statements.add(new FreeStatement(line, id));
+                int x = 5+2;
+
+            }
+            else{
                 statements.add(statement());
                 mustbe(Token.SEMI_COLON);
             }

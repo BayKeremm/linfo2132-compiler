@@ -126,6 +126,9 @@ def int square(int v) {
 }
 
 def void main() {
+    free d;
+    free please2;
+    free kerem;
     int value = readInt();
     writeInt(square(value));
     writeln();
