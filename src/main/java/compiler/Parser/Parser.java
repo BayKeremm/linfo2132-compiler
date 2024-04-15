@@ -56,6 +56,9 @@ public class Parser {
         ArrayList<VariableGod> globals = new ArrayList<>();
         while(have(Token.FINAL)){
             int line = nextSymbol.line();
+            if(!isType()){
+                reportParserError(" -> Expected to parse a type",line);
+            }
             TypeDeclaration type = type();
             Expression identifier = expression();
             mustbe(Token.ASSIGN);
@@ -388,7 +391,6 @@ public class Parser {
         System.err.printf("Parser error: %s:%d ", lexer.getFileName(), nextSymbol.line());
         System.err.printf(message, args[0]);
         System.err.printf(" got: %s\n", nextSymbol);
-        System.err.println("Continuing parsing ...\n ");
         System.err.print(ANSI_RESET);
         System.exit(1);
     }private Boolean check(Token token){
