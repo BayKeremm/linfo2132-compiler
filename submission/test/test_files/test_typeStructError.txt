@@ -1,0 +1,14 @@
+final string name = 3;
+final int age = "4";
+struct if {
+    int a;
+    int b;
+}
+struct Point {
+    int a;
+    int b;
+}
+struct Point {
+    string x;
+    float y;
+}

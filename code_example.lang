@@ -118,6 +118,16 @@ float oo = 2;
 
 def int square(int v) {
     //int k = 5;
+    if(true){
+        int abab = 0;
+    }
+    while{
+        int abab = 0;
+    }
+    int idx;
+    for(idx = 0, , ){
+
+    }
     oo = oo + 0.2;
     return v*v;
 }
@@ -125,7 +135,6 @@ def int square(int v) {
 def void main() {
     free d;
     free please2;
-    free kerem;
     int value = readInt();
     writeInt(square(value));
     writeln();
