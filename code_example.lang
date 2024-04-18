@@ -112,9 +112,6 @@ int JESUS = please2[0].x;
 
 
 
-int[] kerem = int[10];
-
-int elfje = kerem[i];
 
 
 float oo = 2;

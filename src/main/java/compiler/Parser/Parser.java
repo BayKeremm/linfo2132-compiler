@@ -150,8 +150,7 @@ public class Parser {
             } else if(have(Token.FREE)){
                 Expression id = expression();
                 statements.add(new FreeStatement(line, id));
-                int x = 5+2;
-
+                mustbe(Token.SEMI_COLON);
             }
             else{
                 statements.add(statement());
