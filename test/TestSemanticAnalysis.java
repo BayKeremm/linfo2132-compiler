@@ -35,7 +35,7 @@ public class TestSemanticAnalysis{
             semantics1.typeCheck();
         } catch(Error e){
             count += 1;
-            assertEquals("test/test_files/test_typeStructError.txt:1: error: TypeError: Constant Variable type does not match the declaration type: string != int", e.getMessage());
+            assertEquals("test/test_files/test_typeStructError.txt:1: -> Semantic Analysis error: TypeError: Constant Variable type does not match the declaration type: string != int", e.getMessage());
         }
 
         // test2 : struct int;
@@ -45,7 +45,7 @@ public class TestSemanticAnalysis{
             semantics2.typeCheck();
         } catch(Error e){
             count += 1;
-            assertEquals("test/test_files/test_typeStructError.txt:2: error: TypeError: Constant Variable type does not match the declaration type: int != string", e.getMessage());
+            assertEquals("test/test_files/test_typeStructError.txt:2: -> Semantic Analysis error: TypeError: Constant Variable type does not match the declaration type: int != string", e.getMessage());
         }
 
         // test3 : struct if;
@@ -55,7 +55,7 @@ public class TestSemanticAnalysis{
             semantics3.typeCheck();
         } catch(Error e){
             count += 1;
-            assertEquals("test/test_files/test_typeStructError.txt:3: error: StructError: Structure declaration overwirte existing types : if", e.getMessage());
+            assertEquals("test/test_files/test_typeStructError.txt:3: -> Semantic Analysis error: StructError: Structure declaration overwirte existing types : if", e.getMessage());
         }
 
         // test4 : 2x Point;
@@ -65,7 +65,7 @@ public class TestSemanticAnalysis{
             semantics4.typeCheck();
         } catch(Error e){
             count += 1;
-            assertEquals("test/test_files/test_typeStructError.txt:11: error: StructError: Structure declaration overwirte a previously defined structure : Point", e.getMessage());
+            assertEquals("test/test_files/test_typeStructError.txt:11: -> Semantic Analysis error: StructError: Structure declaration overwirte a previously defined structure : Point", e.getMessage());
         }
 
         assertEquals(4, count);
@@ -83,7 +83,7 @@ public class TestSemanticAnalysis{
             semantics1.typeCheck();
         } catch(Error e){
             count += 1;
-            assertEquals("test/test_files/test_OperatorError.txt:1: error: OperatorError: Equality Check Expression Type Error: string is not compatible with int", e.getMessage());
+            assertEquals("test/test_files/test_OperatorError.txt:1: -> Semantic Analysis error: OperatorError: Equality Check Expression Type Error: string is not compatible with int", e.getMessage());
         }
 
         // test2 : 3 + "a"
@@ -93,7 +93,7 @@ public class TestSemanticAnalysis{
             semantics2.typeCheck();
         } catch(Error e){
             count += 1;
-            assertEquals("test/test_files/test_OperatorError.txt:2: error: OperatorError: Term Expression Type Error: int is not compatible with string", e.getMessage());
+            assertEquals("test/test_files/test_OperatorError.txt:2: -> Semantic Analysis error: OperatorError: Term Expression Type Error: int is not compatible with string", e.getMessage());
         }
 
         // test3 : string c = -"a"
@@ -103,7 +103,7 @@ public class TestSemanticAnalysis{
             semantics3.typeCheck();
         } catch(Error e){
             count += 1;
-            assertEquals("test/test_files/test_OperatorError.txt:3: error: OperatorError: Unary Minus Type Error: Cannot make minus type string", e.getMessage());
+            assertEquals("test/test_files/test_OperatorError.txt:3: -> Semantic Analysis error: OperatorError: Unary Minus Type Error: Cannot make minus type string", e.getMessage());
         }
 
         // test4 : int d = !3
@@ -113,7 +113,7 @@ public class TestSemanticAnalysis{
             semantics4.typeCheck();
         } catch(Error e){
             count += 1;
-            assertEquals("test/test_files/test_OperatorError.txt:4: error: OperatorError: Unary Negate Type Error: Cannot negate type int", e.getMessage());
+            assertEquals("test/test_files/test_OperatorError.txt:4: -> Semantic Analysis error: OperatorError: Unary Negate Type Error: Cannot negate type int", e.getMessage());
         }
 
         assertEquals(4, count);
@@ -131,7 +131,7 @@ public class TestSemanticAnalysis{
             semantics1.typeCheck();
         } catch(Error e){
             count += 1;
-            assertEquals("test/test_files/test_ArgumentError.txt:6: error: ArgumentError: Wrong number of arguments in Struct init", e.getMessage());
+            assertEquals("test/test_files/test_ArgumentError.txt:6: -> Semantic Analysis error: ArgumentError: Wrong number of arguments in Struct init", e.getMessage());
         }
 
 
@@ -142,7 +142,7 @@ public class TestSemanticAnalysis{
             semantics2.typeCheck();
         } catch(Error e){
             count += 1;
-            assertEquals("test/test_files/test_ArgumentError.txt:12: error: ArgumentError: Argument type mismatch in Function call: int!=string", e.getMessage());
+            assertEquals("test/test_files/test_ArgumentError.txt:12: -> Semantic Analysis error: ArgumentError: Argument type mismatch in Function call: int!=string", e.getMessage());
         }
 
         // test3 : def int foo(string a); foo(1,2,3);
@@ -152,7 +152,7 @@ public class TestSemanticAnalysis{
             semantics3.typeCheck();
         } catch(Error e){
             count += 1;
-            assertEquals("test/test_files/test_ArgumentError.txt:18: error: ArgumentError: Wrong number of arguments in Function call", e.getMessage());
+            assertEquals("test/test_files/test_ArgumentError.txt:18: -> Semantic Analysis error: ArgumentError: Wrong number of arguments in Function call", e.getMessage());
         }
 
         // test4 : def int foo(string a); foo();
@@ -162,7 +162,7 @@ public class TestSemanticAnalysis{
             semantics4.typeCheck();
         } catch(Error e){
             count += 1;
-            assertEquals("test/test_files/test_ArgumentError.txt:24: error: ArgumentError: Wrong number of arguments in Function call", e.getMessage());
+            assertEquals("test/test_files/test_ArgumentError.txt:24: -> Semantic Analysis error: ArgumentError: Wrong number of arguments in Function call", e.getMessage());
         }
 
         assertEquals(4, count);
@@ -180,7 +180,7 @@ public class TestSemanticAnalysis{
             semantics1.typeCheck();
         } catch(Error e){
             count += 1;
-            assertEquals("test/test_files/test_MissingConditionError.txt:2: error: MissingConditionError : Condition in IfElse statement is empty", e.getMessage());
+            assertEquals("test/test_files/test_MissingConditionError.txt:2: -> Semantic Analysis error: MissingConditionError : Condition in IfElse statement is empty", e.getMessage());
         }
 
         // test2 : while(){}
@@ -190,7 +190,7 @@ public class TestSemanticAnalysis{
             semantics2.typeCheck();
         } catch(Error e){
             count += 1;
-            assertEquals("test/test_files/test_MissingConditionError.txt:7: error: MissingConditionError : Condition in While statement is empty", e.getMessage());
+            assertEquals("test/test_files/test_MissingConditionError.txt:7: -> Semantic Analysis error: MissingConditionError : Condition in While statement is empty", e.getMessage());
         }
 
         // test3 : for(int i = 0;;i++){}
@@ -200,7 +200,7 @@ public class TestSemanticAnalysis{
             semantics3.typeCheck();
         } catch(Error e){
             count += 1;
-            assertEquals("test/test_files/test_MissingConditionError.txt:12: error: MissingConditionError : Condition in For statement is empty", e.getMessage());
+            assertEquals("test/test_files/test_MissingConditionError.txt:12: -> Semantic Analysis error: MissingConditionError : Condition in For statement is empty", e.getMessage());
         }
 
         assertEquals(3, count);
@@ -218,7 +218,7 @@ public class TestSemanticAnalysis{
             semantics1.typeCheck();
         } catch(Error e){
             count += 1;
-            assertEquals("test/test_files/test_ReturnError.txt:2: error: ReturnError : Function return type mismatch: foo expects int not string", e.getMessage());
+            assertEquals("test/test_files/test_ReturnError.txt:2: -> Semantic Analysis error: ReturnError : Function return type mismatch: foo expects int not string", e.getMessage());
         }
 
         // test2 : def int foo(){}
@@ -228,7 +228,7 @@ public class TestSemanticAnalysis{
             semantics2.typeCheck();
         } catch(Error e){
             count += 1;
-            assertEquals("test/test_files/test_ReturnError.txt:5: error: ReturnError : Return expression is empty", e.getMessage());
+            assertEquals("test/test_files/test_ReturnError.txt:5: -> Semantic Analysis error: ReturnError : Function return type mismatch: foo expects int not WEIRD THING HAPPENED IN LIT EXP", e.getMessage());
         }
 
         // test3 : def void foo(){return 3;}
@@ -238,7 +238,7 @@ public class TestSemanticAnalysis{
             semantics3.typeCheck();
         } catch(Error e){
             count += 1;
-            assertEquals("test/test_files/test_ReturnError.txt:8: error: ReturnError : Function return type mismatch: foo expects void not int", e.getMessage());
+            assertEquals("test/test_files/test_ReturnError.txt:8: -> Semantic Analysis error: ReturnError : Function return type mismatch: foo expects void not int", e.getMessage());
         }
 
         assertEquals(3, count);
@@ -256,7 +256,7 @@ public class TestSemanticAnalysis{
             semantics1.typeCheck();
         } catch(Error e){
             count += 1;
-            assertEquals("test/test_files/test_ScopeError.txt:2: error: ScopeError: The variable a already exists in context", e.getMessage());
+            assertEquals("test/test_files/test_ScopeError.txt:2: -> Semantic Analysis error: ScopeError: The variable a already exists in context", e.getMessage());
         }
 
         // test2 : final int a = 3; int a = 2;
@@ -266,7 +266,7 @@ public class TestSemanticAnalysis{
             semantics2.typeCheck();
         } catch(Error e){
             count += 1;
-            assertEquals("test/test_files/test_ScopeError.txt:3: error: ScopeError: Variable already exists in context : a", e.getMessage());
+            assertEquals("test/test_files/test_ScopeError.txt:3: -> Semantic Analysis error: ScopeError: Variable already exists in context : a", e.getMessage());
         }
 
         // test3 : int a = 3 + b;
@@ -276,7 +276,7 @@ public class TestSemanticAnalysis{
             semantics3.typeCheck();
         } catch(Error e){
             count += 1;
-            assertEquals("test/test_files/test_ScopeError.txt:4: error: ScopeError : Variable does not exist in context : b", e.getMessage());
+            assertEquals("test/test_files/test_ScopeError.txt:4: -> Semantic Analysis error: ScopeError : Variable does not exist in context : b", e.getMessage());
         }
 
         // test4 : int a = foo(1);
@@ -286,7 +286,7 @@ public class TestSemanticAnalysis{
             semantics4.typeCheck();
         } catch(Error e){
             count += 1;
-            assertEquals("test/test_files/test_ScopeError.txt:5: error: ScopeError : Function does not exist in context : foo", e.getMessage());
+            assertEquals("test/test_files/test_ScopeError.txt:5: -> Semantic Analysis error: ScopeError : Function does not exist in context : foo", e.getMessage());
         }
 
         assertEquals(4, count);
