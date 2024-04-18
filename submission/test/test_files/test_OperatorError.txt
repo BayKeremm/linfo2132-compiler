@@ -1,4 +1,0 @@
-final bool a = "a" == 2;
-final int b = 3 + "a";
-final string c = -"a";
-final int d = !3;

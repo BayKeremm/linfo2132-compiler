@@ -1,5 +1,0 @@
-final int a = 2;
-final int a = 3;
-int a = 2;
-int a = 3 + b;
-int a = foo(1);
