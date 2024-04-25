@@ -1,19 +1,14 @@
-package compiler.Parser;
+package compiler.semantics;
 
-import com.sun.tools.attach.AgentInitializationException;
 import compiler.Lexer.Symbol;
 import compiler.Lexer.Token;
+import compiler.Parser.*;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Executable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReferenceArray;
 
 import static java.lang.System.exit;
-import static java.lang.System.in;
 
 
 /**
@@ -37,12 +32,12 @@ import static java.lang.System.in;
 * */
 
 
-public class TypeChecker implements NodeVisitor{
+public class SemanticAnalysis implements TypeVisitor {
     Program program;
     ContextGod currContext;
     HashMap<String, UserType> userTypes;
     HashMap<String, ArrayList<ProcedureInfo>> procedureInfos;
-    public TypeChecker(Program p ){
+    public SemanticAnalysis(Program p ){
         this.program = p;
         this.currContext = new Context();
         this.currContext.setPrev(null);
@@ -268,39 +263,39 @@ public class TypeChecker implements NodeVisitor{
 
     @Override
     public void visitTermExpression(TermExpression op) {
-        Expression lhs = op.lhs;
-        Expression rhs = op.rhs;
+        Expression lhs = op.getLhs();
+        Expression rhs = op.getRhs();
         if(!checkExpressionTypes(lhs,rhs)){
-            reportSemanticError("OperatorError: Term Expression Type Error: %s",rhs.line,
+            reportSemanticError("OperatorError: Term Expression Type Error: %s",rhs.getLine(),
                     lhs.getType().toString() + " is not compatible with " + rhs.getType().toString());
         }
 
     }
     public void visitUnaryNegateExpression(UnaryExpression op) {
         // Only boolean
-        assert op.lhs == null;
-        GenericType tr = op.rhs.getType();
+        assert op.getLhs() == null;
+        GenericType tr = op.getRhs().getType();
         if(!tr.type().equals("bool")){
-            reportSemanticError("OperatorError: Unary Negate Type Error: Cannot negate type %s",op.rhs.line,tr);
+            reportSemanticError("OperatorError: Unary Negate Type Error: Cannot negate type %s",op.getRhs().getLine(),tr);
         }
     }
 
     @Override
     public void visitUnaryMinusExpression(UnaryExpression op) {
         // Only float and int
-        assert op.lhs == null;
-        GenericType tr = op.rhs.getType();
+        assert op.getLhs() == null;
+        GenericType tr = op.getRhs().getType();
         if(!tr.type().equals("float") && !tr.type().equals("int")){
-            reportSemanticError("OperatorError: Unary Minus Type Error: Cannot make minus type %s",op.rhs.line,tr);
+            reportSemanticError("OperatorError: Unary Minus Type Error: Cannot make minus type %s",op.getRhs().getLine(),tr);
         }
     }
 
     @Override
     public void visitFactorExpression(FactorExpression op) {
-        Expression lhs = op.lhs;
-        Expression rhs = op.rhs;
+        Expression lhs = op.getLhs();
+        Expression rhs = op.getRhs();
         if(!checkExpressionTypes(lhs,rhs)){
-            reportSemanticError("OperatorError: Factor Expression Type Error: %s",rhs.line,
+            reportSemanticError("OperatorError: Factor Expression Type Error: %s",rhs.getLine(),
                     lhs.getType().toString() + " is not compatible with " + rhs.getType().toString());
         }
 
@@ -308,10 +303,10 @@ public class TypeChecker implements NodeVisitor{
 
     @Override
     public void visitPrimaryExpression(PrimaryExpression op) {
-        Expression lhs = op.lhs;
-        Expression rhs = op.rhs;
+        Expression lhs = op.getLhs();
+        Expression rhs = op.getRhs();
         if(!checkExpressionTypes(lhs,rhs)){
-            reportSemanticError("OperatorError: Primary Expression Type Error: %s",rhs.line,
+            reportSemanticError("OperatorError: Primary Expression Type Error: %s",rhs.getLine(),
                     lhs.getType().toString() + " is not compatible with " + rhs.getType().toString());
         }
 
@@ -319,10 +314,10 @@ public class TypeChecker implements NodeVisitor{
 
     @Override
     public void visitIndexOperation(IndexOp op) {
-        op.index.typeAnalyse(this);
-        GenericType indexType = op.index.getType();
+        op.getIndex().typeAnalyse(this);
+        GenericType indexType = op.getIndex().getType();
         if(!indexType.type().equals(Token.INTEGER.image())){
-            reportSemanticError("IndexOperationError: Trying to index with non int %s", op.line,indexType);
+            reportSemanticError("IndexOperationError: Trying to index with non int %s", op.getLine(),indexType);
         }
     }
 
@@ -330,8 +325,8 @@ public class TypeChecker implements NodeVisitor{
     public void visitFunctionCallExpression(FunctionCallExpression exp) {
         // need to check if it isa struct init, since it is also parsed as functioncall expression in user defined types
         // need to also check if the function exists in the context
-        Symbol identifier = exp.identifier;
-        ArrayList<Expression> expressions = exp.expressionParams;
+        Symbol identifier = exp.getFunctionIdentifier();
+        ArrayList<Expression> expressions = exp.getFunctionExpressionParams();
 
         // is it a struct init?
         if(this.userTypes.containsKey(identifier.image()) || this.procedureInfos.containsKey(identifier.image())) {
@@ -349,7 +344,7 @@ public class TypeChecker implements NodeVisitor{
             
             int field_size = fields.size();
             if(field_size != expressions.size()){
-                reportSemanticError("ArgumentError: Wrong number of arguments in %s",exp.line,context);
+                reportSemanticError("ArgumentError: Wrong number of arguments in %s",exp.getLine(),context);
             }
             int i = 0;
             for(Expression e: expressions){
@@ -357,7 +352,7 @@ public class TypeChecker implements NodeVisitor{
                 GenericType t0 = e.getType();
                 GenericType t1 = fields.get(i);
                 if(!checkTypes(t0, t1,false)){
-                    reportSemanticError("ArgumentError: Argument type mismatch in %s: %s",exp.line,context,
+                    reportSemanticError("ArgumentError: Argument type mismatch in %s: %s",exp.getLine(),context,
                             t1.type() + "!=" + t0.type() );
                 }
                 i++;
@@ -386,10 +381,10 @@ public class TypeChecker implements NodeVisitor{
 
     @Override
     public GenericType visitSymbolTableIdentifier(IdentifierExpression identifier) {
-        String id = identifier.id.image();
+        String id = identifier.getIdentifierSymbol().image();
         GenericType ret = checkContext(id);
         if(ret == null){
-            reportSemanticError("ScopeError : Variable does not exist in context : %s", identifier.line,id); //Not sure about the error type
+            reportSemanticError("ScopeError : Variable does not exist in context : %s", identifier.getLine(),id); //Not sure about the error type
         }
         
         return ret;
@@ -398,7 +393,7 @@ public class TypeChecker implements NodeVisitor{
 
     @Override
     public GenericType visitSymbolTableFunction(FunctionCallExpression functionCallExpression) {
-        String id = functionCallExpression.identifier.image();
+        String id = functionCallExpression.getFunctionIdentifier().image();
         GenericType ret = checkContext(id);
         if(ret != null){
             return ret;
@@ -407,13 +402,14 @@ public class TypeChecker implements NodeVisitor{
         // All this is for len function accepting either array or string :)
         ArrayList<ArrayList<GenericType>> typesAll = getProcedureParamTypes(id);
         if(typesAll == null){
-            reportSemanticError("ScopeError : Function does not exist in context : %s", functionCallExpression.line,id);
+            reportSemanticError("ScopeError : Function does not exist in context : %s", functionCallExpression.getLine(),id);
         }
-        ArrayList<Expression> params = functionCallExpression.expressionParams;
+        ArrayList<Expression> params = functionCallExpression.getFunctionExpressionParams();
+        assert typesAll != null;
         for(ArrayList<GenericType> types: typesAll){
             if(types != null){
                 if(params.size() > 1){
-                    reportSemanticError("ScopeError : Function does not exist in context : %s", functionCallExpression.line,id);
+                    reportSemanticError("ScopeError : Function does not exist in context : %s", functionCallExpression.getLine(),id);
                 }
                 else{
                     // for functions that have no arguments
@@ -438,7 +434,7 @@ public class TypeChecker implements NodeVisitor{
                 }
             }
         }
-        reportSemanticError("ScopeError : Function does not exist in context : %s", functionCallExpression.line,id);
+        reportSemanticError("ScopeError : Function does not exist in context : %s", functionCallExpression.getLine(),id);
         return null;
     }
 
@@ -446,14 +442,14 @@ public class TypeChecker implements NodeVisitor{
     public GenericType visitSymbolTableIndexOp(IndexOp op) {
         // is it actual index operation
         // or is it struct array init
-        if(userTypes.containsKey(op.identifier.image())){
-            return new Type(op.identifier.image(),true); // since we know it is an array init of struct
-        } else if (currContext.containsId(op.identifier.image())) {
-            GenericType arrayType = currContext.getVarType(op.identifier.image());
+        if(userTypes.containsKey(op.getIndexIdentifier().image())){
+            return new Type(op.getIndexIdentifier().image(),true); // since we know it is an array init of struct
+        } else if (currContext.containsId(op.getIndexIdentifier().image())) {
+            GenericType arrayType = currContext.getVarType(op.getIndexIdentifier().image());
             return new Type(arrayType.type(),false);
         }
         else{
-            reportSemanticError("ERROR IN VISIT SYMBOL TABLE INDEX OP", op.line);
+            reportSemanticError("ERROR IN VISIT SYMBOL TABLE INDEX OP", op.getLine());
         }
         return null;
     }
@@ -462,32 +458,32 @@ public class TypeChecker implements NodeVisitor{
     @Override
     public GenericType visitSymbolTableDotOp(DotOperation op) {
         op.prettyPrint("");
-        Expression lhs = op.lhs;
-        Expression rhs = op.rhs;
+        Expression lhs = op.getLhs();
+        Expression rhs = op.getRhs();
         lhs.typeAnalyse(this); // gets the struct type
         GenericType lhsType = lhs.getType();
         if(userTypes.containsKey(lhsType.type())){
             UserType structType = userTypes.get(lhsType.type());
             String member;
             GenericType t = null;
-            if(rhs.lhs != null){
+            if(rhs.getLhs() != null){
                 Expression one_level_down = rhs;
-                while(one_level_down.lhs != null && one_level_down.rhs != null){
-                    Expression level_lhs = one_level_down.lhs;
+                while(one_level_down.getLhs() != null && one_level_down.getRhs() != null){
+                    Expression level_lhs = one_level_down.getLhs();
                     GenericType member1_type = structType.members.get(level_lhs.getRep());
                     if(userTypes.containsKey(member1_type.type())){
                         structType = userTypes.get(member1_type.type());
-                        one_level_down = one_level_down.rhs;
+                        one_level_down = one_level_down.getRhs();
                         if(one_level_down instanceof IndexOp){
-                            ((IndexOp) one_level_down).index.typeAnalyse(this);
-                            String type =  structType.members.get(((IndexOp) one_level_down).identifier.image()).type();
+                            ((IndexOp) one_level_down).getIndex().typeAnalyse(this);
+                            String type =  structType.members.get(((IndexOp) one_level_down).getIndexIdentifier().image()).type();
                             t = new Type(type,false);
                         }else{
                             t = structType.members.get(one_level_down.getRep());
                         }
 
                     }else{
-                        one_level_down = one_level_down.rhs;
+                        one_level_down = one_level_down.getRhs();
                         t = structType.members.get(member1_type.type());
                     }
 
@@ -507,26 +503,6 @@ public class TypeChecker implements NodeVisitor{
         }
         return new Type("ERROR MORUK IN DOT OP SYMBOL TABLE", false);
     }
-//    @Override
-//    public GenericType visitSymbolTableDotOp_old(DotOperation op) {
-//        op.prettyPrint("");
-//        Expression lhs = op.lhs;
-//        Expression rhs = op.rhs;
-//        lhs.typeAnalyse(this); // gets the struct type
-//        GenericType lhsType = lhs.getType();
-//        if(userTypes.containsKey(lhsType.type())){
-//            UserType structType = userTypes.get(lhsType.type());
-//            String member = rhs.getRep();
-//            if(!structType.members.containsKey(member)){
-//                reportSemanticError("Member does not exist or composite struct access not supported: %s",
-//                        lhs.line,member);
-//            }
-//            GenericType t = structType.members.get(member);
-//            return t;
-//        }
-//        return new Type("ERROR MORUK IN DOT OP SYMBOL TABLE", false);
-//    }
-
 
 
     @Override
@@ -543,10 +519,10 @@ public class TypeChecker implements NodeVisitor{
 
     @Override
     public void visitLogicalExpression(LogicalExpression op) {
-        Expression lhs = op.lhs;
-        Expression rhs = op.rhs;
+        Expression lhs = op.getLhs();
+        Expression rhs = op.getRhs();
         if(!checkExpressionTypes(lhs,rhs)){
-            reportSemanticError("OperatorError: Logical Expression Type Error: %s", rhs.line,
+            reportSemanticError("OperatorError: Logical Expression Type Error: %s", rhs.getLine(),
             lhs.getType().toString() + " is not compatible with " + rhs.getType().toString());
         }
 
@@ -554,10 +530,10 @@ public class TypeChecker implements NodeVisitor{
 
     @Override
     public void visitComparisonExpression(ComparisionExpression op) {
-        Expression lhs = op.lhs;
-        Expression rhs = op.rhs;
+        Expression lhs = op.getLhs();
+        Expression rhs = op.getRhs();
         if(!checkExpressionTypes(lhs,rhs)){
-            reportSemanticError("OperatorError: Comparison Expression Type Error: %s", rhs.line,
+            reportSemanticError("OperatorError: Comparison Expression Type Error: %s", rhs.getLine(),
                     lhs.getType().toString() + " is not compatible with " + rhs.getType().toString());
         }
 
@@ -565,10 +541,10 @@ public class TypeChecker implements NodeVisitor{
 
     @Override
     public void visitEqualityCheckExpression(EqualityCheckExpression op) {
-        Expression lhs = op.lhs;
-        Expression rhs = op.rhs;
+        Expression lhs = op.getLhs();
+        Expression rhs = op.getRhs();
         if(!checkExpressionTypes(lhs,rhs)){
-            reportSemanticError("OperatorError: Equality Check Expression Type Error: %s", rhs.line,
+            reportSemanticError("OperatorError: Equality Check Expression Type Error: %s", rhs.getLine(),
                     lhs.getType().toString() + " is not compatible with " + rhs.getType().toString());
         }
     }
@@ -585,7 +561,7 @@ public class TypeChecker implements NodeVisitor{
 
     @Override
     public void visitParanExpression(ParanExpression p) {
-        p.expressions.get(0).typeAnalyse(this);
+        p.getParanExpressions().get(0).typeAnalyse(this);
     }
 
     @Override
@@ -594,7 +570,7 @@ public class TypeChecker implements NodeVisitor{
         if(userTypes.containsKey(freedType.type())||freedType.isArray()){
             return;
         }
-        reportSemanticError("FreeError: Cannot free type: %s", st.line, freedType.type());
+        reportSemanticError("FreeError: Cannot free type: %s", st.getLine(), freedType.type());
         //if(userTypes.containsKey(freedType.type()) && !freedType.isArray()){
         //    reportSemanticError("FreeError: Cannot free non-array built in type: %s", st.line, freedType.type());
         //}
@@ -610,17 +586,17 @@ public class TypeChecker implements NodeVisitor{
         var.declarator().typeAnalyse(this);
         // then check if the declaration type matches the id type
         GenericType decType = var.declarator().getType();
-        GenericType varType = new Type(var.typeDeclaration().type.image(),var.typeDeclaration().isArray);
+        GenericType varType = new Type(var.typeDeclaration().getTypeSymbol().image(),var.typeDeclaration().getIsArray());
         if(!checkTypes(varType, decType,true) || !compareForPromotion(varType,decType)){
             reportSemanticError("TypeError: Constant Variable type does not match the declaration type: %s",
-                    var.line,  var.typeDeclaration().toString() + " != " + var.declarator().getType() );
+                    var.getLine(),  var.typeDeclaration().toString() + " != " + var.declarator().getType() );
         }
         // add to the context
-        Type t = new Type(decType.type(),var.typeDeclaration().isArray);
+        Type t = new Type(decType.type(),var.typeDeclaration().getIsArray());
         t.setIsConstant(true);
         if(!currContext.addToContext(var.identifier().getRep(),t)){
            reportSemanticError("ScopeError: The variable %s already exists in context",
-                   var.identifier().line,
+                   var.identifier().getLine(),
                    var.identifier().getRep());
         }
     }
@@ -630,23 +606,23 @@ public class TypeChecker implements NodeVisitor{
         String id = var.identifier().getRep();
         if(currContext.getConstants_and_globals().containsKey(id)){
             reportSemanticError("ScopeError : Trying to create a variable with the same name as one " +
-                    "of the globals or constants: %s", var.line,id ); //TODO
+                    "of the globals or constants: %s", var.getLine(),id ); //TODO
         }
         // whether it is an uninit variable or not
         if(var.declarator() != null){
             var.declarator().typeAnalyse(this);
             GenericType decType = var.declarator().getType();
-            GenericType varType = new Type(var.typeDeclaration().type.image(),var.typeDeclaration().isArray);
+            GenericType varType = new Type(var.typeDeclaration().getTypeSymbol().image(),var.typeDeclaration().getIsArray());
             if(!checkTypes(varType, decType,true) || !compareForPromotion(varType,decType)){
                 reportSemanticError("TypeError: Global Variable type does not match the declaration type: %s",
-                        var.line,  var.typeDeclaration().toString() + " != " + var.declarator().getType() );
+                        var.getLine(),  var.typeDeclaration().toString() + " != " + var.declarator().getType() );
             }
         }
         // add to the context
         if(!currContext.addToContext(var.identifier().getRep(),
-                new Type(var.typeDeclaration().type.image(),var.typeDeclaration().isArray))){
+                new Type(var.typeDeclaration().getTypeSymbol().image(),var.typeDeclaration().getIsArray()))){
             reportSemanticError("ScopeError: Variable already exists in context : %s",
-                    var.identifier().line,
+                    var.identifier().getLine(),
                     var.identifier().getRep());
         }
 
@@ -654,55 +630,55 @@ public class TypeChecker implements NodeVisitor{
 
     @Override
     public void visitScopeVariable(ScopeVariable var) {
-        Expression declarator = var.declarator;
-        Expression identifier = var.identifier;
+        Expression declarator = var.getScopeDeclarator();
+        Expression identifier = var.getScopeIdentifier();
         declarator.typeAnalyse(this);
         identifier.typeAnalyse(this);
         GenericType varType = identifier.getType();
         GenericType decType = declarator.getType();
         if(!checkTypes(varType, decType,true) || !compareForPromotion(varType,decType)){
             reportSemanticError("TypeError: Scope Variable type does not match the declaration type: %s",
-                    var.line,  varType + " != " + var.declarator().getType() );
+                    var.getLine(),  varType + " != " + var.declarator().getType() );
         }
     }
 
     @Override
     public void visitStructDeclaration(StructDeclaration s) {
-        Expression identifier = s.identifier;
-        Block block = s.block;
+        Expression identifier = s.getStructIdentifier();
+        Block block = s.getStructBlock();
 
         if(identifier.getRep().equals("while") || identifier.getRep().equals("if") || identifier.getRep().equals("for")){
-            reportSemanticError("StructError: Structure declaration overwirte existing types : %s", s.line, identifier.getRep());
+            reportSemanticError("StructError: Structure declaration overwirte existing types : %s", s.getLine(), identifier.getRep());
         }
         else if(userTypes.containsKey(identifier.getRep())) {
-            reportSemanticError("StructError: Structure declaration overwirte a previously defined structure : %s", s.line, identifier.getRep());
+            reportSemanticError("StructError: Structure declaration overwirte a previously defined structure : %s", s.getLine(), identifier.getRep());
         }
         this.userTypes.put(identifier.getRep(),new UserType(block));
     }
 
     @Override
     public void visitProcedure(Procedure p) {
-        TypeDeclaration typeDeclaration = p.returnType;
-        Symbol identifier = p.identifier;
-        ProcedureDeclarator declarator = p.declarator;
-        ArrayList<Expression> parameters = declarator.parameters;
+        TypeDeclaration typeDeclaration = p.getProcedureReturnType();
+        Symbol identifier = p.getProcedureIdentifier();
+        ProcedureDeclarator declarator = p.getProcedureDeclarator();
+        ArrayList<Expression> parameters = declarator.getProDecParameters();
 
-        GenericType ret = new Type(typeDeclaration.type.image(),typeDeclaration.isArray);
+        GenericType ret = new Type(typeDeclaration.getTypeSymbol().image(),typeDeclaration.getIsArray());
         currContext.addToContext(identifier.image(),ret);
 
         ProcedureContext procedureContext = new ProcedureContext(parameters);
         procedureContext.setContextName(identifier.image());
         pushContext(procedureContext);
 
-        Block block = declarator.block;
-        for(Statement s : block.statements){
+        Block block = declarator.getProDecBlock();
+        for(Statement s : block.getStatements()){
             s.typeAnalyse(this);
         }
         // Check the last statement, it needs to be a return if not ret is void
         if(!ret.type().equals("void")){
-            Statement last = block.statements.get(block.statements.size()-1);
+            Statement last = block.getStatements().get(block.getStatements().size()-1);
             if(!(last instanceof ReturnStatement)){
-                reportSemanticError("ReturnError : Missing return, please return with type: %s ", block.line, ret.type());
+                reportSemanticError("ReturnError : Missing return, please return with type: %s ", block.getLine(), ret.type());
             }
 
         }
@@ -712,7 +688,6 @@ public class TypeChecker implements NodeVisitor{
 
         ArrayList<GenericType> types = new ArrayList<>();
         for(Map.Entry<String, GenericType> entry : procedureContext.arguments.entrySet()) {
-            String key = entry.getKey();
             GenericType value = entry.getValue();
             types.add(value);
         }
@@ -725,17 +700,17 @@ public class TypeChecker implements NodeVisitor{
 
     @Override
     public void visitReturn(ReturnStatement ret) {
-        Expression retExp = ret.expression;
+        Expression retExp = ret.getReturnExpression();
         retExp.typeAnalyse(this);
 
-        if(retExp.getClass() == LiteralExpression.class && ((LiteralExpression) retExp).literal == null){
-            reportSemanticError("ReturnError : Return expression is empty", retExp.line);
+        if(retExp.getClass() == LiteralExpression.class && ((LiteralExpression) retExp).getLiteral() == null){
+            reportSemanticError("ReturnError : Return expression is empty", retExp.getLine());
         }
 
         GenericType retType = retExp.getType();
         String contextName = currContext.getContextName();
         if(!currContext.containsId(contextName)){
-            reportSemanticError("ReturnError : Trying to return in a strange way without a function context", ret.line);
+            reportSemanticError("ReturnError : Trying to return in a strange way without a function context", ret.getLine());
         }
         GenericType functionRetType = currContext.getVarType(contextName);
         if(userTypes.containsKey(functionRetType.type())){
@@ -743,14 +718,14 @@ public class TypeChecker implements NodeVisitor{
         }
         if(!checkTypes(retType, functionRetType, false)){
             reportSemanticError("ReturnError : Function return type mismatch: %s expects %s not %s"
-                    ,ret.line,contextName,functionRetType.type(),retType.type());
+                    ,ret.getLine(),contextName,functionRetType.type(),retType.type());
         }
     }
     @Override
     public void visitWhile(WhileStatement w) {
-        Expression condition = w.condition;
+        Expression condition = w.getWhileCondition();
         condition.typeAnalyse(this);
-        Block block = w.block;
+        Block block = w.getWhileBlock();
 
         Context whileContext = new Context();
         whileContext.setContextName(currContext.getContextName());
@@ -759,7 +734,7 @@ public class TypeChecker implements NodeVisitor{
         visitCondition(condition, "While");
 
         if(block != null){
-            for(Statement s : block.statements){
+            for(Statement s : block.getStatements()){
                 s.typeAnalyse(this);
             }
         }
@@ -768,10 +743,10 @@ public class TypeChecker implements NodeVisitor{
 
     @Override
     public void visitIfElse(IfElseStatement ifelse) {
-        Expression condition = ifelse.ifCondition;
+        Expression condition = ifelse.getIfCondition();
         condition.typeAnalyse(this);
-        Block ifBlock = ifelse.ifBlock;
-        Block elseBlock = ifelse.elseBlock;
+        Block ifBlock = ifelse.getIfBlock();
+        Block elseBlock = ifelse.getElseBlock();
 
         visitCondition(condition, "IfElse");
 
@@ -779,7 +754,7 @@ public class TypeChecker implements NodeVisitor{
             Context ifContext = new Context();
             ifContext.setContextName(currContext.getContextName());
             pushContext(ifContext);
-            for(Statement s : ifBlock.statements){
+            for(Statement s : ifBlock.getStatements()){
                 s.typeAnalyse(this);
             }
             popContext();
@@ -788,7 +763,7 @@ public class TypeChecker implements NodeVisitor{
             Context elseContext = new Context();
             elseContext.setContextName(currContext.getContextName());
             pushContext(elseContext);
-            for(Statement s : elseBlock.statements){
+            for(Statement s : elseBlock.getStatements()){
                 s.typeAnalyse(this);
             }
             popContext();
@@ -798,12 +773,12 @@ public class TypeChecker implements NodeVisitor{
 
     @Override
     public void visitFor(ForStatement forStatement) {
-        Statement pos0 = forStatement.pos0;
-        Expression pos1 = forStatement.pos1;
-        Statement pos2 = forStatement.pos2;
-        Block forBlock = forStatement.block;
+        Statement pos0 = forStatement.getPos0();
+        Expression pos1 = forStatement.getPos1();
+        Statement pos2 = forStatement.getPos2();
+        Block forBlock = forStatement.getForBlock();
         if(pos0.toString().equals("LiteralExp(null)") ||pos2.toString().equals("LiteralExp(null)")){
-            reportSemanticError("MissingConditionError : one of the statements in %s statement is empty", pos0.line, "For");
+            reportSemanticError("MissingConditionError : one of the statements in %s statement is empty", pos0.getLine(), "For");
         }
 
         pos0.typeAnalyse(this);
@@ -816,7 +791,7 @@ public class TypeChecker implements NodeVisitor{
             Context forContext = new Context();
             forContext.setContextName(currContext.getContextName());
             pushContext(forContext);
-            for(Statement s : forBlock.statements){
+            for(Statement s : forBlock.getStatements()){
                 s.typeAnalyse(this);
             }
             popContext();
@@ -825,12 +800,12 @@ public class TypeChecker implements NodeVisitor{
 
     public void visitCondition(Expression condition, String context){
         condition.typeAnalyse(this);
-        if(condition.getClass() == LiteralExpression.class && ((LiteralExpression) condition).literal.token() == Token.NULL){
-            reportSemanticError("MissingConditionError : Condition in %s statement is empty", condition.line, context);
+        if(condition.getClass() == LiteralExpression.class && ((LiteralExpression) condition).getLiteral().token() == Token.NULL){
+            reportSemanticError("MissingConditionError : Condition in %s statement is empty", condition.getLine(), context);
         }
 
         if(!checkTypes(condition.getType(),new Type("bool",false) , false)){
-            reportSemanticError("MissingConditionError :  Condition is in %s statement not a boolean expression : %s", condition.line, context, condition.getType().type());
+            reportSemanticError("MissingConditionError :  Condition is in %s statement not a boolean expression : %s", condition.getLine(), context, condition.getType().type());
         }
     }
 

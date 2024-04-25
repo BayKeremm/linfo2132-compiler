@@ -1,4 +1,7 @@
-package compiler.Parser;
+package compiler.semantics;
+
+import compiler.Parser.Expression;
+import compiler.Parser.GenericType;
 
 import java.util.ArrayList;
 import java.util.HashMap;

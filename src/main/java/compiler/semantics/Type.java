@@ -1,15 +1,9 @@
-package compiler.Parser;
+package compiler.semantics;
 
-import java.util.ArrayList;
-abstract class GenericType{
-    public abstract String toString();
-    public abstract String type();
-    public boolean isArray(){
-        return false;
-    }
-}
 
-public class Type extends GenericType{
+import compiler.Parser.GenericType;
+
+public class Type extends GenericType {
     String type;
     Boolean isArray;
     Boolean isConstant;

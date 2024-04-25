@@ -8,18 +8,18 @@ import org.junit.Test;
 import compiler.Lexer.Lexer;
 import compiler.Parser.Parser;
 import compiler.Parser.Program;
-import compiler.Parser.TypeChecker;
+import compiler.semantics.SemanticAnalysis;
 
 public class TestSemanticAnalysis{
 
-    public TypeChecker semantics(String filename, int line) throws Exception{
+    public SemanticAnalysis semantics(String filename, int line) throws Exception{
         LineNumberReader reader = new LineNumberReader(new FileReader(filename));
         for(int i = 0; i<line;i++) reader.readLine();
         Lexer lexer = new Lexer(reader);
         lexer.setFileName(filename);
         Parser parser = new Parser(lexer);
         Program p = parser.program();
-        TypeChecker semantics = new TypeChecker(p);
+        SemanticAnalysis semantics = new SemanticAnalysis(p);
         return semantics;
     }
 
@@ -29,7 +29,7 @@ public class TestSemanticAnalysis{
         int count = 0;
 
         // test1 : string a = 3;
-        TypeChecker semantics1 = semantics(filename, 0);
+        SemanticAnalysis semantics1 = semantics(filename, 0);
         
         try{
             semantics1.typeCheck();
@@ -39,7 +39,7 @@ public class TestSemanticAnalysis{
         }
 
         // test2 : struct int;
-        TypeChecker semantics2 = semantics(filename, 1);
+        SemanticAnalysis semantics2 = semantics(filename, 1);
 
         try{
             semantics2.typeCheck();
@@ -49,7 +49,7 @@ public class TestSemanticAnalysis{
         }
 
         // test3 : struct if;
-        TypeChecker semantics3 = semantics(filename, 2);
+        SemanticAnalysis semantics3 = semantics(filename, 2);
 
         try{
             semantics3.typeCheck();
@@ -59,7 +59,7 @@ public class TestSemanticAnalysis{
         }
 
         // test4 : 2x Point;
-        TypeChecker semantics4 = semantics(filename, 6);
+        SemanticAnalysis semantics4 = semantics(filename, 6);
 
         try{
             semantics4.typeCheck();
@@ -77,7 +77,7 @@ public class TestSemanticAnalysis{
         int count = 0;
 
         // test1 : "a" == 2
-        TypeChecker semantics1 = semantics(filename, 0);
+        SemanticAnalysis semantics1 = semantics(filename, 0);
         
         try{
             semantics1.typeCheck();
@@ -87,7 +87,7 @@ public class TestSemanticAnalysis{
         }
 
         // test2 : 3 + "a"
-        TypeChecker semantics2 = semantics(filename, 1);
+        SemanticAnalysis semantics2 = semantics(filename, 1);
 
         try{
             semantics2.typeCheck();
@@ -97,7 +97,7 @@ public class TestSemanticAnalysis{
         }
 
         // test3 : string c = -"a"
-        TypeChecker semantics3 = semantics(filename, 2);
+        SemanticAnalysis semantics3 = semantics(filename, 2);
 
         try{
             semantics3.typeCheck();
@@ -107,7 +107,7 @@ public class TestSemanticAnalysis{
         }
 
         // test4 : int d = !3
-        TypeChecker semantics4 = semantics(filename, 3);
+        SemanticAnalysis semantics4 = semantics(filename, 3);
 
         try{
             semantics4.typeCheck();
@@ -125,7 +125,7 @@ public class TestSemanticAnalysis{
         int count = 0;
 
         // test1 : struct Point{int x; int y;}; Point(3);
-        TypeChecker semantics1 = semantics(filename, 0);
+        SemanticAnalysis semantics1 = semantics(filename, 0);
 
         try{
             semantics1.typeCheck();
@@ -136,7 +136,7 @@ public class TestSemanticAnalysis{
 
 
         // test2 : def int foo(string a); foo(3);
-        TypeChecker semantics2 = semantics(filename, 7);
+        SemanticAnalysis semantics2 = semantics(filename, 7);
 
         try{
             semantics2.typeCheck();
@@ -146,7 +146,7 @@ public class TestSemanticAnalysis{
         }
 
         // test3 : def int foo(string a); foo(1,2,3);
-        TypeChecker semantics3 = semantics(filename, 13);
+        SemanticAnalysis semantics3 = semantics(filename, 13);
 
         try{
             semantics3.typeCheck();
@@ -156,7 +156,7 @@ public class TestSemanticAnalysis{
         }
 
         // test4 : def int foo(string a); foo();
-        TypeChecker semantics4 = semantics(filename, 19);
+        SemanticAnalysis semantics4 = semantics(filename, 19);
         
         try{
             semantics4.typeCheck();
@@ -174,7 +174,7 @@ public class TestSemanticAnalysis{
         int count = 0;
 
         // test1 : if(){}
-        TypeChecker semantics1 = semantics(filename, 0);
+        SemanticAnalysis semantics1 = semantics(filename, 0);
         
         try{
             semantics1.typeCheck();
@@ -184,7 +184,7 @@ public class TestSemanticAnalysis{
         }
 
         // test2 : while(){}
-        TypeChecker semantics2 = semantics(filename, 5);
+        SemanticAnalysis semantics2 = semantics(filename, 5);
 
         try{
             semantics2.typeCheck();
@@ -194,7 +194,7 @@ public class TestSemanticAnalysis{
         }
 
         // test3 : for(int i = 0;;i++){}
-        TypeChecker semantics3 = semantics(filename, 10);
+        SemanticAnalysis semantics3 = semantics(filename, 10);
 
         try{
             semantics3.typeCheck();
@@ -212,7 +212,7 @@ public class TestSemanticAnalysis{
         int count = 0;
 
         // test1 : def int foo(){return "a";}
-        TypeChecker semantics1 = semantics(filename, 0);
+        SemanticAnalysis semantics1 = semantics(filename, 0);
         
         try{
             semantics1.typeCheck();
@@ -222,7 +222,7 @@ public class TestSemanticAnalysis{
         }
 
         // test2 : def int foo(){}
-        TypeChecker semantics2 = semantics(filename, 3);
+        SemanticAnalysis semantics2 = semantics(filename, 3);
 
         try{
             semantics2.typeCheck();
@@ -232,7 +232,7 @@ public class TestSemanticAnalysis{
         }
 
         // test3 : def void foo(){return 3;}
-        TypeChecker semantics3 = semantics(filename, 6);
+        SemanticAnalysis semantics3 = semantics(filename, 6);
 
         try{
             semantics3.typeCheck();
@@ -250,7 +250,7 @@ public class TestSemanticAnalysis{
         int count = 0;
 
         // test1 : final int a = 3; final int a = 2;
-        TypeChecker semantics1 = semantics(filename, 0);
+        SemanticAnalysis semantics1 = semantics(filename, 0);
 
         try{
             semantics1.typeCheck();
@@ -260,7 +260,7 @@ public class TestSemanticAnalysis{
         }
 
         // test2 : final int a = 3; int a = 2;
-        TypeChecker semantics2 = semantics(filename, 1);
+        SemanticAnalysis semantics2 = semantics(filename, 1);
 
         try{
             semantics2.typeCheck();
@@ -270,7 +270,7 @@ public class TestSemanticAnalysis{
         }
 
         // test3 : int a = 3 + b;
-        TypeChecker semantics3 = semantics(filename, 3);
+        SemanticAnalysis semantics3 = semantics(filename, 3);
 
         try{
             semantics3.typeCheck();
@@ -280,7 +280,7 @@ public class TestSemanticAnalysis{
         }
 
         // test4 : int a = foo(1);
-        TypeChecker semantics4 = semantics(filename, 4);
+        SemanticAnalysis semantics4 = semantics(filename, 4);
 
         try{
             semantics4.typeCheck();

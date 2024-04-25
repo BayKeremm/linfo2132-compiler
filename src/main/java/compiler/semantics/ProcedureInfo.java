@@ -1,4 +1,6 @@
-package compiler.Parser;
+package compiler.semantics;
+
+import compiler.Parser.GenericType;
 
 import java.util.ArrayList;
 

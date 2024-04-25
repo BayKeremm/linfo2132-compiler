@@ -7,7 +7,7 @@ import compiler.Lexer.Lexer;
 import compiler.Parser.Parser;
 import compiler.Parser.Program;
 import compiler.Parser.TestParser;
-import compiler.Parser.TypeChecker;
+import compiler.semantics.SemanticAnalysis;
 
 import java.io.FileReader;
 import java.io.LineNumberReader;
@@ -53,7 +53,7 @@ public class Compiler {
             Program p = parser.program();
             p.printNode();
 
-            TypeChecker semantics = new TypeChecker(p);
+            SemanticAnalysis semantics = new SemanticAnalysis(p);
             semantics.typeCheck();
             semantics.debug();
 
