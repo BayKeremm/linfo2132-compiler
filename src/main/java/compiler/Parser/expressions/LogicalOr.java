@@ -28,6 +28,7 @@ public class LogicalOr extends LogicalExpression {
 
     @Override
     public void codeGen(ByteVisitor b) {
+        b.visitOR(this);
 
     }
 }

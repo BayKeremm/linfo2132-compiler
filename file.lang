@@ -1,11 +1,14 @@
-final int x = 5*2+1-2*2;
-//final float y = 2.0 + 2.0;
-//final string z = "hello";
-//final bool q = true && false;
+final int x = 10+(2*(-2));
+final float y = 2.0 + 2.0;
+final string z = "hello";
+final bool q = true && false || true;
+final bool a = !true;
+final bool b = 2 < 3;
+final int[] c = int[5];
 def void main() {
     writeInt(x);
-    //writeFloat(y);
-    //write(z);
+    writeFloat(y);
+    write(z);
 }
 
 

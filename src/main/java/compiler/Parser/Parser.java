@@ -334,9 +334,6 @@ public class Parser {
             mustbe(Token.RBRAC);
             return new ArrayInitializer(line,type,size);
         }
-        //else if(have(Token.RPARAN)){
-        //    return null;
-        //}
         else{
             Symbol lit =  literal();
             return new LiteralExpression(line,lit);

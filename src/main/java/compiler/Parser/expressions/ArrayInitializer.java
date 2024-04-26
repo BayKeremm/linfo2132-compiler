@@ -7,6 +7,7 @@ import compiler.semantics.Type;
 import compiler.semantics.TypeVisitor;
 
 public class ArrayInitializer extends Expression {
+
     TypeDeclaration type;
     Expression size;
     public ArrayInitializer(int line, TypeDeclaration type, Expression size) {
@@ -28,6 +29,10 @@ public class ArrayInitializer extends Expression {
     @Override
     public GenericType getType() {
         return new Type(type.getTypeSymbol().token().image(),type.getIsArray());
+    }
+
+    public Expression getSize() {
+        return size;
     }
 
     @Override
@@ -61,6 +66,7 @@ public class ArrayInitializer extends Expression {
 
     @Override
     public void codeGen(ByteVisitor b) {
+        b.visitArrayInit(this);
 
     }
 }

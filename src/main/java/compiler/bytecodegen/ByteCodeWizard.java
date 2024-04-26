@@ -10,6 +10,7 @@ import compiler.Parser.statements.Statement;
 import compiler.semantics.ProcedureInfo;
 import compiler.semantics.Type;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
@@ -24,6 +25,7 @@ import java.util.HashMap;
  - Globals
  - Structs
  **/
+// TODO: PROMOTING DOES NOT WORK => look at I2F opcode
 
 
 public class ByteCodeWizard implements ByteVisitor{
@@ -127,6 +129,18 @@ public class ByteCodeWizard implements ByteVisitor{
         this.currMethodVisitor = null;
     }
 
+    @Override
+    public void visitArrayInit(ArrayInitializer init) {
+        GenericType type = init.getType();
+        Expression size = init.getSize();
+        size.codeGen(this);
+        switch (type.type()){
+            case "int":
+                this.currMethodVisitor.visitIntInsn(Opcodes.NEWARRAY, Opcodes.T_INT);
+                break;
+        }
+    }
+
     public void visitLiteral(LiteralExpression exp){
         String lit = exp.getLiteral().image();
         int num;
@@ -172,7 +186,6 @@ public class ByteCodeWizard implements ByteVisitor{
         rhs.codeGen(this);
 
 
-        // TODO: PROMOTING DOES NOT WORK
         if(lhs_type.type().equals("int")){
             this.currMethodVisitor.visitInsn(Opcodes.IADD);
         }else{
@@ -191,13 +204,60 @@ public class ByteCodeWizard implements ByteVisitor{
         rhs.codeGen(this);
 
 
-        // TODO: PROMOTING DOES NOT WORK
         if(lhs_type.type().equals("int")){
             this.currMethodVisitor.visitInsn(Opcodes.ISUB);
         }else{
             this.currMethodVisitor.visitInsn(Opcodes.FSUB);
         }
 
+    }
+
+    @Override
+    public void visitModulo(ModuloOperation modulo) {
+        Expression lhs = modulo.getLhs();
+        Expression rhs = modulo.getRhs();
+        GenericType lhs_type = lhs.getType();
+        GenericType rhs_type = rhs.getType();
+
+        lhs.codeGen(this);
+        rhs.codeGen(this);
+
+
+        if(lhs_type.type().equals("int")){
+            this.currMethodVisitor.visitInsn(Opcodes.IREM);
+        }else{
+            this.currMethodVisitor.visitInsn(Opcodes.FREM);
+        }
+
+    }
+
+    @Override
+    public void visitUNegate(UnaryNegateOperation uNegate) {
+        Expression lhs = uNegate.getLhs();
+        assert lhs == null;
+        Expression rhs = uNegate.getRhs();
+
+        this.currMethodVisitor.visitLdcInsn(Opcodes.ICONST_1);
+        rhs.codeGen(this);
+
+
+        this.currMethodVisitor.visitInsn(Opcodes.IXOR);
+
+    }
+
+    @Override
+    public void visitUMinus(UnaryMinusOperation uMinus) {
+        Expression lhs = uMinus.getLhs();
+        assert lhs == null;
+        Expression rhs = uMinus.getRhs();
+        GenericType rhs_type = rhs.getType();
+
+        rhs.codeGen(this);
+        if(rhs_type.type().equals("int")){
+            this.currMethodVisitor.visitInsn(Opcodes.INEG);
+        }else{
+            this.currMethodVisitor.visitInsn(Opcodes.FNEG);
+        }
     }
 
     @Override
@@ -211,13 +271,30 @@ public class ByteCodeWizard implements ByteVisitor{
         rhs.codeGen(this);
 
 
-        // TODO: PROMOTING DOES NOT WORK
         if(lhs_type.type().equals("int")){
             this.currMethodVisitor.visitInsn(Opcodes.IMUL);
         }else{
             this.currMethodVisitor.visitInsn(Opcodes.FMUL);
         }
 
+    }
+
+    @Override
+    public void visitDivide(DivideOperation div) {
+        Expression lhs = div.getLhs();
+        Expression rhs = div.getRhs();
+        GenericType lhs_type = lhs.getType();
+        GenericType rhs_type = rhs.getType();
+
+        lhs.codeGen(this);
+        rhs.codeGen(this);
+
+
+        if(lhs_type.type().equals("int")){
+            this.currMethodVisitor.visitInsn(Opcodes.IDIV);
+        }else{
+            this.currMethodVisitor.visitInsn(Opcodes.FDIV);
+        }
     }
 
     @Override
@@ -233,42 +310,202 @@ public class ByteCodeWizard implements ByteVisitor{
     }
 
     @Override
+    public void visitOR(LogicalOr or) {
+        Expression lhs = or.getLhs();
+        Expression rhs = or.getRhs();
+
+        lhs.codeGen(this);
+        rhs.codeGen(this);
+
+        this.currMethodVisitor.visitInsn(Opcodes.IOR);
+    }
+
+    @Override
+    public void visitEquality(EqualComparison comp) {
+        Expression lhs = comp.getLhs();
+        Expression rhs = comp.getRhs();
+
+        Label equalLabel = new Label();
+        Label endLabel = new Label();
+
+        lhs.codeGen(this);
+        rhs.codeGen(this);
+
+        this.currMethodVisitor.visitJumpInsn(Opcodes.IF_ICMPEQ, equalLabel);
+        // If the comparison fails (lhs < rhs), push 0 (false) onto the stack
+        this.currMethodVisitor.visitInsn(Opcodes.ICONST_0);
+        this.currMethodVisitor.visitJumpInsn(Opcodes.GOTO, endLabel);
+
+        this.currMethodVisitor.visitLabel(equalLabel);
+
+        this.currMethodVisitor.visitInsn(Opcodes.ICONST_1);
+
+        this.currMethodVisitor.visitLabel(endLabel);
+
+    }
+
+    @Override
+    public void visitNotEqual(NotEqualComparison comp) {
+        Expression lhs = comp.getLhs();
+        Expression rhs = comp.getRhs();
+
+        Label nEqualLabel = new Label();
+        Label endLabel = new Label();
+
+        lhs.codeGen(this);
+        rhs.codeGen(this);
+
+        this.currMethodVisitor.visitJumpInsn(Opcodes.IF_ICMPNE, nEqualLabel);
+        // If the comparison fails (lhs < rhs), push 0 (false) onto the stack
+        this.currMethodVisitor.visitInsn(Opcodes.ICONST_0);
+        this.currMethodVisitor.visitJumpInsn(Opcodes.GOTO, endLabel);
+
+        this.currMethodVisitor.visitLabel(nEqualLabel);
+
+        this.currMethodVisitor.visitInsn(Opcodes.ICONST_1);
+
+        this.currMethodVisitor.visitLabel(endLabel);
+
+    }
+
+    @Override
+    public void visitGE(GEComparison ge) {
+        Expression lhs = ge.getLhs();
+        Expression rhs = ge.getRhs();
+
+        Label greaterThanOrEqualLabel = new Label();
+        Label endLabel = new Label();
+
+        lhs.codeGen(this);
+        rhs.codeGen(this);
+
+        this.currMethodVisitor.visitJumpInsn(Opcodes.IF_ICMPGE, greaterThanOrEqualLabel);
+        // If the comparison fails (lhs < rhs), push 0 (false) onto the stack
+        this.currMethodVisitor.visitInsn(Opcodes.ICONST_0);
+        this.currMethodVisitor.visitJumpInsn(Opcodes.GOTO, endLabel);
+
+        this.currMethodVisitor.visitLabel(greaterThanOrEqualLabel);
+
+        this.currMethodVisitor.visitInsn(Opcodes.ICONST_1);
+
+        this.currMethodVisitor.visitLabel(endLabel);
+
+    }
+
+    @Override
+    public void visitGT(GTComparison gt) {
+        Expression lhs = gt.getLhs();
+        Expression rhs = gt.getRhs();
+
+        Label greater = new Label();
+        Label endLabel = new Label();
+
+        lhs.codeGen(this);
+        rhs.codeGen(this);
+
+        this.currMethodVisitor.visitJumpInsn(Opcodes.IF_ICMPGT, greater);
+        // If the comparison fails (lhs < rhs), push 0 (false) onto the stack
+        this.currMethodVisitor.visitInsn(Opcodes.ICONST_0);
+        this.currMethodVisitor.visitJumpInsn(Opcodes.GOTO, endLabel);
+
+        this.currMethodVisitor.visitLabel(greater);
+
+        this.currMethodVisitor.visitInsn(Opcodes.ICONST_1);
+
+        this.currMethodVisitor.visitLabel(endLabel);
+
+    }
+
+    @Override
+    public void visitLE(LEComparison le) {
+        Expression lhs = le.getLhs();
+        Expression rhs = le.getRhs();
+
+        Label lessEqual = new Label();
+        Label endLabel = new Label();
+
+        lhs.codeGen(this);
+        rhs.codeGen(this);
+
+        this.currMethodVisitor.visitJumpInsn(Opcodes.IF_ICMPLE, lessEqual);
+        // If the comparison fails (lhs < rhs), push 0 (false) onto the stack
+        this.currMethodVisitor.visitInsn(Opcodes.ICONST_0);
+        this.currMethodVisitor.visitJumpInsn(Opcodes.GOTO, endLabel);
+
+        this.currMethodVisitor.visitLabel(lessEqual);
+
+        this.currMethodVisitor.visitInsn(Opcodes.ICONST_1);
+
+        this.currMethodVisitor.visitLabel(endLabel);
+
+    }
+
+    @Override
+    public void visitLT(LTComparison lt) {
+        Expression lhs = lt.getLhs();
+        Expression rhs = lt.getRhs();
+
+        Label less = new Label();
+        Label endLabel = new Label();
+
+        lhs.codeGen(this);
+        rhs.codeGen(this);
+
+        this.currMethodVisitor.visitJumpInsn(Opcodes.IF_ICMPLT, less);
+        // If the comparison fails (lhs < rhs), push 0 (false) onto the stack
+        this.currMethodVisitor.visitInsn(Opcodes.ICONST_0);
+        this.currMethodVisitor.visitJumpInsn(Opcodes.GOTO, endLabel);
+
+        this.currMethodVisitor.visitLabel(less);
+
+        this.currMethodVisitor.visitInsn(Opcodes.ICONST_1);
+
+        this.currMethodVisitor.visitLabel(endLabel);
+
+    }
+
+    @Override
     public void visitConstantVariable(ConstantVariable variable) {
         String name = variable.getVariableName();
         String type = constants.get(name);
         Expression declarator = variable.declarator();
         if(staticInitializer == null){
-            this.staticInitializer = this.classWriter.visitMethod(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null);
+            this.staticInitializer = this.classWriter.visitMethod(Opcodes.ACC_STATIC,
+                    "<clinit>", "()V", null, null);
             staticInitializer.visitCode();
         }
         this.currMethodVisitor = staticInitializer;
+        String signature = "";
         switch (type){
             case "int":
-                this.classWriter.visitField(Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC + Opcodes.ACC_FINAL,
-                        name, "I", null, null).visitEnd();
-                declarator.codeGen(this);
-                staticInitializer.visitFieldInsn(Opcodes.PUTSTATIC, programName, name, "I");
+                if(declarator instanceof ArrayInitializer){
+                    signature = "[I";
+                }else{
+                    signature = "I";
+                }
                 break;
             case "float":
-                this.classWriter.visitField(Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC + Opcodes.ACC_FINAL,
-                        name, "F", null, null).visitEnd();
-                declarator.codeGen(this);
-                staticInitializer.visitFieldInsn(Opcodes.PUTSTATIC, programName, name, "F");
+                if(declarator instanceof ArrayInitializer){
+                    signature = "[F";
+                }else{
+                    signature = "F";
+                }
                 break;
             case "string":
-                this.classWriter.visitField(Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC + Opcodes.ACC_FINAL,
-                        name, "Ljava/lang/String;", null, null).visitEnd();
-                declarator.codeGen(this);
-                staticInitializer.visitFieldInsn(Opcodes.PUTSTATIC, programName, name, "Ljava/lang/String;");
+                signature = "Ljava/lang/String;";
                 break;
             case "bool":
-                this.classWriter.visitField(Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC + Opcodes.ACC_FINAL,
-                        name, "Z", null, null).visitEnd();
-                declarator.codeGen(this);
-                staticInitializer.visitFieldInsn(Opcodes.PUTSTATIC, programName, name, "Z");
+                if(declarator instanceof ArrayInitializer){
+                    signature = "[Z";
+                }else{
+                    signature = "Z";
+                }
                 break;
-
         }
+        this.classWriter.visitField(Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC + Opcodes.ACC_FINAL,
+                name, signature, null, null).visitEnd();
+        declarator.codeGen(this);
+        staticInitializer.visitFieldInsn(Opcodes.PUTSTATIC, programName, name, signature);
         this.currMethodVisitor = null;
     }
 
@@ -339,7 +576,6 @@ public class ByteCodeWizard implements ByteVisitor{
         param.codeGen(this);
         this.currMethodVisitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
     }
-
 
 
 

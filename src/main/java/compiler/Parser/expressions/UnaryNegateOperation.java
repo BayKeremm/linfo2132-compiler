@@ -33,6 +33,6 @@ public class UnaryNegateOperation extends UnaryExpression{
 
     @Override
     public void codeGen(ByteVisitor b) {
-
+        b.visitUNegate(this);
     }
 }

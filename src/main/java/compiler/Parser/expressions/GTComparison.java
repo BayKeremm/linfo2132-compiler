@@ -27,6 +27,6 @@ public class GTComparison extends ComparisionExpression {
 
     @Override
     public void codeGen(ByteVisitor b) {
-
+        b.visitGT(this);
     }
 }

@@ -27,6 +27,6 @@ public class LEComparison extends ComparisionExpression {
 
     @Override
     public void codeGen(ByteVisitor b) {
-
+        b.visitLE(this);
     }
 }

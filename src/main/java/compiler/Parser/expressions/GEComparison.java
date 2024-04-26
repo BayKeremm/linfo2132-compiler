@@ -27,6 +27,6 @@ public class GEComparison extends ComparisionExpression {
 
     @Override
     public void codeGen(ByteVisitor b) {
-
+        b.visitGE(this);
     }
 }

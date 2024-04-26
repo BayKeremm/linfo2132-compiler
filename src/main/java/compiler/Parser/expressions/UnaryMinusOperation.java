@@ -32,6 +32,7 @@ public class UnaryMinusOperation extends UnaryExpression{
 
     @Override
     public void codeGen(ByteVisitor b) {
+        b.visitUMinus(this);
 
     }
 }

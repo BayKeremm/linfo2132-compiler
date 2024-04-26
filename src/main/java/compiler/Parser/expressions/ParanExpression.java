@@ -62,6 +62,7 @@ public class ParanExpression extends PrimaryExpression {
 
     @Override
     public void codeGen(ByteVisitor b) {
+        expressions.get(0).codeGen(b);
 
     }
 }

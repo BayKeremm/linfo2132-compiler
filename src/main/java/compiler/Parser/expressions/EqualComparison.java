@@ -27,6 +27,6 @@ public class EqualComparison extends EqualityCheckExpression {
 
     @Override
     public void codeGen(ByteVisitor b) {
-
+        b.visitEquality(this);
     }
 }

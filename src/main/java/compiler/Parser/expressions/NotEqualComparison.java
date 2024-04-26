@@ -28,6 +28,6 @@ public class NotEqualComparison extends EqualityCheckExpression {
 
     @Override
     public void codeGen(ByteVisitor b) {
-
+        b.visitNotEqual(this);
     }
 }

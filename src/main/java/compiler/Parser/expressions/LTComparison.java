@@ -27,6 +27,6 @@ public class LTComparison extends ComparisionExpression {
 
     @Override
     public void codeGen(ByteVisitor b) {
-
+        b.visitLT(this);
     }
 }

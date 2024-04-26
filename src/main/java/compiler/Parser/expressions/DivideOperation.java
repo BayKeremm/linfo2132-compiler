@@ -27,6 +27,6 @@ public class DivideOperation extends FactorExpression {
 
     @Override
     public void codeGen(ByteVisitor b) {
-
+        b.visitDivide(this);
     }
 }
