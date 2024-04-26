@@ -1,5 +1,6 @@
 package compiler.Parser;
 
+import compiler.bytecodegen.ByteVisitor;
 import compiler.semantics.TypeVisitor;
 
 public class ScopeVariable extends VariableGod {
@@ -68,6 +69,11 @@ public class ScopeVariable extends VariableGod {
     @Override
     public void typeAnalyse(TypeVisitor v) {
         v.visitScopeVariable(this);
+
+    }
+
+    @Override
+    public void codeGen(ByteVisitor b) {
 
     }
 }

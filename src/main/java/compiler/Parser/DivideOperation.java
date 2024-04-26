@@ -1,5 +1,7 @@
 package compiler.Parser;
 
+import compiler.bytecodegen.ByteVisitor;
+
 public class DivideOperation extends FactorExpression{
     public DivideOperation(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "/");
@@ -21,5 +23,10 @@ public class DivideOperation extends FactorExpression{
         else if (!this.operator.equals(a.operator)) return false;
 
         return true;
+    }
+
+    @Override
+    public void codeGen(ByteVisitor b) {
+
     }
 }

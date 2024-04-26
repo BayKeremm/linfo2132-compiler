@@ -1,5 +1,6 @@
 package compiler.Parser;
 
+import compiler.bytecodegen.ByteVisitor;
 import compiler.semantics.TypeVisitor;
 
 public class UnaryMinusOperation extends UnaryExpression{
@@ -26,6 +27,11 @@ public class UnaryMinusOperation extends UnaryExpression{
     @Override
     public void typeAnalyse(TypeVisitor v) {
         v.visitUnaryMinusExpression(this);
+
+    }
+
+    @Override
+    public void codeGen(ByteVisitor b) {
 
     }
 }

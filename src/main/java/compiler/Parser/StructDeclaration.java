@@ -1,5 +1,6 @@
 package compiler.Parser;
 
+import compiler.bytecodegen.ByteVisitor;
 import compiler.semantics.TypeVisitor;
 
 public class StructDeclaration extends Statement  {
@@ -47,4 +48,8 @@ public class StructDeclaration extends Statement  {
         v.visitStructDeclaration(this);
     }
 
+    @Override
+    public void codeGen(ByteVisitor b) {
+
+    }
 }

@@ -1,5 +1,7 @@
 package compiler.Parser;
 
+import compiler.bytecodegen.ByteVisitor;
+
 public class PlusOperation extends TermExpression{
     public PlusOperation(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "+");
@@ -23,4 +25,8 @@ public class PlusOperation extends TermExpression{
         return true;
     }
 
+    @Override
+    public void codeGen(ByteVisitor b) {
+        b.visitPlus(this);
+    }
 }

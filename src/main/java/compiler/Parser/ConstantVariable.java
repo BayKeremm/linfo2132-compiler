@@ -1,5 +1,6 @@
 package compiler.Parser;
 
+import compiler.bytecodegen.ByteVisitor;
 import compiler.semantics.TypeVisitor;
 
 public class ConstantVariable extends VariableGod {
@@ -58,5 +59,10 @@ public class ConstantVariable extends VariableGod {
     @Override
     public Expression declarator() {
         return this.declarator;
+    }
+
+    @Override
+    public void codeGen(ByteVisitor b) {
+        b.visitConstantVariable(this);
     }
 }

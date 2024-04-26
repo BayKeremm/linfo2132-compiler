@@ -2,9 +2,11 @@ package compiler.Parser;
 
 
 import compiler.Lexer.Symbol;
+import compiler.bytecodegen.ByteCodeGenerator;
+import compiler.bytecodegen.ByteVisitor;
 import compiler.semantics.TypeVisitor;
 
-public class Procedure extends Statement {
+public class Procedure extends Statement implements ByteCodeGenerator {
     ProcedureDeclarator declarator;
 
     public ProcedureDeclarator getProcedureDeclarator() {
@@ -53,6 +55,11 @@ public class Procedure extends Statement {
     @Override
     public void typeAnalyse(TypeVisitor v) {
         v.visitProcedure(this);
+    }
+
+    @Override
+    public void codeGen(ByteVisitor b) {
+        b.visitProcedure(this);
     }
 }
 

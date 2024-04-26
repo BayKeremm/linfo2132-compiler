@@ -1,5 +1,6 @@
 package compiler.Parser;
 
+import compiler.bytecodegen.ByteVisitor;
 import compiler.semantics.TypeVisitor;
 
 public class ForStatement extends Statement{
@@ -71,6 +72,11 @@ public class ForStatement extends Statement{
     @Override
     public void typeAnalyse(TypeVisitor v) {
         v.visitFor(this);
+
+    }
+
+    @Override
+    public void codeGen(ByteVisitor b) {
 
     }
 }

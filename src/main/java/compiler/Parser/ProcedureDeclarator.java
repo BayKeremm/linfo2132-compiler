@@ -1,5 +1,6 @@
 package compiler.Parser;
 
+import compiler.bytecodegen.ByteVisitor;
 import compiler.semantics.TypeVisitor;
 
 import java.util.ArrayList;
@@ -49,6 +50,11 @@ public class ProcedureDeclarator extends Statement {
 
     @Override
     public void typeAnalyse(TypeVisitor v) {
+
+    }
+
+    @Override
+    public void codeGen(ByteVisitor b) {
 
     }
 }

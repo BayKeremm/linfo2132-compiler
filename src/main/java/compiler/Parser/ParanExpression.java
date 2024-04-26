@@ -1,5 +1,6 @@
 package compiler.Parser;
 
+import compiler.bytecodegen.ByteVisitor;
 import compiler.semantics.TypeVisitor;
 
 import java.util.ArrayList;
@@ -56,5 +57,10 @@ public class ParanExpression extends PrimaryExpression{
     @Override
     public boolean equals(Object o) {
         return this.expressions.equals(((ParanExpression) o).expressions);
+    }
+
+    @Override
+    public void codeGen(ByteVisitor b) {
+
     }
 }

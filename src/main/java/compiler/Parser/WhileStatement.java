@@ -1,5 +1,6 @@
 package compiler.Parser;
 
+import compiler.bytecodegen.ByteVisitor;
 import compiler.semantics.TypeVisitor;
 
 public class WhileStatement extends Statement {
@@ -52,6 +53,11 @@ public class WhileStatement extends Statement {
     @Override
     public void typeAnalyse(TypeVisitor v) {
         v.visitWhile(this);
+
+    }
+
+    @Override
+    public void codeGen(ByteVisitor b) {
 
     }
 }

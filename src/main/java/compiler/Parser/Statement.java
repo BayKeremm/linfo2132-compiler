@@ -1,8 +1,9 @@
 package compiler.Parser;
 
+import compiler.bytecodegen.ByteCodeGenerator;
 import compiler.semantics.StatementChecker;
 
-public abstract class Statement extends ASTNode implements StatementChecker {
+public abstract class Statement extends ASTNode implements StatementChecker, ByteCodeGenerator {
 
     int line;
     protected Statement(int line) {

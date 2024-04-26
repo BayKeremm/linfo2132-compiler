@@ -1,0 +1,9 @@
+final int x = 5;
+final float y = 2.0 + 2.0;
+final string z = "hello";
+def void main() {
+    writeInt(x);
+    writeFloat(y);
+    write(z);
+}
+

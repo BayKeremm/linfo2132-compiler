@@ -1,6 +1,7 @@
 package compiler.Parser;
 
 import compiler.Lexer.Symbol;
+import compiler.bytecodegen.ByteVisitor;
 import compiler.semantics.TypeVisitor;
 
 import java.util.ArrayList;
@@ -76,5 +77,11 @@ public class FunctionCallExpression extends PrimaryExpression{
         else if(!this.expressionParams.equals(a.expressionParams)) return false;
 
         return true;
+    }
+
+    @Override
+    public void codeGen(ByteVisitor b) {
+        b.visitFunctionCall(this);
+
     }
 }

@@ -1,6 +1,7 @@
 package compiler.Parser;
 
 import compiler.Lexer.Symbol;
+import compiler.bytecodegen.ByteVisitor;
 import compiler.semantics.TypeVisitor;
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -48,5 +49,10 @@ public class IdentifierExpression extends Expression{
     @Override
     public boolean equals(Object o) {
         return this.id.equals(((IdentifierExpression) o).id);
+    }
+
+    @Override
+    public void codeGen(ByteVisitor b) {
+        b.visitIdentifier(this);
     }
 }

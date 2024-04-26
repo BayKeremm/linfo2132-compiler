@@ -1,6 +1,7 @@
 package compiler.Parser;
 
 import compiler.Lexer.Symbol;
+import compiler.bytecodegen.ByteVisitor;
 import compiler.semantics.TypeVisitor;
 
 public class TypeDeclaration extends Statement {
@@ -49,6 +50,11 @@ public class TypeDeclaration extends Statement {
 
     @Override
     public void typeAnalyse(TypeVisitor v) {
+
+    }
+
+    @Override
+    public void codeGen(ByteVisitor b) {
 
     }
 }

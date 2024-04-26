@@ -1,5 +1,6 @@
 package compiler.Parser;
 
+import compiler.bytecodegen.ByteVisitor;
 import compiler.semantics.TypeVisitor;
 
 public class IfElseStatement extends Statement {
@@ -62,6 +63,11 @@ public class IfElseStatement extends Statement {
     @Override
     public void typeAnalyse(TypeVisitor v) {
         v.visitIfElse(this);
+
+    }
+
+    @Override
+    public void codeGen(ByteVisitor b) {
 
     }
 }

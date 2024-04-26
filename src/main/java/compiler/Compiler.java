@@ -7,6 +7,7 @@ import compiler.Lexer.Lexer;
 import compiler.Parser.Parser;
 import compiler.Parser.Program;
 import compiler.Parser.TestParser;
+import compiler.bytecodegen.ByteCodeWizard;
 import compiler.semantics.SemanticAnalysis;
 
 import java.io.FileReader;
@@ -56,6 +57,9 @@ public class Compiler {
             SemanticAnalysis semantics = new SemanticAnalysis(p);
             semantics.typeCheck();
             semantics.debug();
+
+            ByteCodeWizard wiz = new ByteCodeWizard(p);
+            wiz.codeGen();
 
         }
 

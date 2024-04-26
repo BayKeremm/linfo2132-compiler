@@ -1,5 +1,6 @@
 package compiler.Parser;
 
+import compiler.bytecodegen.ByteVisitor;
 import compiler.semantics.TypeVisitor;
 
 public class FreeStatement extends Statement{
@@ -31,5 +32,10 @@ public class FreeStatement extends Statement{
     public void typeAnalyse(TypeVisitor v) {
         this.type = v.visitSymbolTableIdentifier((IdentifierExpression) identifierExp);
         v.visitFreeStatement(this);
+    }
+
+    @Override
+    public void codeGen(ByteVisitor b) {
+
     }
 }

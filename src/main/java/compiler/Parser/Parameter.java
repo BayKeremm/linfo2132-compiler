@@ -1,5 +1,6 @@
 package compiler.Parser;
 
+import compiler.bytecodegen.ByteVisitor;
 import compiler.semantics.Type;
 import compiler.semantics.TypeVisitor;
 
@@ -56,5 +57,10 @@ public class Parameter extends Expression {
         else if(!this.expression.equals(p.expression)) return false;
         
         return true;
+    }
+
+    @Override
+    public void codeGen(ByteVisitor b) {
+
     }
 }

@@ -1,6 +1,7 @@
 package compiler.Parser;
 
 import compiler.Lexer.Symbol;
+import compiler.bytecodegen.ByteVisitor;
 import compiler.semantics.TypeVisitor;
 
 public class IndexOp extends Expression {
@@ -68,5 +69,10 @@ public class IndexOp extends Expression {
         else if(!this.index.equals(a.index)) return false;
 
         return true;
+    }
+
+    @Override
+    public void codeGen(ByteVisitor b) {
+
     }
 }

@@ -1,5 +1,6 @@
 package compiler.Parser;
 
+import compiler.bytecodegen.ByteVisitor;
 import compiler.semantics.TypeVisitor;
 
 public class UnaryNegateOperation extends UnaryExpression{
@@ -28,5 +29,10 @@ public class UnaryNegateOperation extends UnaryExpression{
     public void prettyPrint(String indentation) {
         System.out.print(indentation+"Unary Negate op:\n");
         super.prettyPrint(indentation+" ");
+    }
+
+    @Override
+    public void codeGen(ByteVisitor b) {
+
     }
 }

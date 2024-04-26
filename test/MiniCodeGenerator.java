@@ -123,7 +123,8 @@ public class MiniCodeGenerator {
         cw.visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC, program.name, null, "java/lang/Object", null);
 
         // create main method
-        var mw = cw.visitMethod(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC, "main", "([Ljava/lang/String;)V", null, null);
+        var mw = cw.visitMethod(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC, "main",
+         "([Ljava/lang/String;)V", null, null);
         mw.visitCode();
         // call the procedure of the program
         mw.visitMethodInsn(Opcodes.INVOKESTATIC, program.name, program.procedure.name, "()V", false);

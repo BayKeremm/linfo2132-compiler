@@ -1,5 +1,7 @@
 package compiler.Parser;
 
+import compiler.bytecodegen.ByteVisitor;
+
 public class LogicalAnd extends LogicalExpression{
     public LogicalAnd(int line, Expression lhs, Expression rhs) {
         super(line, lhs, rhs, "&&");
@@ -22,5 +24,10 @@ public class LogicalAnd extends LogicalExpression{
         else if (!this.operator.equals(a.operator)) return false;
 
         return true;
+    }
+
+    @Override
+    public void codeGen(ByteVisitor b) {
+
     }
 }

@@ -1,5 +1,6 @@
 package compiler.Parser;
 
+import compiler.bytecodegen.ByteVisitor;
 import compiler.semantics.Type;
 import compiler.semantics.TypeVisitor;
 
@@ -54,5 +55,10 @@ public class ArrayInitializer extends Expression {
         else if(!this.type.equals(a.type)) return false;
 
         return true;
+    }
+
+    @Override
+    public void codeGen(ByteVisitor b) {
+
     }
 }

@@ -1,5 +1,7 @@
 package compiler.Parser;
 
+import compiler.bytecodegen.ByteVisitor;
+
 public class EqualComparison extends EqualityCheckExpression {
 
     public EqualComparison(int line, Expression lhs, Expression rhs) {
@@ -21,5 +23,10 @@ public class EqualComparison extends EqualityCheckExpression {
         else if (!this.operator.equals(a.operator)) return false;
 
         return true;
+    }
+
+    @Override
+    public void codeGen(ByteVisitor b) {
+
     }
 }

@@ -1,5 +1,6 @@
 package compiler.Parser;
 
+import compiler.bytecodegen.ByteVisitor;
 import compiler.semantics.TypeVisitor;
 
 public class ReturnStatement extends Statement {
@@ -41,6 +42,11 @@ public class ReturnStatement extends Statement {
     public void typeAnalyse(TypeVisitor v) {
         // TODO: Return statement type analyse
         v.visitReturn(this);
+
+    }
+
+    @Override
+    public void codeGen(ByteVisitor b) {
 
     }
 }

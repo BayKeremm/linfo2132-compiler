@@ -11,27 +11,6 @@ import java.util.Map;
 import static java.lang.System.exit;
 
 
-/**
-* TODO:
- * -> proper error message for missing identifier for variable declarations instead of null pointer exception
- * What I did last:
- * -> missing free statement handling
- * -> missing return statement error is missing
- * -> fix float int promotion
- * -> composite struct accesses in one line
- *  -> variable scopes
- *  -> Child contexts
- *  -> how to update context
- * -> part of  struct accesses
- * -> Next step: Structs to user defined types
- * -> Update error messages
- * - refactored types to GenericType and extended more specific ones
- * - added array declarations
- * - declaration type changes the TypeDec type
- * - RootContext gives info about a variable so you can use idenexpressions
-* */
-
-
 public class SemanticAnalysis implements TypeVisitor {
     Program program;
     ContextGod currContext;

@@ -1,5 +1,6 @@
 package compiler.Parser;
 
+import compiler.bytecodegen.ByteVisitor;
 import compiler.semantics.TypeVisitor;
 
 import java.util.ArrayList;
@@ -41,4 +42,8 @@ public class Block extends Statement{
         return this.statements;
     }
 
+    @Override
+    public void codeGen(ByteVisitor b) {
+
+    }
 }

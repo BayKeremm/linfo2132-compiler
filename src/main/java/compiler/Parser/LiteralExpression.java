@@ -1,6 +1,7 @@
 package compiler.Parser;
 
 import compiler.Lexer.Symbol;
+import compiler.bytecodegen.ByteVisitor;
 import compiler.semantics.Type;
 
 public class LiteralExpression extends PrimaryExpression{
@@ -61,5 +62,11 @@ public class LiteralExpression extends PrimaryExpression{
     @Override
     public boolean equals(Object o) {
         return this.literal.equals(((LiteralExpression) o).literal);
+    }
+
+    @Override
+    public void codeGen(ByteVisitor b) {
+        b.visitLiteral(this);
+
     }
 }

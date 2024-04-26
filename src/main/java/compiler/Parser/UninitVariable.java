@@ -1,5 +1,6 @@
 package compiler.Parser;
 
+import compiler.bytecodegen.ByteVisitor;
 import compiler.semantics.Type;
 import compiler.semantics.TypeVisitor;
 
@@ -64,6 +65,11 @@ public class UninitVariable extends VariableGod {
     @Override
     public void typeAnalyse(TypeVisitor v) {
         v.visitVariable(this);
+
+    }
+
+    @Override
+    public void codeGen(ByteVisitor b) {
 
     }
 }
