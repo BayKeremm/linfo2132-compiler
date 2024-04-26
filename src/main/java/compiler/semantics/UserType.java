@@ -1,8 +1,8 @@
 package compiler.semantics;
 
-import compiler.Parser.Block;
+import compiler.Parser.statements.Block;
 import compiler.Parser.GenericType;
-import compiler.Parser.Statement;
+import compiler.Parser.statements.Statement;
 
 import java.util.ArrayList;
 import java.util.HashMap;

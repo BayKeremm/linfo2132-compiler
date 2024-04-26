@@ -1,6 +1,6 @@
 package compiler.semantics;
 
-import compiler.Parser.Expression;
+import compiler.Parser.expressions.Expression;
 import compiler.Parser.GenericType;
 
 import java.util.ArrayList;

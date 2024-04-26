@@ -3,9 +3,12 @@ package compiler.bytecodegen;
 import compiler.Lexer.Symbol;
 import compiler.Lexer.Token;
 import compiler.Parser.*;
+import compiler.Parser.expressions.*;
+import compiler.Parser.statements.ConstantVariable;
+import compiler.Parser.statements.Procedure;
+import compiler.Parser.statements.Statement;
 import compiler.semantics.ProcedureInfo;
 import compiler.semantics.Type;
-import compiler.semantics.TypeVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -65,7 +68,7 @@ public class ByteCodeWizard implements ByteVisitor{
             constantVariable.codeGen(this);
         }
         staticInitializer.visitInsn(Opcodes.RETURN);
-        staticInitializer.visitMaxs(-1, -1); // maximum stack size and local variable count
+        staticInitializer.visitMaxs(-1, -1);
         staticInitializer.visitEnd();
 
 
@@ -142,6 +145,17 @@ public class ByteCodeWizard implements ByteVisitor{
             }
         }
 
+        if(lit.equals("true") || lit.equals("false")){
+            switch (lit){
+                case "true":
+                    this.currMethodVisitor.visitLdcInsn(true);
+                    return;
+                case "false":
+                    this.currMethodVisitor.visitLdcInsn(false);
+                    return;
+            }
+        }
+
         // String and true false
         this.currMethodVisitor.visitLdcInsn(lit);
 
@@ -158,11 +172,64 @@ public class ByteCodeWizard implements ByteVisitor{
         rhs.codeGen(this);
 
 
+        // TODO: PROMOTING DOES NOT WORK
         if(lhs_type.type().equals("int")){
             this.currMethodVisitor.visitInsn(Opcodes.IADD);
         }else{
             this.currMethodVisitor.visitInsn(Opcodes.FADD);
         }
+    }
+
+    @Override
+    public void visitMinus(MinusOperation minus) {
+        Expression lhs = minus.getLhs();
+        Expression rhs = minus.getRhs();
+        GenericType lhs_type = lhs.getType();
+        GenericType rhs_type = rhs.getType();
+
+        lhs.codeGen(this);
+        rhs.codeGen(this);
+
+
+        // TODO: PROMOTING DOES NOT WORK
+        if(lhs_type.type().equals("int")){
+            this.currMethodVisitor.visitInsn(Opcodes.ISUB);
+        }else{
+            this.currMethodVisitor.visitInsn(Opcodes.FSUB);
+        }
+
+    }
+
+    @Override
+    public void visitMul(MultiplyOperation mul) {
+        Expression lhs = mul.getLhs();
+        Expression rhs = mul.getRhs();
+        GenericType lhs_type = lhs.getType();
+        GenericType rhs_type = rhs.getType();
+
+        lhs.codeGen(this);
+        rhs.codeGen(this);
+
+
+        // TODO: PROMOTING DOES NOT WORK
+        if(lhs_type.type().equals("int")){
+            this.currMethodVisitor.visitInsn(Opcodes.IMUL);
+        }else{
+            this.currMethodVisitor.visitInsn(Opcodes.FMUL);
+        }
+
+    }
+
+    @Override
+    public void visitAND(LogicalAnd and) {
+        Expression lhs = and.getLhs();
+        Expression rhs = and.getRhs();
+
+        lhs.codeGen(this);
+        rhs.codeGen(this);
+
+        this.currMethodVisitor.visitInsn(Opcodes.IAND);
+
     }
 
     @Override
@@ -194,6 +261,12 @@ public class ByteCodeWizard implements ByteVisitor{
                 declarator.codeGen(this);
                 staticInitializer.visitFieldInsn(Opcodes.PUTSTATIC, programName, name, "Ljava/lang/String;");
                 break;
+            case "bool":
+                this.classWriter.visitField(Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC + Opcodes.ACC_FINAL,
+                        name, "Z", null, null).visitEnd();
+                declarator.codeGen(this);
+                staticInitializer.visitFieldInsn(Opcodes.PUTSTATIC, programName, name, "Z");
+                break;
 
         }
         this.currMethodVisitor = null;
@@ -221,6 +294,7 @@ public class ByteCodeWizard implements ByteVisitor{
 
 
     }
+
 
     @Override
     public void visitFunctionCall(FunctionCallExpression functionCallExpression) {

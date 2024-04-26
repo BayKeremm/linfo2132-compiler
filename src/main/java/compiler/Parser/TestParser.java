@@ -9,8 +9,8 @@ import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.sound.sampled.AudioFileFormat.Type;
-
+import compiler.Parser.expressions.*;
+import compiler.Parser.statements.*;
 import org.junit.Test;
 
 import compiler.Lexer.Lexer;
@@ -49,7 +49,7 @@ public class TestParser {
         LineNumberReader reader = new LineNumberReader(new FileReader(filename));
         Lexer lexer = new Lexer(reader);
         Parser parser = new Parser(lexer);
-        Program p = parser.program();  
+        Program p = parser.program();
 
         Program Test = new Program("test1", new ArrayList<ConstantVariable>(), new ArrayList<VariableGod>(), new ArrayList<StructDeclaration>(), new ArrayList<Procedure>(),parser.getTypes());
         TypeDeclaration testTypeDeclaration1 = type("int",Token.INTEGER,false);
@@ -83,7 +83,7 @@ public class TestParser {
         LineNumberReader reader = new LineNumberReader(new FileReader(filename));
         Lexer lexer = new Lexer(reader);
         Parser parser = new Parser(lexer);
-        Program p = parser.program();  
+        Program p = parser.program();
 
         Program Test = new Program("test3", new ArrayList<ConstantVariable>(), new ArrayList<VariableGod>(), new ArrayList<StructDeclaration>(), new ArrayList<Procedure>(),parser.getTypes());
 
@@ -93,13 +93,13 @@ public class TestParser {
 
         TypeDeclaration testTypes = type("int",Token.INTEGER,false);
         TypeDeclaration retType = type("float",Token.FLOAT,false);
-        
+
 
         parameters.add(new Parameter(0, testTypes, id("x")));
         parameters.add(new Parameter(0, testTypes, id("y")));
         parameters.add(new Parameter(0, testTypes, id("z")));
 
-        statements.add(new UninitVariable(0, testTypes,id("i")));        
+        statements.add(new UninitVariable(0, testTypes,id("i")));
         wstatements.add(new ScopeVariable(0, id("i"), new PlusOperation(0, id("i"), num(1))));
 
         EqualComparison condition = new EqualComparison(0, id("i"), num(3));
@@ -124,8 +124,8 @@ public class TestParser {
         ForStatement forStatement = new ForStatement(1, pos0, pos1, pos2, forBlock);
         statements.add(forStatement);
 
-        NotEqualComparison condition3 = new NotEqualComparison(0, id("i"), num(5));   
-        ArrayList<Statement> ifStatements = new ArrayList<Statement>();     
+        NotEqualComparison condition3 = new NotEqualComparison(0, id("i"), num(5));
+        ArrayList<Statement> ifStatements = new ArrayList<Statement>();
         ArrayList<Statement> elseStatements = new ArrayList<Statement>();
         Block ifBlock = new Block(0, ifStatements);
         Block elseBlock = new Block(0, elseStatements);
@@ -166,7 +166,7 @@ public class TestParser {
        ArrayList<Expression> expression = new ArrayList<Expression>();
        FunctionCallExpression call = new FunctionCallExpression(1, new Symbol(Token.IDENTIFIER,"Point" ,0), expression);
        Variable var = new Variable(1, varType, varId, call);
-    
+
        expression.add(num(3));
 
        Test.addGlobal(var);
@@ -180,7 +180,7 @@ public class TestParser {
        IdentifierExpression varId3 = id("b");
        DotOperation dot = new DotOperation(3, id("p"), id("a"));
        Variable var3 = new Variable(3, varType3, varId3, dot);
-    
+
        Test.addGlobal(var3);
 
        TypeDeclaration varType4 = type("int",Token.INTEGER,false);

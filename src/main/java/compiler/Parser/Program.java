@@ -1,7 +1,7 @@
 package compiler.Parser;
 import java.util.ArrayList;
-import compiler.Lexer.Symbol;
-import compiler.Lexer.Token;
+
+import compiler.Parser.statements.*;
 import compiler.bytecodegen.ByteCodeGenerator;
 import compiler.bytecodegen.ByteVisitor;
 

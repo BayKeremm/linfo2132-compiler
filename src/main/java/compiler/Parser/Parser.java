@@ -3,6 +3,8 @@ package compiler.Parser;
 import compiler.Lexer.Lexer;
 import compiler.Lexer.Symbol;
 import compiler.Lexer.Token;
+import compiler.Parser.expressions.*;
+import compiler.Parser.statements.*;
 
 import java.util.ArrayList;
 import java.util.Objects;

@@ -1,6 +1,6 @@
 package compiler.Parser;
 
-abstract class ASTNode {
+public abstract class ASTNode {
     public static Program program;
 
 

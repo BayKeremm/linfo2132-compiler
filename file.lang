@@ -1,9 +1,14 @@
-final int x = 5;
-final float y = 2.0 + 2.0;
-final string z = "hello";
+final int x = 5*2+1-2*2;
+//final float y = 2.0 + 2.0;
+//final string z = "hello";
+//final bool q = true && false;
 def void main() {
     writeInt(x);
-    writeFloat(y);
-    write(z);
+    //writeFloat(y);
+    //write(z);
 }
+
+
+// Notes:
+// We cannot print booleans
 

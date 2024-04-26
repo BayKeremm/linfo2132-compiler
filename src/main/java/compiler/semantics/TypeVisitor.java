@@ -1,6 +1,8 @@
 package compiler.semantics;
 
 import compiler.Parser.*;
+import compiler.Parser.expressions.*;
+import compiler.Parser.statements.*;
 
 public interface TypeVisitor {
     void visitTermExpression(TermExpression op);
