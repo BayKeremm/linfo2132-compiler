@@ -75,6 +75,6 @@ public class ScopeVariable extends VariableGod {
 
     @Override
     public void codeGen(ByteVisitor b) {
-
+        b.visitScopeVariable(this);
     }
 }

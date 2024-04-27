@@ -74,6 +74,7 @@ public class IndexOp extends Expression {
 
     @Override
     public void codeGen(ByteVisitor b) {
+        b.visitIndexOp(this);
 
     }
 }

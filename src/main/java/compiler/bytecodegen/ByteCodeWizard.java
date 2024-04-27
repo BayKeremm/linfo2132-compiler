@@ -4,10 +4,9 @@ import compiler.Lexer.Symbol;
 import compiler.Lexer.Token;
 import compiler.Parser.*;
 import compiler.Parser.expressions.*;
-import compiler.Parser.statements.ConstantVariable;
-import compiler.Parser.statements.Procedure;
-import compiler.Parser.statements.Statement;
+import compiler.Parser.statements.*;
 import compiler.semantics.ProcedureInfo;
+import compiler.semantics.SemanticAnalysis;
 import compiler.semantics.Type;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
@@ -18,6 +17,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import static java.lang.System.exit;
 
 /**
 - TODO:
@@ -37,6 +38,7 @@ public class ByteCodeWizard implements ByteVisitor{
     private MethodVisitor staticInitializer;
     HashMap<String, ArrayList<ProcedureInfo>> procedureInfos;
     HashMap<String, String> constants;
+    HashMap<String, String> globals;
 
     public ByteCodeWizard(Program program){
         this.program = program;
@@ -44,9 +46,13 @@ public class ByteCodeWizard implements ByteVisitor{
         this.currMethodVisitor = null;
         this.procedureInfos = new HashMap<>();
         this.constants = new HashMap<>();
+        this.globals = new HashMap<>();
         addBuiltInFunctions();
         for(ConstantVariable constantVariable: program.constantVariables){
             constants.put(constantVariable.getVariableName(), constantVariable.typeDeclaration().getTypeSymbol().image());
+        }
+        for(VariableGod variable: program.globals){
+            globals.put(variable.getVariableName(), variable.typeDeclaration().getTypeSymbol().image());
         }
     }
 
@@ -68,6 +74,9 @@ public class ByteCodeWizard implements ByteVisitor{
 
         for(ConstantVariable constantVariable: program.constantVariables){
             constantVariable.codeGen(this);
+        }
+        for(VariableGod var: program.globals){
+            var.codeGen(this);
         }
         staticInitializer.visitInsn(Opcodes.RETURN);
         staticInitializer.visitMaxs(-1, -1);
@@ -138,7 +147,80 @@ public class ByteCodeWizard implements ByteVisitor{
             case "int":
                 this.currMethodVisitor.visitIntInsn(Opcodes.NEWARRAY, Opcodes.T_INT);
                 break;
+            case "float":
+                this.currMethodVisitor.visitIntInsn(Opcodes.NEWARRAY, Opcodes.T_FLOAT);
+                break;
+            case "string":
+                this.currMethodVisitor.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/String");
+                break;
+            case "bool":
+                this.currMethodVisitor.visitIntInsn(Opcodes.NEWARRAY, Opcodes.T_BOOLEAN);
+                break;
         }
+    }
+
+    @Override
+    public void visitIndexOp(IndexOp op) {
+        Expression index  = op.getIndex();
+        GenericType type = op.getType();
+        Symbol identifier = op.getIndexIdentifier();
+        switch (type.type()){
+            case "int":
+                currMethodVisitor.visitFieldInsn(Opcodes.GETSTATIC, programName,
+                        identifier.image(), "[I");
+                break;
+            case "float":
+                currMethodVisitor.visitFieldInsn(Opcodes.GETSTATIC, programName,
+                        identifier.image(), "[F");
+                break;
+            case "string":
+                currMethodVisitor.visitFieldInsn(Opcodes.GETSTATIC, programName,
+                        identifier.image(), "[Ljava/lang/String;");
+                break;
+            case "bool":
+                currMethodVisitor.visitFieldInsn(Opcodes.GETSTATIC, programName,
+                        identifier.image(), "[Z");
+                break;
+        }
+        index.codeGen(this);
+        switch (type.type()){
+            case "int":
+                currMethodVisitor.visitInsn(Opcodes.IALOAD);
+                break;
+            case "float":
+                currMethodVisitor.visitInsn(Opcodes.FALOAD);
+                break;
+            case "string":
+                currMethodVisitor.visitInsn(Opcodes.AALOAD);
+                break;
+            case "bool":
+                currMethodVisitor.visitInsn(Opcodes.BALOAD);
+                break;
+        }
+    }
+    public void prepIndexOp(IndexOp op){
+        Expression index  = op.getIndex();
+        GenericType type = op.getType();
+        Symbol identifier = op.getIndexIdentifier();
+        switch (type.type()){
+            case "int":
+                currMethodVisitor.visitFieldInsn(Opcodes.GETSTATIC, programName,
+                        identifier.image(), "[I");
+                break;
+            case "float":
+                currMethodVisitor.visitFieldInsn(Opcodes.GETSTATIC, programName,
+                        identifier.image(), "[F");
+                break;
+            case "string":
+                currMethodVisitor.visitFieldInsn(Opcodes.GETSTATIC, programName,
+                        identifier.image(), "[Ljava/lang/String;");
+                break;
+            case "bool":
+                currMethodVisitor.visitFieldInsn(Opcodes.GETSTATIC, programName,
+                        identifier.image(), "[Z");
+                break;
+        }
+        index.codeGen(this);
     }
 
     public void visitLiteral(LiteralExpression exp){
@@ -464,16 +546,21 @@ public class ByteCodeWizard implements ByteVisitor{
 
     }
 
-    @Override
-    public void visitConstantVariable(ConstantVariable variable) {
+    private String getSignature(VariableGod variable){
         String name = variable.getVariableName();
-        String type = constants.get(name);
-        Expression declarator = variable.declarator();
+        String type;
+        if(constants.containsKey(name)){
+            type = constants.get(name);
+        }else {
+            type= globals.get(name);
+        }
+
         if(staticInitializer == null){
             this.staticInitializer = this.classWriter.visitMethod(Opcodes.ACC_STATIC,
                     "<clinit>", "()V", null, null);
             staticInitializer.visitCode();
         }
+        Expression declarator = variable.declarator();
         this.currMethodVisitor = staticInitializer;
         String signature = "";
         switch (type){
@@ -492,7 +579,11 @@ public class ByteCodeWizard implements ByteVisitor{
                 }
                 break;
             case "string":
-                signature = "Ljava/lang/String;";
+                if(declarator instanceof ArrayInitializer){
+                    signature = "[Ljava/lang/String;";
+                }else{
+                    signature = "Ljava/lang/String;";
+                }
                 break;
             case "bool":
                 if(declarator instanceof ArrayInitializer){
@@ -502,7 +593,15 @@ public class ByteCodeWizard implements ByteVisitor{
                 }
                 break;
         }
-        this.classWriter.visitField(Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC + Opcodes.ACC_FINAL,
+        return signature;
+    }
+
+    @Override
+    public void visitConstantVariable(ConstantVariable variable) {
+        String name = variable.getVariableName();
+        Expression declarator = variable.declarator();
+        String signature = getSignature(variable);
+        this.classWriter.visitField(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL,
                 name, signature, null, null).visitEnd();
         declarator.codeGen(this);
         staticInitializer.visitFieldInsn(Opcodes.PUTSTATIC, programName, name, signature);
@@ -510,11 +609,84 @@ public class ByteCodeWizard implements ByteVisitor{
     }
 
     @Override
+    public void visitVariable(Variable variable) {
+        String name = variable.getVariableName();
+        Expression declarator = variable.declarator();
+        String signature = getSignature(variable);
+        this.classWriter.visitField(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC,
+                name, signature, null, null).visitEnd();
+        declarator.codeGen(this);
+        staticInitializer.visitFieldInsn(Opcodes.PUTSTATIC, programName, name, signature);
+        this.currMethodVisitor = null;
+    }
+
+    @Override
+    public void visitScopeVariable(ScopeVariable variable) {
+        final String ANSI_RESET = "\u001B[0m";
+        final String ANSI_RED = "\u001B[31m";
+        Expression declarator = variable.getScopeDeclarator();
+        Expression identifier = variable.getScopeIdentifier();
+        String type = identifier.getType().type();
+        boolean arr = false;
+
+        String name = identifier.getRep();
+        if(identifier instanceof IndexOp){
+            prepIndexOp((IndexOp) identifier);
+            arr = true;
+            int index = name.indexOf('[');
+            name = name.substring(0, index);
+        }
+        if(constants.containsKey(name)){
+            System.err.print(ANSI_RED);
+            System.err.printf("ConstantError: --> Cannot modify constants at line %d", identifier.getLine());
+            System.err.print(ANSI_RESET);
+            exit(1);
+        }
+        declarator.codeGen(this);
+
+        if(arr){
+            switch (type){
+                case "int":
+                    currMethodVisitor.visitInsn(Opcodes.IASTORE);
+                    break;
+                case "float":
+                    currMethodVisitor.visitInsn(Opcodes.FASTORE);
+                    break;
+                case "string":
+                    currMethodVisitor.visitInsn(Opcodes.AASTORE);
+                    break;
+            }
+
+        }else {
+            switch (type){
+                case "int":
+                    this.currMethodVisitor.visitFieldInsn(Opcodes.PUTSTATIC, programName, name, "I");
+                    break;
+                case "float":
+                    this.currMethodVisitor.visitFieldInsn(Opcodes.PUTSTATIC, programName, name, "F");
+                    break;
+                case "string":
+                    this.currMethodVisitor.visitFieldInsn(Opcodes.PUTSTATIC, programName, name, "Ljava/lang/String;");
+                    break;
+            }
+        }
+
+    }
+
+
+    @Override
     public void visitIdentifier(IdentifierExpression expression) {
         String name = expression.getIdentifierSymbol().image();
-        String type =  constants.get(name);
+        String type = null;
+        if(constants.containsKey(name) ){
+            type =  constants.get(name);
+        }else if(globals.containsKey(name)){
+            type =  globals.get(name);
+        }else{
+            System.err.println("PROBLEM IN VISITIDENTIFIER IN BYTECODEGEN");
+            exit(1);
+        }
         // Constant
-        if(constants.containsKey(name)){
             switch(type){
                 case "int":
                     this.currMethodVisitor.visitFieldInsn(Opcodes.GETSTATIC, programName, name, "I");
@@ -526,7 +698,6 @@ public class ByteCodeWizard implements ByteVisitor{
                     this.currMethodVisitor.visitFieldInsn(Opcodes.GETSTATIC, programName, name, "Ljava/lang/String;");
                     return;
             }
-        }
 
 
 

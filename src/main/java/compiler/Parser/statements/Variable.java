@@ -34,6 +34,11 @@ public class Variable extends VariableGod {
     }
 
     @Override
+    public String getVariableName() {
+        return identifier.getRep();
+    }
+
+    @Override
     public String toString() {
         return "Variable{" +
                 typeDeclaration +
@@ -71,6 +76,6 @@ public class Variable extends VariableGod {
 
     @Override
     public void codeGen(ByteVisitor b) {
-
+        b.visitVariable(this);
     }
 }

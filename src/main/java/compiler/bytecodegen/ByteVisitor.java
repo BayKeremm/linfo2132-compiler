@@ -4,14 +4,25 @@ import compiler.Parser.*;
 import compiler.Parser.expressions.*;
 import compiler.Parser.statements.ConstantVariable;
 import compiler.Parser.statements.Procedure;
+import compiler.Parser.statements.ScopeVariable;
+import compiler.Parser.statements.Variable;
 
 import java.lang.management.MonitorInfo;
 
 public interface ByteVisitor {
     void visitProgram(Program program);
     void visitProcedure(Procedure procedure);
+    void visitConstantVariable(ConstantVariable variable);
+
+    void visitVariable(Variable var);
+
+    void visitScopeVariable(ScopeVariable variable);
+
+    void visitIdentifier(IdentifierExpression expression);
 
     void visitArrayInit(ArrayInitializer init);
+
+    void visitIndexOp(IndexOp op);
     void visitFunctionCall(FunctionCallExpression functionCallExpression);
 
     void visitLiteral(LiteralExpression expression);
@@ -39,8 +50,5 @@ public interface ByteVisitor {
     void visitLE(LEComparison le);
     void visitLT(LTComparison lt);
 
-    void visitConstantVariable(ConstantVariable variable);
-
-    void visitIdentifier(IdentifierExpression expression);
 
 }
