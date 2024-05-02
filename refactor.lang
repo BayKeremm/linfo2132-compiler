@@ -1,0 +1,29 @@
+//final int x = 10+(2*(-2));
+//final bool y = !false;
+//final float z = 3.0 % 2;
+
+def void main() {
+
+    //writeInt(x);
+    //writeFloat(z);
+    int bro = 2+2*(-2);
+    writeInt(bro);
+
+    string[] kerem = string[5];
+    kerem[0]="1";
+    write(kerem[0]);
+
+    int a = 3;
+    writeInt(a);
+
+    string k = "heloo";
+    write(k);
+
+    int[] aa = int[5];
+    aa[0] = 2;
+    writeInt(aa[0]);
+    writeInt(aa[1]);
+}
+
+// TODO: Adding the constants fuck up the  stack
+

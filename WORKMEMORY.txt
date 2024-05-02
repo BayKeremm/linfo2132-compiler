@@ -1,0 +1,8 @@
+I was going funciton by funciton and putting everything in the ASMHelper file
+Try to refactor there and keep clear function names that can be called from the wizard
+Do not forget to add documentation
+
+15H30
+start with the operators
+then go to
+deal with scopes

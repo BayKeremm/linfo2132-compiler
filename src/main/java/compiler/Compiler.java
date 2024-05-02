@@ -4,11 +4,9 @@
 package compiler;
 
 import compiler.Lexer.Lexer;
-import compiler.Parser.Parser;
-import compiler.Parser.Program;
-import compiler.Parser.TestParser;
-import compiler.bytecodegen.ByteCodeWizard;
-import compiler.semantics.SemanticAnalysis;
+import compiler.Parser.*;
+import compiler.bytecodegen.*;
+import compiler.semantics.*;
 
 import java.io.FileReader;
 import java.io.LineNumberReader;

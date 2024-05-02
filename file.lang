@@ -33,6 +33,11 @@ def void main() {
     // float arr
     elfje[0] = 0.2;
     writeFloat(elfje[0]);
+// --------------------------------------
+    //int local = 5;
+    //writeInt(local);
+
+
 }
 
 
