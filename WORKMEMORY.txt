@@ -6,3 +6,9 @@ Do not forget to add documentation
 start with the operators
 then go to
 deal with scopes
+
+bugs:
+    float j;
+    j = i + 1;
+    => cannot turn i + 1 to float
+

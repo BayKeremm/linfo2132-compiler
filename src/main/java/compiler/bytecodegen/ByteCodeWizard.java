@@ -495,13 +495,41 @@ public class ByteCodeWizard implements ByteVisitor{
         Expression pos1 = forStatement.getPos1();
         Statement pos2 = forStatement.getPos2();
 
-        String loopCounter = pos0.getVariableName();
 
-        // loop counter is initialized before so it is in the table
-        // pos0 is going to initialize the loop counter
+        // Step 1: Initialize loop counter
+        //  - loop counter is initialized before so it is in the table
+        //  - pos0 is going to initialize the loop counter (e.g., i = 1)
         pos0.codeGen(this);
-        // pos1 is the condition
+
+        // Step 2: Start of the loop
+        Label startLabel = asmHelper.getLabel();
+        asmHelper.visitLabel(startLabel);
+
+        // Step 3: Generate loop condition
+        //  - pos1 is the condition (e.g., i < 10)
+        //  - load loop variable
+        pos1.codeGen(this);
         Label endLabel = asmHelper.getLabel();
+        // TODO: What if ==> i > 0
+        asmHelper.performJumpOp(Opcodes.IFEQ, endLabel);
+
+        // Step 4: inside the loop
+        for(Statement s: forBlock.getStatements()){
+            s.codeGen(this);
+        }
+
+        // Step 5: pos2 contains the increment
+        pos2.codeGen(this);
+
+        // Step 6: jump back to the start
+        asmHelper.performJumpOp(Opcodes.GOTO,startLabel);
+
+        // Step 7: end label
+        asmHelper.visitLabel(endLabel);
+
+
+
+
         // pos2 is the increment to the loop counter
 
     }

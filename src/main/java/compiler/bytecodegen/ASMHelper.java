@@ -198,21 +198,21 @@ public class ASMHelper {
                 if(arr){
                     this.currMethodVisitor.visitInsn(Opcodes.IASTORE);
                 }else{
-                    this.currMethodVisitor.visitInsn(Opcodes.ISTORE);
+                    this.currMethodVisitor.visitVarInsn(Opcodes.ISTORE, index);
                 }
                 break;
             case "float":
                 if(arr){
                     this.currMethodVisitor.visitInsn(Opcodes.FASTORE);
                 }else{
-                    this.currMethodVisitor.visitInsn(Opcodes.FSTORE);
+                    this.currMethodVisitor.visitVarInsn(Opcodes.FSTORE,index);
                 }
                 break;
             case "string":
                 if(arr){
                     this.currMethodVisitor.visitInsn(Opcodes.AASTORE);
                 }else{
-                    this.currMethodVisitor.visitInsn(Opcodes.ASTORE);
+                    this.currMethodVisitor.visitVarInsn(Opcodes.ASTORE, index);
                 }
                 break;
         }
