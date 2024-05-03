@@ -2,10 +2,7 @@ package compiler.bytecodegen;
 
 import compiler.Parser.*;
 import compiler.Parser.expressions.*;
-import compiler.Parser.statements.ConstantVariable;
-import compiler.Parser.statements.Procedure;
-import compiler.Parser.statements.ScopeVariable;
-import compiler.Parser.statements.Variable;
+import compiler.Parser.statements.*;
 
 import java.lang.management.MonitorInfo;
 
@@ -15,6 +12,7 @@ public interface ByteVisitor {
     void visitConstantVariable(ConstantVariable variable);
 
     void visitVariable(Variable var);
+    void visitUnInitVariable(UninitVariable var);
 
     void visitScopeVariable(ScopeVariable variable);
 
@@ -49,6 +47,10 @@ public interface ByteVisitor {
 
     void visitLE(LEComparison le);
     void visitLT(LTComparison lt);
+
+    void visitIfElse(IfElseStatement ifElseStatement);
+
+    void visitFor(ForStatement forStatement);
 
 
 }

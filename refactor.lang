@@ -3,12 +3,38 @@ final bool y = !false;
 final float z = 3.0 % 2;
 
 final int xx = 10+(2*(-2));
-final bool yy = !false;
 final float zz = 3.0 % 2;
 
 int bruh = 5;
 int[] manyak = int[10];
+bool yy = !false;
 def void main() {
+
+    int i;
+    writeInt(i);
+
+    float j;
+    writeFloat(j);
+
+    string empty;
+    write(empty);
+
+    // TODO:
+    //for (i=1, i<5, i = i+1) {
+    //    writeInt(i);
+    //}
+
+    if(y){
+        write(" y is true");
+    }else{
+        write(" y is false");
+    }
+
+    if(yy){
+        write(" yy is true");
+    }else{
+        write(" yy is false");
+    }
 
     manyak[0] = 2;
     writeInt(manyak[0]);
@@ -41,6 +67,10 @@ def void main() {
     aa[0] = 2;
     writeInt(aa[0]);
     writeInt(aa[1]);
+
+
+
+
 }
 
 // TODO: Adding the constants fuck up the  stack

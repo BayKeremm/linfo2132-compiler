@@ -78,6 +78,7 @@ public class ForStatement extends Statement {
 
     @Override
     public void codeGen(ByteVisitor b) {
+        b.visitFor(this);
 
     }
 }

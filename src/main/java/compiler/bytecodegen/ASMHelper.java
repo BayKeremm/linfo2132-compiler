@@ -219,7 +219,6 @@ public class ASMHelper {
 
     }
     public void storeLocalVariable(String name){
-        // TODO: STORE ARRAY
         int index = currentScope.getIndex(name);
 
         String type = currentScope.getType(name).type();
@@ -315,10 +314,10 @@ public class ASMHelper {
         if(literal.equals("true") || literal.equals("false")){
             switch (literal){
                 case "true":
-                    currMethodVisitor.visitLdcInsn(true);
+                    currMethodVisitor.visitLdcInsn(Opcodes.ICONST_1);
                     return;
                 case "false":
-                    currMethodVisitor.visitLdcInsn(false);
+                    currMethodVisitor.visitLdcInsn(Opcodes.ICONST_0);
                     return;
             }
         }
@@ -326,8 +325,8 @@ public class ASMHelper {
         currMethodVisitor.visitLdcInsn(literal);
     }
 
-    public void pushIntConst1(){
-        this.currMethodVisitor.visitLdcInsn(Opcodes.ICONST_1);
+    public void pushIConst1(){
+        this.currMethodVisitor.visitInsn(Opcodes.ICONST_1);
     }
 
     public void turnIntToFloat(){
@@ -340,6 +339,18 @@ public class ASMHelper {
 
     public void performSingleOp(Integer opcode){
         this.currMethodVisitor.visitInsn(opcode);
+    }
+
+    public Label getLabel(){
+        return new Label();
+    }
+
+    public void performJumpOp(Integer opcode, Label label){
+        this.currMethodVisitor.visitJumpInsn(opcode,label);
+    }
+
+    public void visitLabel(Label label){
+       this.currMethodVisitor.visitLabel(label);
     }
 
     public void performComparison(Integer opcode){
@@ -444,5 +455,56 @@ public class ASMHelper {
         Expression declarator = variable.declarator();
         String type = declarator.getType().type();
         return getSignature(type,declarator);
+    }
+
+    public String getUnInitSignature(String name, GenericType type){
+        boolean arr = type.isArray();
+        String signature = "";
+        switch (type.type()){
+            case "int":
+                if(arr){
+                    signature = "[I";
+                }else{
+                    signature = "I";
+                }
+                break;
+            case "float":
+                if(arr){
+                    signature = "[F";
+                }else{
+                    signature = "F";
+                }
+                break;
+            case "string":
+                // TODO: EMPTY DEFAULT VAL ???
+                if(arr){
+                    signature = "[Ljava/lang/String;";
+                }else{
+                    signature = "Ljava/lang/String;";
+                }
+                break;
+            case "bool":
+                if(arr){
+                    signature = "[Z";
+                }else{
+                    signature = "Z";
+                }
+                break;
+        }
+        return signature;
+    }
+    public void pushDefaultValue(String name){
+        GenericType type = currentScope.getType(name);
+        switch (type.type()){
+            case "int", "bool":
+                this.currMethodVisitor.visitInsn(Opcodes.ICONST_0);
+                break;
+            case "float":
+                this.currMethodVisitor.visitInsn(Opcodes.FCONST_0);
+                break;
+            case "string":
+                this.pushLiteral("null");
+                break;
+        }
     }
 }

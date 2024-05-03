@@ -71,6 +71,6 @@ public class UninitVariable extends VariableGod {
 
     @Override
     public void codeGen(ByteVisitor b) {
-
+        b.visitUnInitVariable(this);
     }
 }

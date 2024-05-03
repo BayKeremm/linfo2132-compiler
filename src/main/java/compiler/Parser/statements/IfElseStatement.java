@@ -69,6 +69,6 @@ public class IfElseStatement extends Statement {
 
     @Override
     public void codeGen(ByteVisitor b) {
-
+        b.visitIfElse(this);
     }
 }

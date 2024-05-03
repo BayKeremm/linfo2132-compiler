@@ -7,9 +7,7 @@ import compiler.Parser.expressions.*;
 import compiler.Parser.statements.*;
 import compiler.semantics.ProcedureInfo;
 import compiler.semantics.Type;
-import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 import java.util.ArrayList;
@@ -125,6 +123,22 @@ public class ByteCodeWizard implements ByteVisitor{
             declarator.codeGen(this);
             asmHelper.storeStaticField(name,signature);
         }
+    }
+
+    @Override
+    public void visitUnInitVariable(UninitVariable variable) {
+        String name = variable.getVariableName();
+        GenericType type = variable.getType();
+        if(localVariable){
+            asmHelper.addLocalToScope(name, type);
+            String signature = asmHelper.getUnInitSignature(name, type);
+            asmHelper.visitLocalVariable(name, signature);
+            asmHelper.pushDefaultValue(name);
+            asmHelper.storeLocalVariable(name);
+        }else{
+            System.err.println("SIKE, YOU CANNOT HAVE UNINIT VAR OUTSIDE PROCEDURES");
+        }
+
     }
 
     @Override
@@ -320,10 +334,10 @@ public class ByteCodeWizard implements ByteVisitor{
         assert lhs == null;
         Expression rhs = uNegate.getRhs();
 
-        asmHelper.pushIntConst1();
 
         rhs.codeGen(this);
 
+        asmHelper.pushIConst1();
         asmHelper.performSingleOp(Opcodes.IXOR);
     }
 
@@ -451,7 +465,49 @@ public class ByteCodeWizard implements ByteVisitor{
         rhs.codeGen(this);
 
         asmHelper.performComparison(Opcodes.IF_ICMPLT);
-    }    @Override
+    }
+
+    @Override
+    public void visitIfElse(IfElseStatement ifElseStatement) {
+        Block ifBlock = ifElseStatement.getIfBlock();
+        Block elseBlock = ifElseStatement.getElseBlock();
+        Expression condition = ifElseStatement.getIfCondition();
+        condition.codeGen(this);
+        Label elseLabel = asmHelper.getLabel();
+        asmHelper.performJumpOp(Opcodes.IFLE, elseLabel);
+        for(Statement s: ifBlock.getStatements()){
+            s.codeGen(this);
+        }
+        Label endLabel = asmHelper.getLabel();
+        asmHelper.performJumpOp(Opcodes.GOTO, endLabel);
+        asmHelper.visitLabel(elseLabel);
+        for(Statement s: elseBlock.getStatements()){
+            s.codeGen(this);
+        }
+        asmHelper.visitLabel(endLabel);
+    }
+
+    @Override
+    public void visitFor(ForStatement forStatement) {
+        // TODO: last you did the uninit var
+        Block forBlock = forStatement.getForBlock();
+        Statement pos0 = forStatement.getPos0();
+        Expression pos1 = forStatement.getPos1();
+        Statement pos2 = forStatement.getPos2();
+
+        String loopCounter = pos0.getVariableName();
+
+        // loop counter is initialized before so it is in the table
+        // pos0 is going to initialize the loop counter
+        pos0.codeGen(this);
+        // pos1 is the condition
+        Label endLabel = asmHelper.getLabel();
+        // pos2 is the increment to the loop counter
+
+    }
+
+
+    @Override
     public void visitFunctionCall(FunctionCallExpression functionCallExpression) {
         Symbol identifier = functionCallExpression.getFunctionIdentifier();
         var params = functionCallExpression.getFunctionExpressionParams();
