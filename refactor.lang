@@ -1,17 +1,35 @@
-//final int x = 10+(2*(-2));
-//final bool y = !false;
-//final float z = 3.0 % 2;
+final int x = 10+(2*(-2));
+final bool y = !false;
+final float z = 3.0 % 2;
 
+final int xx = 10+(2*(-2));
+final bool yy = !false;
+final float zz = 3.0 % 2;
+
+int bruh = 5;
+int[] manyak = int[10];
 def void main() {
 
-    //writeInt(x);
-    //writeFloat(z);
+    manyak[0] = 2;
+    writeInt(manyak[0]);
+    writeInt(bruh);
+    write(" ");
+    write(" ");
+    write(" ");
+    writeInt(x);
+    writeFloat(z);
+    writeInt(xx);
+    writeFloat(zz);
     int bro = 2+2*(-2);
     writeInt(bro);
 
     string[] kerem = string[5];
     kerem[0]="1";
+    kerem[1]="aaa";
+    kerem[2]="aaaaaa";
     write(kerem[0]);
+    write(kerem[1]);
+    write(kerem[2]);
 
     int a = 3;
     writeInt(a);

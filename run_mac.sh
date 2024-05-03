@@ -1,2 +1,5 @@
 gradle run --args="-parser refactor.lang" &&
-java refactor
+java refactor &&
+
+gradle run --args="-parser file.lang" &&
+java file

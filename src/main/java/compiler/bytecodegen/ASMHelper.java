@@ -36,6 +36,8 @@ public class ASMHelper {
         LocalScope newScope = new LocalScope();
         newScope.setPrevScope(currentScope);
         currentScope = newScope;
+        currMethodVisitor.visitLabel(currentScope.getStartLabel());
+        currentScope.setStartVisit(true);
     }
 
     public void addLocalToScope(String name, GenericType type){
@@ -132,6 +134,20 @@ public class ASMHelper {
         currMethodVisitor.visitFieldInsn(Opcodes.PUTSTATIC, className, name, signature);
     }
 
+    public void storeStaticFieldArray(String type){
+        switch (type){
+            case "int":
+                currMethodVisitor.visitInsn(Opcodes.IASTORE);
+                break;
+            case "float":
+                currMethodVisitor.visitInsn(Opcodes.FASTORE);
+                break;
+            case "string":
+                currMethodVisitor.visitInsn(Opcodes.AASTORE);
+                break;
+        }
+    }
+
     public void getStaticField(String name, String type){
         switch(type){
             case "int":
@@ -169,10 +185,6 @@ public class ASMHelper {
     public void visitLocalVariable(String name, String signature ){
         currMethodVisitor.visitLocalVariable(name, signature,
                 null, currentScope.getStartLabel(), currentScope.getEndLabel(),currentScope.getIndex(name) );
-        if(!currentScope.isStartVisit()){
-            currMethodVisitor.visitLabel(currentScope.getStartLabel());
-            currentScope.setStartVisit(true);
-        }
     }
 
     public void updateLocalVariable(String name){
@@ -234,7 +246,6 @@ public class ASMHelper {
 
 
     public void loadLocalVariable(String name){
-        // TODO: STORE ARRAY
         String type = currentScope.getType(name).type();
         boolean arr = currentScope.getType(name).isArray();
         int index = currentScope.getIndex(name);

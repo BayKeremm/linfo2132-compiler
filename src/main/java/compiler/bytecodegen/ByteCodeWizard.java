@@ -164,11 +164,17 @@ public class ByteCodeWizard implements ByteVisitor{
         }
         declarator.codeGen(this);
 
-        if(localVariable){
+        if(constants.containsKey(name) || globals.containsKey(name)){
+            if(arr){
+                asmHelper.storeStaticFieldArray(type);
+
+            }else{
+                String signature = asmHelper.getSignature(type, declarator);
+                asmHelper.storeStaticField(name, signature);
+            }
+        }
+        else if(localVariable){
             asmHelper.updateLocalVariable(name);
-        }else{
-            String signature = asmHelper.getSignature(type, declarator);
-            asmHelper.storeStaticField(name, signature);
         }
     }
 
@@ -194,31 +200,6 @@ public class ByteCodeWizard implements ByteVisitor{
     }
 
 
-    @Override
-    public void visitFunctionCall(FunctionCallExpression functionCallExpression) {
-        Symbol identifier = functionCallExpression.getFunctionIdentifier();
-        var params = functionCallExpression.getFunctionExpressionParams();
-
-        if(procedureInfos.containsKey(identifier.image())){
-            switch (identifier.image()){
-                case "writeInt":
-                    writeInt(params.get(0));
-                    return;
-                case "writeFloat":
-                    writeFloat(params.get(0));
-                    return;
-                case "write":
-                    writeString(params.get(0));
-                    return;
-            }
-        }
-        if(params.isEmpty()){
-            // TODO: this is not only for empty things add parameter info as well
-            System.out.println("IMPLEMENT FUNCTION CALL EXPRESSION VISIT");
-            exit(1);
-        }
-
-    }
 
 
     @Override
@@ -231,17 +212,18 @@ public class ByteCodeWizard implements ByteVisitor{
 
     @Override
     public void visitIndexOp(IndexOp op) {
-        // TODO: UPDATE FOR LOCALS
         Expression index  = op.getIndex();
-        GenericType type = op.getType();
+        String type = op.getType().type();
         Symbol identifier = op.getIndexIdentifier();
-        if(localVariable){
+        String name = identifier.image();
+        if(constants.containsKey(name)  || globals.containsKey(name)){
+            asmHelper.getStaticFieldArray(identifier.image(), type);
+        }
+        else if(localVariable){
             asmHelper.loadLocalVariable(identifier.image());
-        }else{
-            asmHelper.getStaticFieldArray(identifier.image(), type.type());
         }
         index.codeGen(this);
-        switch (type.type()){
+        switch (type){
             case "int":
                 asmHelper.performSingleOp(Opcodes.IALOAD);
                 break;
@@ -258,14 +240,15 @@ public class ByteCodeWizard implements ByteVisitor{
 
     }
     public void prepIndexOp(IndexOp op){
-        // TODO: UPDATE FOR LOCALS
         Expression index  = op.getIndex();
         GenericType type = op.getType();
         Symbol identifier = op.getIndexIdentifier();
-        if(localVariable){
-            asmHelper.loadLocalVariable(identifier.image());
-        }else{
+        String name = identifier.image();
+        if(constants.containsKey(name) || globals.containsKey(name)){
             asmHelper.getStaticFieldArray(identifier.image(), type.type());
+        }
+        else if(localVariable){
+            asmHelper.loadLocalVariable(identifier.image());
         }
         index.codeGen(this);
     }
@@ -468,7 +451,32 @@ public class ByteCodeWizard implements ByteVisitor{
         rhs.codeGen(this);
 
         asmHelper.performComparison(Opcodes.IF_ICMPLT);
+    }    @Override
+    public void visitFunctionCall(FunctionCallExpression functionCallExpression) {
+        Symbol identifier = functionCallExpression.getFunctionIdentifier();
+        var params = functionCallExpression.getFunctionExpressionParams();
+
+        if(procedureInfos.containsKey(identifier.image())){
+            switch (identifier.image()){
+                case "writeInt":
+                    writeInt(params.get(0));
+                    return;
+                case "writeFloat":
+                    writeFloat(params.get(0));
+                    return;
+                case "write":
+                    writeString(params.get(0));
+                    return;
+            }
+        }
+        if(params.isEmpty()){
+            // TODO: this is not only for empty things add parameter info as well
+            System.out.println("IMPLEMENT FUNCTION CALL EXPRESSION VISIT");
+            exit(1);
+        }
+
     }
+
 
     void writeInt(Expression param){
         asmHelper.setPrintStream();

@@ -34,8 +34,8 @@ def void main() {
     elfje[0] = 0.2;
     writeFloat(elfje[0]);
 // --------------------------------------
-    //int local = 5;
-    //writeInt(local);
+    int local = 5;
+    writeInt(local);
 
 
 }
