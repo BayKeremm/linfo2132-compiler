@@ -469,12 +469,16 @@ public class ByteCodeWizard implements ByteVisitor{
 
     @Override
     public void visitIfElse(IfElseStatement ifElseStatement) {
+
+        // SCOPE
+        asmHelper.startNewScope();
+
         Block ifBlock = ifElseStatement.getIfBlock();
         Block elseBlock = ifElseStatement.getElseBlock();
         Expression condition = ifElseStatement.getIfCondition();
         condition.codeGen(this);
         Label elseLabel = asmHelper.getLabel();
-        asmHelper.performJumpOp(Opcodes.IFLE, elseLabel);
+        asmHelper.performJumpOp(Opcodes.IFEQ, elseLabel);
         for(Statement s: ifBlock.getStatements()){
             s.codeGen(this);
         }
@@ -485,11 +489,12 @@ public class ByteCodeWizard implements ByteVisitor{
             s.codeGen(this);
         }
         asmHelper.visitLabel(endLabel);
+        asmHelper.popScope();
     }
 
     @Override
     public void visitFor(ForStatement forStatement) {
-        // TODO: last you did the uninit var
+        asmHelper.startNewScope();
         Block forBlock = forStatement.getForBlock();
         Statement pos0 = forStatement.getPos0();
         Expression pos1 = forStatement.getPos1();
@@ -510,7 +515,6 @@ public class ByteCodeWizard implements ByteVisitor{
         //  - load loop variable
         pos1.codeGen(this);
         Label endLabel = asmHelper.getLabel();
-        // TODO: What if ==> i > 0
         asmHelper.performJumpOp(Opcodes.IFEQ, endLabel);
 
         // Step 4: inside the loop
@@ -526,11 +530,38 @@ public class ByteCodeWizard implements ByteVisitor{
 
         // Step 7: end label
         asmHelper.visitLabel(endLabel);
+        asmHelper.popScope();
 
+    }
 
+    @Override
+    public void visitWhile(WhileStatement whileStatement) {
+        asmHelper.startNewScope();
+        Block whileBlock = whileStatement.getWhileBlock();
+        Expression condition = whileStatement.getWhileCondition();
 
+        // Step 1: Start of the loop
+        Label startLabel = asmHelper.getLabel();
+        asmHelper.visitLabel(startLabel);
 
-        // pos2 is the increment to the loop counter
+        // Step 2: Generate loop condition
+        //  - pos1 is the condition (e.g., i < 10)
+        //  - load loop variable
+        condition.codeGen(this);
+        Label endLabel = asmHelper.getLabel();
+        asmHelper.performJumpOp(Opcodes.IFEQ, endLabel);
+
+        // Step 3: inside the loop
+        for(Statement s: whileBlock.getStatements()){
+            s.codeGen(this);
+        }
+
+        // Step 4: jump back to the start
+        asmHelper.performJumpOp(Opcodes.GOTO,startLabel);
+
+        // Step 5: end label
+        asmHelper.visitLabel(endLabel);
+        asmHelper.popScope();
 
     }
 

@@ -5,8 +5,10 @@ import org.objectweb.asm.Label;
 
 import java.util.HashMap;
 
+import static java.lang.System.exit;
+
 public class LocalScope {
-    int index = 0;
+    int currIndex = 0;
     HashMap<String, Integer> varIndexTable;
     HashMap<String, GenericType> varTypeTable;
     LocalScope prevScope;
@@ -14,35 +16,20 @@ public class LocalScope {
     Label startLabel;
     Label endLabel;
 
-    boolean startVisit;
-
-
-    boolean endVisit;
-
     public LocalScope() {
         varIndexTable = new HashMap<>();
         varTypeTable = new HashMap<>();
         this.startLabel = new Label();
         this.endLabel = new Label();
-        startVisit = false;
-        endVisit = false;
     }
 
-    public boolean isStartVisit() {
-        return startVisit;
+    public void setStartIndex(int index){
+        this.currIndex = index;
+    }
+    public int getCurrIndex(){
+        return this.currIndex;
     }
 
-    public void setStartVisit(boolean startVisit) {
-        this.startVisit = startVisit;
-    }
-
-    public boolean isEndVisit() {
-        return endVisit;
-    }
-
-    public void setEndVisit(boolean endVisit) {
-        this.endVisit = endVisit;
-    }
     public LocalScope getPrevScope() {
         return prevScope;
     }
@@ -68,16 +55,52 @@ public class LocalScope {
     }
 
     public int getIndex(String name) {
-        return varIndexTable.get(name);
+        if(varIndexTable.containsKey(name)){
+            return varIndexTable.get(name);
+        }
+        else{
+            var prev = this.prevScope;
+            while(prev != null){
+                var ret = prev.getIndex(name);
+                if(ret != -1){
+                    return ret;
+                }
+                else{
+                    prev = prev.prevScope;
+                }
+            }
+
+        }
+        System.err.println("ERROR IN GET INDEX LOCAL SCOPE");
+        exit(1);
+        return -1;
     }
     public GenericType getType(String name){
-        return varTypeTable.get(name);
+        if(varTypeTable.containsKey(name)){
+            return varTypeTable.get(name);
+        }
+        else{
+            var prev = this.prevScope;
+            while(prev != null){
+                var ret = prev.getType(name);
+                if(ret != null){
+                    return ret;
+                }
+                else{
+                    prev = prev.prevScope;
+                }
+            }
+
+        }
+        System.err.println("ERROR IN GET TYPE LOCAL SCOPE");
+        exit(1);
+        return null;
     }
 
 
     public void addToTable(String name, GenericType type) {
-        varIndexTable.put(name, index);
+        varIndexTable.put(name, currIndex);
         varTypeTable.put(name, type);
-        index++;
+        currIndex++;
     }
 }

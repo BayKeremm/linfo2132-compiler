@@ -35,14 +35,25 @@ public class ASMHelper {
         // init new local scope
         LocalScope newScope = new LocalScope();
         newScope.setPrevScope(currentScope);
+        int index = 0;
+        if(currentScope != null){
+            index = currentScope.getCurrIndex();
+        }
         currentScope = newScope;
-        currMethodVisitor.visitLabel(currentScope.getStartLabel());
-        currentScope.setStartVisit(true);
+        currentScope.setStartIndex(index);
+        //currMethodVisitor.visitLabel(currentScope.getStartLabel());
+        //currentScope.setStartVisit(true);
+    }
+    public void popScope(){
+        //if(!currentScope.isEndVisit()){
+        //    currMethodVisitor.visitLabel(currentScope.getEndLabel());
+        //    currentScope.setEndVisit(true);
+        //}
+        currentScope = currentScope.getPrevScope();
     }
 
     public void addLocalToScope(String name, GenericType type){
         currentScope.addToTable(name,type);
-
     }
 
 
@@ -105,13 +116,6 @@ public class ASMHelper {
         currMethodVisitor.visitCode();
     }
 
-    public void popScope(){
-        if(!currentScope.isEndVisit()){
-            currMethodVisitor.visitLabel(currentScope.getEndLabel());
-            currentScope.setEndVisit(true);
-        }
-        currentScope = currentScope.getPrevScope();
-    }
 
     public void endMethodVisitor(){
         // Visits a zero operand instruction.
@@ -314,10 +318,10 @@ public class ASMHelper {
         if(literal.equals("true") || literal.equals("false")){
             switch (literal){
                 case "true":
-                    currMethodVisitor.visitLdcInsn(Opcodes.ICONST_1);
+                    currMethodVisitor.visitInsn(Opcodes.ICONST_1);
                     return;
                 case "false":
-                    currMethodVisitor.visitLdcInsn(Opcodes.ICONST_0);
+                    currMethodVisitor.visitInsn(Opcodes.ICONST_0);
                     return;
             }
         }

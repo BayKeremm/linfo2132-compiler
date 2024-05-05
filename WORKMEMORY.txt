@@ -12,3 +12,5 @@ bugs:
     j = i + 1;
     => cannot turn i + 1 to float
 
+    without Else statement bug
+

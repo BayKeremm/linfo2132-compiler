@@ -59,6 +59,7 @@ public class WhileStatement extends Statement {
 
     @Override
     public void codeGen(ByteVisitor b) {
+        b.visitWhile(this);
 
     }
 }

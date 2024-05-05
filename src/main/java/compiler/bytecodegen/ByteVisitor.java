@@ -52,5 +52,7 @@ public interface ByteVisitor {
 
     void visitFor(ForStatement forStatement);
 
+    void visitWhile(WhileStatement whileStatement);
+
 
 }
