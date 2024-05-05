@@ -1,0 +1,11 @@
+struct Point {
+    int x;
+    int y;
+}
+Point pp = Point(2,4);
+def void main(){
+    //write("hallo");
+    Point p = Point(10,20);
+    writeInt(pp.x + p.x);
+    writeInt(pp.y + p.y);
+}

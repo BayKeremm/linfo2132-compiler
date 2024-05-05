@@ -15,10 +15,7 @@ import java.util.HashMap;
 
 import static java.lang.System.exit;
 
-// TODO: PROMOTING DOES NOT WORK => look at I2F opcode
-// TODO: LOCAL VARIABLES
 // TODO: New functions, signature creation based on parameters
-// TODO: IF ELSE THINGS
 // TODO: STRUCTS
 
 
@@ -27,11 +24,14 @@ public class ByteCodeWizard implements ByteVisitor{
     private Program program;
     private String programName;
     private Boolean localVariable = false;
+    private Boolean structDeclarations = false;
 
 
     HashMap<String, ArrayList<ProcedureInfo>> procedureInfos;
     HashMap<String, String> constants;
     HashMap<String, String> globals;
+    HashMap<String, StructDeclaration> structs;
+    HashMap<String, HashMap<String, String>> structFields;
 
 
     ASMHelper asmHelper;
@@ -42,6 +42,8 @@ public class ByteCodeWizard implements ByteVisitor{
         this.procedureInfos = new HashMap<>();
         this.constants = new HashMap<>();
         this.globals = new HashMap<>();
+        this.structs = new HashMap<>();
+        this.structFields = new HashMap<>();
         addBuiltInFunctions();
         for(ConstantVariable constantVariable: program.constantVariables){
             constants.put(constantVariable.getVariableName(), constantVariable.typeDeclaration().getTypeSymbol().image());
@@ -49,11 +51,16 @@ public class ByteCodeWizard implements ByteVisitor{
         for(VariableGod variable: program.globals){
             globals.put(variable.getVariableName(), variable.typeDeclaration().getTypeSymbol().image());
         }
+        for(StructDeclaration s : program.structDeclarations){
+           structs.put(s.getStructIdentifier().getRep(), s);
+           HashMap<String, String> fields = new HashMap<>();
+           for(Statement e: s.getStructBlock().getStatements()){
+                fields.put(e.getVariableName(),e.getType().type());
+           }
+           structFields.put(s.getStructIdentifier().getRep(), fields);
 
-        asmHelper = new ASMHelper(programName, constants, globals);
-
-
-
+        }
+        asmHelper = new ASMHelper(programName, constants, globals, structs);
     }
 
     public void codeGen(){
@@ -61,6 +68,14 @@ public class ByteCodeWizard implements ByteVisitor{
     }
 
     public void visitProgram(Program program){
+        // Generate a class for each struct type
+        structDeclarations = true;
+        for(var d: program.structDeclarations){
+            d.codeGen(this);
+        }
+        structDeclarations = false;
+
+        // START THE MAIN CLASS
         asmHelper.startClassWriter();
 
         if(!constants.isEmpty() || !globals.isEmpty()){
@@ -74,8 +89,6 @@ public class ByteCodeWizard implements ByteVisitor{
             asmHelper.endMethodVisitor();
         }
 
-        // TODO: BIG FUCKING TODO
-        // Generate a class for each struct type
 
         // Go through all the procedures
         this.localVariable=true;
@@ -89,8 +102,6 @@ public class ByteCodeWizard implements ByteVisitor{
 
     @Override
     public void visitProcedure(Procedure procedure) {
-
-
         asmHelper.startProcedureMethod(procedure.getProcedureIdentifier().image());
 
         asmHelper.startNewScope();
@@ -135,8 +146,12 @@ public class ByteCodeWizard implements ByteVisitor{
             asmHelper.visitLocalVariable(name, signature);
             asmHelper.pushDefaultValue(name);
             asmHelper.storeLocalVariable(name);
+        }else if(structDeclarations){
+            String signature = asmHelper.getUnInitSignature(name, type);
+            asmHelper.visitStructField(name, signature);
         }else{
             System.err.println("SIKE, YOU CANNOT HAVE UNINIT VAR OUTSIDE PROCEDURES");
+            exit(1);
         }
 
     }
@@ -565,6 +580,41 @@ public class ByteCodeWizard implements ByteVisitor{
 
     }
 
+    @Override
+    public void visitStructDeclaration(StructDeclaration declaration) {
+        Expression identifier = declaration.getStructIdentifier();
+        Block structBlock = declaration.getStructBlock();
+        // start the class writer for the struct
+        asmHelper.startClassWriter(identifier.getRep());
+
+        // go through the fields of the struct stored in the block of declaration
+        StringBuilder sig = new StringBuilder();
+        sig.append("(");
+        for(Statement field : structBlock.getStatements()){
+            field.codeGen(this);
+            String t = field.getType().type();
+            sig.append(asmHelper.getSignature(t,null));
+        }
+        sig.append(")V");
+
+        HashMap<String, String> fields = structFields.get(identifier.getRep());
+
+        asmHelper.writeClass(identifier.getRep(), String.valueOf(sig), fields);
+
+
+    }
+
+    @Override
+    public void visitDotOp(DotOperation op) {
+        Expression rhs = op.getRhs();
+        Expression lhs = op.getLhs();
+        lhs.codeGen(this);
+        String signature = asmHelper.getSignature(
+                structFields.get(lhs.getType().type()).get(rhs.getRep()), null);
+
+        asmHelper.getFieldOfStruct(lhs.getType().type(), rhs.getRep(), signature);
+    }
+
 
     @Override
     public void visitFunctionCall(FunctionCallExpression functionCallExpression) {
@@ -584,6 +634,21 @@ public class ByteCodeWizard implements ByteVisitor{
                     return;
             }
         }
+
+        if(structs.containsKey(identifier.image())){
+            asmHelper.createStructInstance(identifier.image());
+            StringBuilder signature = new StringBuilder();
+            signature.append("(");
+            for(Expression p: params){
+               p.codeGen(this);
+               signature.append(asmHelper.getSignature(p.getType().type(), null));
+            }
+            signature.append(")V");
+            // get the function signature from params
+            asmHelper.constructStructInstance(identifier.image(),
+                    String.valueOf(signature));
+        }
+
         if(params.isEmpty()){
             // TODO: this is not only for empty things add parameter info as well
             System.out.println("IMPLEMENT FUNCTION CALL EXPRESSION VISIT");

@@ -54,5 +54,9 @@ public interface ByteVisitor {
 
     void visitWhile(WhileStatement whileStatement);
 
+    void visitStructDeclaration(StructDeclaration declaration);
+
+    void visitDotOp(DotOperation op);
+
 
 }

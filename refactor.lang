@@ -5,12 +5,22 @@ final float z = 3.0 % 2;
 final int xx = 10+(2*(-2));
 final float zz = 3.0 % 2;
 
+struct Point {
+    int x;
+    int y;
+}
+Point pp = Point(2,4);
+
 int bruh = 5;
 int[] manyak = int[10];
 bool yy = !false;
 
 int a = 3;
 def void main() {
+// STRUCT TEST
+    Point p = Point(10,20);
+    writeInt(pp.x + p.x);
+    writeInt(pp.y + p.y);
 
 // IF ELSE TEST
     int i = 1;
@@ -32,17 +42,39 @@ def void main() {
     }
     writeInt(i);
 
-
-    string empty;
-    write(empty);
-
-
+// WHILE TEST
     int iii = 0;
     while(iii < 3){
         write("iii is:");
         writeInt(iii);
         iii = iii + 1;
+        int i = 2;
+        write("i in while scope is: ");
+        writeInt(i);
     }
+
+// COMBINED CONTROL TESTS
+    int idx;
+    for(idx=0, idx < 10, idx = idx+1){
+        int i = 0;
+        while(i < 2){
+            write("i inside while combined: ");
+            writeInt(i);
+            i = i + 1;
+            if(idx % 2 == 0){
+                write("idx is even ");
+                writeInt(idx);
+            }else{
+                write("idx is oneven ");
+                writeInt(idx);
+            }
+        }
+    }
+
+    string empty;
+    write(empty);
+
+
 
 
     float j;

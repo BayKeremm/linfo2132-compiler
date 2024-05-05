@@ -3,6 +3,8 @@ package compiler.bytecodegen;
 import compiler.Parser.GenericType;
 import compiler.Parser.expressions.ArrayInitializer;
 import compiler.Parser.expressions.Expression;
+import compiler.Parser.expressions.FunctionCallExpression;
+import compiler.Parser.statements.StructDeclaration;
 import compiler.Parser.statements.VariableGod;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
@@ -11,25 +13,104 @@ import org.objectweb.asm.Opcodes;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ASMHelper {
     private final String className;
 
     HashMap<String, String> constants;
     HashMap<String, String> globals;
+    HashMap<String, StructDeclaration> structDeclarations;
     LocalScope currentScope;
 
     ClassWriter classWriter;
+    ClassWriter previousClassWriter;
 
     MethodVisitor currMethodVisitor;
 
     public ASMHelper(String className, HashMap<String, String> constants,
-                     HashMap<String, String> globals) {
+                     HashMap<String, String> globals, HashMap<String, StructDeclaration> structDeclarations) {
         this.className = className;
         this.constants = constants;
         this.globals = globals;
+        this.structDeclarations = structDeclarations;
     }
+
+    public void startClassWriter(){
+        var cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+        cw.visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC, className, null,
+                "java/lang/Object", null);
+
+        this.classWriter = cw;
+    }
+    public void writeClass(){
+        // write class file
+        classWriter.visitEnd();
+
+        var bytes = classWriter.toByteArray();
+        try(var outFile = new FileOutputStream(className+".class")) {
+            outFile.write(bytes);
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void startClassWriter(String structName){
+        var cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+        cw.visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC, structName, null,
+                "java/lang/Object", null);
+
+        this.classWriter = cw;
+    }
+    // Only for structs
+    public void writeClass(String structName, String signature, HashMap<String, String> fields){
+        // Generate constructor for the struct class
+        MethodVisitor constructor = classWriter.visitMethod(Opcodes.ACC_PUBLIC,
+                "<init>", signature, null, null);
+        constructor.visitCode();
+        constructor.visitVarInsn(Opcodes.ALOAD, 0); // Load 'this'
+        constructor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
+
+        int index = 1;
+        for (Map.Entry<String, String> entry : fields.entrySet()) {
+            String fieldName = entry.getKey();
+            String fieldType = entry.getValue();
+            constructor.visitVarInsn(Opcodes.ALOAD, 0); // Load 'this'
+            constructor.visitVarInsn(Opcodes.ILOAD, index);
+            // TODO: what if the field type is a string
+            String sig = getSignature(fieldType, null);
+            constructor.visitFieldInsn(Opcodes.PUTFIELD, structName, fieldName, sig);
+            index++;
+        }
+
+        constructor.visitInsn(Opcodes.RETURN);
+        constructor.visitMaxs(-1, -1);
+        constructor.visitEnd();
+
+        // write class file
+        classWriter.visitEnd();
+
+        var bytes = classWriter.toByteArray();
+        try(var outFile = new FileOutputStream(structName+".class")) {
+            outFile.write(bytes);
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+        this.classWriter = null;
+
+    }
+
+    public void getFieldOfStruct(String userType, String field,   String signature){
+        currMethodVisitor.visitFieldInsn(Opcodes.GETFIELD,
+                userType, field, signature);
+
+    }
+
 
     public void startNewScope(){
         // init new local scope
@@ -54,34 +135,6 @@ public class ASMHelper {
 
     public void addLocalToScope(String name, GenericType type){
         currentScope.addToTable(name,type);
-    }
-
-
-    public void writeClass(){
-        // write class file
-        classWriter.visitEnd();
-
-        var bytes = classWriter.toByteArray();
-        try(var outFile = new FileOutputStream(className+".class")) {
-            outFile.write(bytes);
-        }
-        catch(IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public void startClassWriter(){
-        /**
-        *
-        ClassWriter:visit
-            Visits the header of the class.
-        * */
-        var cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-        cw.visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC, className, null,
-                "java/lang/Object", null);
-
-        this.classWriter = cw;
     }
 
     public void startProcedureMethod(String procedureName){
@@ -166,6 +219,9 @@ public class ASMHelper {
             case "string":
                 this.currMethodVisitor.visitFieldInsn(Opcodes.GETSTATIC, className, name, "Ljava/lang/String;");
                 break;
+            default:
+                this.currMethodVisitor.visitFieldInsn(Opcodes.GETSTATIC, className, name, "L"+type+";");
+                break;
         }
     }
 
@@ -225,12 +281,13 @@ public class ASMHelper {
     public void storeLocalVariable(String name){
         int index = currentScope.getIndex(name);
 
-        String type = currentScope.getType(name).type();
-        boolean arr = currentScope.getType(name).isArray();
+        GenericType t = currentScope.getType(name);
+        String type = t.type();
+        boolean arr = t.isArray();
 
         if(arr){
             this.currMethodVisitor.visitVarInsn(Opcodes.ASTORE,index );
-        }else{
+        } else{
             switch(type){
                 case "int", "bool":
                     this.currMethodVisitor.visitVarInsn(Opcodes.ISTORE,index );
@@ -238,7 +295,7 @@ public class ASMHelper {
                 case "float":
                     this.currMethodVisitor.visitVarInsn(Opcodes.FSTORE,index );
                     break;
-                case "string":
+                default: // for strings and structs
                     this.currMethodVisitor.visitVarInsn(Opcodes.ASTORE,index );
                     break;
             }
@@ -263,7 +320,7 @@ public class ASMHelper {
                 case "float":
                     this.currMethodVisitor.visitVarInsn(Opcodes.FLOAD, index);
                     break;
-                case "string":
+                default: // for strings and structs
                     this.currMethodVisitor.visitVarInsn(Opcodes.ALOAD, index);
                     break;
             }
@@ -281,6 +338,22 @@ public class ASMHelper {
     public void visitConstantVariable(String name, String signature){
         this.classWriter.visitField(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL,
                 name, signature, null, null).visitEnd();
+    }
+
+    public void visitStructField(String name, String signature){
+        this.classWriter.visitField(Opcodes.ACC_PUBLIC,
+                name, signature, null, null).visitEnd();
+
+    }
+
+    public void createStructInstance(String name){
+        currMethodVisitor.visitTypeInsn(Opcodes.NEW, name);
+        currMethodVisitor.visitInsn(Opcodes.DUP);
+    }
+
+    public void constructStructInstance(String name, String signature){
+        currMethodVisitor.visitMethodInsn(Opcodes.INVOKESPECIAL,
+                name, "<init>", signature, false);
     }
 
     public void visitArrayInit(String type){
@@ -406,7 +479,7 @@ public class ASMHelper {
 
     public void printString(){
         this.currMethodVisitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream",
-                "println", "(Ljava/lang/String;)V", false);
+                "print", "(Ljava/lang/String;)V", false);
     }
 
     public String getSignature(String type, Expression declarator){
@@ -440,6 +513,8 @@ public class ASMHelper {
                     signature = "Z";
                 }
                 break;
+            default:
+                signature = "L"+type+";";
         }
         return signature;
     }
@@ -456,9 +531,19 @@ public class ASMHelper {
     }
 
     public String getLocalSignature(VariableGod variable){
-        Expression declarator = variable.declarator();
-        String type = declarator.getType().type();
-        return getSignature(type,declarator);
+        String typeName = "";
+        if(variable.declarator() instanceof FunctionCallExpression){
+           typeName = ((FunctionCallExpression) variable.declarator())
+                   .getFunctionIdentifier().image();
+        }
+        if(structDeclarations.containsKey(typeName)){
+            //return "L"+typeName;
+            return "L"+typeName+";";
+        }else{
+            Expression declarator = variable.declarator();
+            String type = declarator.getType().type();
+            return getSignature(type,declarator);
+        }
     }
 
     public String getUnInitSignature(String name, GenericType type){

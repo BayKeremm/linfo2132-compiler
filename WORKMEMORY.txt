@@ -7,6 +7,9 @@ start with the operators
 then go to
 deal with scopes
 
+
+
+
 bugs:
     float j;
     j = i + 1;

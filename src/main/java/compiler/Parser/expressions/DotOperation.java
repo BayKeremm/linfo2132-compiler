@@ -49,6 +49,7 @@ public class DotOperation extends Expression {
 
     @Override
     public void codeGen(ByteVisitor b) {
+        b.visitDotOp(this);
 
     }
 }

@@ -6,6 +6,13 @@ import compiler.semantics.TypeVisitor;
 
 public class StructDeclaration extends Statement {
     Expression identifier;
+    Block block;
+
+    public StructDeclaration(int line, Expression identifier, Block block) {
+        super(line);
+        this.identifier = identifier;
+        this.block = block;
+    }
 
     public Expression getStructIdentifier() {
         return identifier;
@@ -15,13 +22,6 @@ public class StructDeclaration extends Statement {
         return block;
     }
 
-    Block block;
-
-    public StructDeclaration(int line, Expression identifier, Block block) {
-        super(line);
-        this.identifier = identifier;
-        this.block = block;
-    }
 
     @Override
     public void prettyPrint(String indentation) {
@@ -51,6 +51,7 @@ public class StructDeclaration extends Statement {
 
     @Override
     public void codeGen(ByteVisitor b) {
+        b.visitStructDeclaration(this);
 
     }
 }
