@@ -19,8 +19,8 @@ import java.util.Map;
 public class ASMHelper {
     private final String className;
 
-    HashMap<String, String> constants;
-    HashMap<String, String> globals;
+    HashMap<String, GenericType> constants;
+    HashMap<String, GenericType> globals;
     HashMap<String, StructDeclaration> structDeclarations;
     LocalScope currentScope;
 
@@ -29,8 +29,8 @@ public class ASMHelper {
 
     MethodVisitor currMethodVisitor;
 
-    public ASMHelper(String className, HashMap<String, String> constants,
-                     HashMap<String, String> globals, HashMap<String, StructDeclaration> structDeclarations) {
+    public ASMHelper(String className, HashMap<String, GenericType> constants,
+                     HashMap<String, GenericType> globals, HashMap<String, StructDeclaration> structDeclarations) {
         this.className = className;
         this.constants = constants;
         this.globals = globals;
@@ -219,45 +219,8 @@ public class ASMHelper {
         }
     }
 
-    public void getStaticField(String name, String type){
-        switch(type){
-            case "int":
-                this.currMethodVisitor.visitFieldInsn(Opcodes.GETSTATIC, className, name, "I");
-                break;
-            case "float":
-                this.currMethodVisitor.visitFieldInsn(Opcodes.GETSTATIC, className, name, "F");
-                break;
-            case "bool":
-                this.currMethodVisitor.visitFieldInsn(Opcodes.GETSTATIC, className, name, "Z");
-                break;
-            case "string":
-                this.currMethodVisitor.visitFieldInsn(Opcodes.GETSTATIC, className, name, "Ljava/lang/String;");
-                break;
-            default:
-                this.currMethodVisitor.visitFieldInsn(Opcodes.GETSTATIC, className, name, "L"+type+";");
-                break;
-        }
-    }
-
-    public void getStructField(String name, String type){
-        this.currMethodVisitor.visitFieldInsn(Opcodes.GETSTATIC, className, name, "L"+type+";");
-    }
-
-    public void getStaticFieldArray(String name, String type){
-        switch(type){
-            case "int":
-                this.currMethodVisitor.visitFieldInsn(Opcodes.GETSTATIC, className, name, "[I");
-                break;
-            case "float":
-                this.currMethodVisitor.visitFieldInsn(Opcodes.GETSTATIC, className, name, "[F");
-                break;
-            case "bool":
-                this.currMethodVisitor.visitFieldInsn(Opcodes.GETSTATIC, className, name, "[Z");
-                break;
-            case "string":
-                this.currMethodVisitor.visitFieldInsn(Opcodes.GETSTATIC, className, name, "[Ljava/lang/String;");
-                break;
-        }
+    public void getStaticFieldV2(String name, String signature){
+        this.currMethodVisitor.visitFieldInsn(Opcodes.GETSTATIC, className, name, signature);
     }
 
     public void visitLocalVariable(String name, String signature ){
@@ -564,9 +527,9 @@ public class ASMHelper {
         String name = variable.getVariableName();
         String type="";
         if(constants.containsKey(name)){
-            type = constants.get(name);
+            type = constants.get(name).type();
         }else {
-            type= globals.get(name);
+            type= globals.get(name).type();
         }
         Expression declarator = variable.declarator();
         return getSignature(type,declarator);

@@ -29,8 +29,8 @@ public class ByteCodeWizard implements ByteVisitor{
 
 
     HashMap<String, ArrayList<ProcedureInfo>> procedureInfos;
-    HashMap<String, String> constants;
-    HashMap<String, String> globals;
+    HashMap<String, GenericType> constants;
+    HashMap<String, GenericType> globals;
     HashMap<String, StructDeclaration> structs;
     LinkedHashMap<String, LinkedHashMap<String, GenericType>> structFields;
 
@@ -47,10 +47,14 @@ public class ByteCodeWizard implements ByteVisitor{
         this.structFields = new LinkedHashMap<>();
         addBuiltInFunctions();
         for(ConstantVariable constantVariable: program.constantVariables){
-            constants.put(constantVariable.getVariableName(), constantVariable.typeDeclaration().getTypeSymbol().image());
+            constants.put(constantVariable.getVariableName(),
+                    new Type(constantVariable.typeDeclaration().getTypeSymbol().image(),
+                            constantVariable.typeDeclaration().getIsArray()));
         }
         for(VariableGod variable: program.globals){
-            globals.put(variable.getVariableName(), variable.typeDeclaration().getTypeSymbol().image());
+            globals.put(variable.getVariableName(),
+                    new Type(variable.typeDeclaration().getTypeSymbol().image(),
+                            variable.typeDeclaration().getIsArray()));
         }
         for(StructDeclaration s : program.structDeclarations){
            structs.put(s.getStructIdentifier().getRep(), s);
@@ -188,7 +192,11 @@ public class ByteCodeWizard implements ByteVisitor{
         Symbol identifier = op.getIndexIdentifier();
         String name = identifier.image();
         if(constants.containsKey(name) || globals.containsKey(name)){
-            asmHelper.getStaticFieldArray(identifier.image(), type.type());
+            String sig = asmHelper.getSignature(type.type(), null);
+            // We know it is an array
+            sig = "["+sig;
+            //asmHelper.getStaticFieldArray(identifier.image(), type.type());
+            asmHelper.getStaticFieldV2(identifier.image(), sig);
         }
         else if(localVariable){
             asmHelper.loadLocalVariable(identifier.image());
@@ -224,7 +232,8 @@ public class ByteCodeWizard implements ByteVisitor{
                 GenericType fieldType = structFields.get(identifier.getLhs().getType().type())
                         .get(fieldName);
                 GenericType userType = identifier.getLhs().getType();
-                asmHelper.getStructField(name, userType.type() );
+                //asmHelper.getStructField(name, userType.type() );
+                asmHelper.getStaticFieldV2(name, "L"+userType.type()+";" );
                 declarator.codeGen(this);
                 asmHelper.putStructField(userType.type(),fieldName, fieldType);
             }
@@ -264,7 +273,7 @@ public class ByteCodeWizard implements ByteVisitor{
     @Override
     public void visitIdentifier(IdentifierExpression expression) {
         String name = expression.getIdentifierSymbol().image();
-        String type = null;
+        GenericType type = null;
         Boolean constant = false;
         if(constants.containsKey(name) ){
             type =  constants.get(name);
@@ -275,7 +284,11 @@ public class ByteCodeWizard implements ByteVisitor{
         }
         // Constant
         if(constant){
-            asmHelper.getStaticField(name, type);
+            String sig = asmHelper.getSignature(type.type(), null);
+            if(type.isArray()){
+                sig = "["+sig;
+            }
+            asmHelper.getStaticFieldV2(name, sig);
         }else{
             asmHelper.loadLocalVariable(name);
         }
@@ -298,12 +311,24 @@ public class ByteCodeWizard implements ByteVisitor{
         String type = op.getType().type();
         Symbol identifier = op.getIndexIdentifier();
         String name = identifier.image();
-        if(constants.containsKey(name)  || globals.containsKey(name)){
-            asmHelper.getStaticFieldArray(identifier.image(), type);
+
+        GenericType variableType = null;
+        if (constants.containsKey(name)) {
+            variableType = constants.get(name);
+        } else if (globals.containsKey(name)) {
+            variableType = globals.get(name);
         }
-        else if(localVariable){
-            asmHelper.loadLocalVariable(identifier.image());
+
+        if (variableType != null) {
+            String sig = asmHelper.getSignature(variableType.type(), null);
+            if (variableType.isArray()) {
+                sig = "[" + sig;
+            }
+            asmHelper.getStaticFieldV2(name, sig);
+        } else if (localVariable) {
+            asmHelper.loadLocalVariable(name);
         }
+
         index.codeGen(this);
         switch (type){
             case "int":
