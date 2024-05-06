@@ -16,4 +16,6 @@ bugs:
     => cannot turn i + 1 to float
 
     without Else statement bug
+    Dot operation array access bug
+    - p.history[0] gets null type and causes exception
 

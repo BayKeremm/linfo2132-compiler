@@ -9,6 +9,13 @@ struct Point {
     int x;
     int y;
 }
+
+struct PointV2 {
+    int x;
+    int y;
+    int [] history;
+}
+
 Point pp = Point(2,4);
 
 int bruh = 5;
@@ -22,13 +29,24 @@ def void main() {
     writeInt(pp.x + p.x);
     writeInt(pp.y + p.y);
 
+    PointV2 p2 = PointV2(10,20, int[5]);
+
+    int[] hist = p2.history;
+    hist[0]=2;
+    write("we are expecting a 2: ");
+    writeInt(hist[0]);
+
+    int[] hist2 = p2.history;
+    write("we are expecting another 2: ");
+    writeInt(hist2[0]);
+
 // IF ELSE TEST
     int i = 1;
     bool b = false;
     if(b){
         writeInt(i);
     }else{
-        int i = 2;
+        int i = 156;
         writeInt(i);
     }
     writeInt(i);

@@ -3,6 +3,7 @@ package compiler.Parser.expressions;
 import compiler.Lexer.Token;
 import compiler.Parser.GenericType;
 import compiler.Parser.statements.Statement;
+import compiler.bytecodegen.ByteVisitor;
 import compiler.semantics.Type;
 
 public abstract class Expression extends Statement {
@@ -33,6 +34,10 @@ public abstract class Expression extends Statement {
     }
 
     public abstract String getRep();
+
+    public void prepCodeGen(ByteVisitor b){
+
+    }
 
     public GenericType getType(){
         GenericType tl = this.lhs.getType();

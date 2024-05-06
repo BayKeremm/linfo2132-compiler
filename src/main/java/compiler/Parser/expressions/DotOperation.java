@@ -15,7 +15,7 @@ public class DotOperation extends Expression {
 
     @Override
     public String getRep() {
-        return null;
+        return lhs.getRep();
     }
 
     @Override
@@ -45,6 +45,11 @@ public class DotOperation extends Expression {
         else if (!this.operator.equals(a.operator)) return false;
 
         return true;
+    }
+
+    @Override
+    public void prepCodeGen(ByteVisitor b) {
+        b.prepDotOp(this);
     }
 
     @Override

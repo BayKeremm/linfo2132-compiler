@@ -12,6 +12,7 @@ import org.objectweb.asm.Opcodes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import static java.lang.System.exit;
 
@@ -31,7 +32,7 @@ public class ByteCodeWizard implements ByteVisitor{
     HashMap<String, String> constants;
     HashMap<String, String> globals;
     HashMap<String, StructDeclaration> structs;
-    HashMap<String, HashMap<String, String>> structFields;
+    LinkedHashMap<String, LinkedHashMap<String, GenericType>> structFields;
 
 
     ASMHelper asmHelper;
@@ -43,7 +44,7 @@ public class ByteCodeWizard implements ByteVisitor{
         this.constants = new HashMap<>();
         this.globals = new HashMap<>();
         this.structs = new HashMap<>();
-        this.structFields = new HashMap<>();
+        this.structFields = new LinkedHashMap<>();
         addBuiltInFunctions();
         for(ConstantVariable constantVariable: program.constantVariables){
             constants.put(constantVariable.getVariableName(), constantVariable.typeDeclaration().getTypeSymbol().image());
@@ -53,9 +54,9 @@ public class ByteCodeWizard implements ByteVisitor{
         }
         for(StructDeclaration s : program.structDeclarations){
            structs.put(s.getStructIdentifier().getRep(), s);
-           HashMap<String, String> fields = new HashMap<>();
+           LinkedHashMap<String, GenericType> fields = new LinkedHashMap<>();
            for(Statement e: s.getStructBlock().getStatements()){
-                fields.put(e.getVariableName(),e.getType().type());
+                fields.put(e.getVariableName(),e.getType());
            }
            structFields.put(s.getStructIdentifier().getRep(), fields);
 
@@ -125,6 +126,9 @@ public class ByteCodeWizard implements ByteVisitor{
             GenericType type = declarator.getType();
             asmHelper.addLocalToScope(name, type);
             String signature = asmHelper.getLocalSignature(variable);
+            if(type.isArray()){
+               signature = "["+signature;
+            }
             asmHelper.visitLocalVariable(name, signature);
             declarator.codeGen(this);
             asmHelper.storeLocalVariable(name);
@@ -167,6 +171,33 @@ public class ByteCodeWizard implements ByteVisitor{
     }
 
     @Override
+    public void prepDotOp(DotOperation op) {
+        String name = op.getRep();
+        String fieldName = op.getRhs().getRep();
+        GenericType fieldType = structFields.get(op.getLhs().getType().type())
+                .get(fieldName);
+        GenericType userType = op.getLhs().getType();
+
+        asmHelper.loadStructField(name);
+    }
+
+    @Override
+    public void prepIndexOp(IndexOp op) {
+        Expression index  = op.getIndex();
+        GenericType type = op.getType();
+        Symbol identifier = op.getIndexIdentifier();
+        String name = identifier.image();
+        if(constants.containsKey(name) || globals.containsKey(name)){
+            asmHelper.getStaticFieldArray(identifier.image(), type.type());
+        }
+        else if(localVariable){
+            asmHelper.loadLocalVariable(identifier.image());
+        }
+        index.codeGen(this);
+
+    }
+
+    @Override
     public void visitScopeVariable(ScopeVariable variable) {
         boolean arr = false;
 
@@ -175,35 +206,57 @@ public class ByteCodeWizard implements ByteVisitor{
         String type = identifier.getType().type();
 
         String name = identifier.getRep();
-
-        if(identifier instanceof IndexOp){
-            prepIndexOp((IndexOp) identifier);
+        int index = name.indexOf('[');
+        if (index != -1) {
             arr = true;
-            int index = name.indexOf('[');
             name = name.substring(0, index);
         }
 
-        if(constants.containsKey(name)){
-            final String ANSI_RESET = "\u001B[0m";
-            final String ANSI_RED = "\u001B[31m";
-            System.err.print(ANSI_RED);
-            System.err.printf("ConstantError: --> Cannot modify constants at line %d", identifier.getLine());
-            System.err.print(ANSI_RESET);
-            exit(1);
-        }
+        identifier.prepCodeGen(this);
+
+        checkConstantModify(name);
+
         declarator.codeGen(this);
 
-        if(constants.containsKey(name) || globals.containsKey(name)){
-            if(arr){
+        if(globals.containsKey(name)){
+            if(identifier instanceof DotOperation){
+                String fieldName = identifier.getRhs().getRep();
+                GenericType fieldType = structFields.get(identifier.getLhs().getType().type())
+                        .get(fieldName);
+                GenericType userType = identifier.getLhs().getType();
+                asmHelper.getStructField(name, userType.type() );
+                declarator.codeGen(this);
+                asmHelper.putStructField(userType.type(),fieldName, fieldType);
+            }
+            else if(arr){
                 asmHelper.storeStaticFieldArray(type);
-
             }else{
                 String signature = asmHelper.getSignature(type, declarator);
                 asmHelper.storeStaticField(name, signature);
             }
         }
         else if(localVariable){
-            asmHelper.updateLocalVariable(name);
+            // updating sturct field
+            if(identifier instanceof DotOperation){
+                String fieldName = identifier.getRhs().getRep();
+                GenericType fieldType = structFields.get(identifier.getLhs().getType().type())
+                        .get(fieldName);
+                GenericType userType = identifier.getLhs().getType();
+                asmHelper.putStructField(userType.type(),fieldName, fieldType);
+            }else{
+                asmHelper.updateLocalVariable(name);
+            }
+        }
+    }
+
+    public void checkConstantModify(String name){
+        if(constants.containsKey(name)){
+            final String ANSI_RESET = "\u001B[0m";
+            final String ANSI_RED = "\u001B[31m";
+            System.err.print(ANSI_RED);
+            System.err.printf("ConstantError: --> Cannot modify constants: %s", name);
+            System.err.print(ANSI_RESET);
+            exit(1);
         }
     }
 
@@ -267,19 +320,6 @@ public class ByteCodeWizard implements ByteVisitor{
                 break;
         }
 
-    }
-    public void prepIndexOp(IndexOp op){
-        Expression index  = op.getIndex();
-        GenericType type = op.getType();
-        Symbol identifier = op.getIndexIdentifier();
-        String name = identifier.image();
-        if(constants.containsKey(name) || globals.containsKey(name)){
-            asmHelper.getStaticFieldArray(identifier.image(), type.type());
-        }
-        else if(localVariable){
-            asmHelper.loadLocalVariable(identifier.image());
-        }
-        index.codeGen(this);
     }
 
     public void visitLiteral(LiteralExpression exp){
@@ -593,11 +633,14 @@ public class ByteCodeWizard implements ByteVisitor{
         for(Statement field : structBlock.getStatements()){
             field.codeGen(this);
             String t = field.getType().type();
+            if(field.getType().isArray()){
+               sig.append("[");
+            }
             sig.append(asmHelper.getSignature(t,null));
         }
         sig.append(")V");
 
-        HashMap<String, String> fields = structFields.get(identifier.getRep());
+        HashMap<String, GenericType> fields = structFields.get(identifier.getRep());
 
         asmHelper.writeClass(identifier.getRep(), String.valueOf(sig), fields);
 
@@ -609,11 +652,16 @@ public class ByteCodeWizard implements ByteVisitor{
         Expression rhs = op.getRhs();
         Expression lhs = op.getLhs();
         lhs.codeGen(this);
+        GenericType t = structFields.get(lhs.getType().type()).get(rhs.getRep());
         String signature = asmHelper.getSignature(
-                structFields.get(lhs.getType().type()).get(rhs.getRep()), null);
+                t.type(), null);
 
+        if(t.isArray()){
+            signature = "["+signature;
+        }
         asmHelper.getFieldOfStruct(lhs.getType().type(), rhs.getRep(), signature);
     }
+
 
 
     @Override
@@ -632,6 +680,9 @@ public class ByteCodeWizard implements ByteVisitor{
                 case "write":
                     writeString(params.get(0));
                     return;
+                case "writeln":
+                    writeln();
+                    return;
             }
         }
 
@@ -641,7 +692,12 @@ public class ByteCodeWizard implements ByteVisitor{
             signature.append("(");
             for(Expression p: params){
                p.codeGen(this);
-               signature.append(asmHelper.getSignature(p.getType().type(), null));
+               GenericType t = p.getType();
+               String sig = asmHelper.getSignature(t.type(), null);
+               if(t.isArray()){
+                   sig = "[" + sig;
+               }
+               signature.append(sig);
             }
             signature.append(")V");
             // get the function signature from params
@@ -673,6 +729,11 @@ public class ByteCodeWizard implements ByteVisitor{
         asmHelper.setPrintStream();
         param.codeGen(this);
         asmHelper.printString();
+    }
+
+    void writeln(){
+        asmHelper.setPrintStream();
+        asmHelper.println();
     }
 
 

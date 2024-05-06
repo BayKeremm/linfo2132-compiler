@@ -1,11 +1,60 @@
 struct Point {
     int x;
     int y;
+    int[] history;
 }
-Point pp = Point(2,4);
+struct Mix {
+    float grams;
+    string name;
+}
+
+struct MixV2 {
+    float[] grams;
+    string[] names;
+}
+Point pp = Point(2,4, int[10]);
 def void main(){
-    //write("hallo");
-    Point p = Point(10,20);
+    Mix m = Mix(2.5,"salt");
+    writeFloat(m.grams);
+    write(m.name);
+    writeln();
+
+    MixV2 m2 = MixV2(float[5],string[10]);
+    float[] grams = m2.grams;
+    string[] names = m2.names;
+    writeFloat(grams[0]);
+    write(names[0]);
+    writeln();
+
+    grams[0]=2.1;
+    names[0] = "kerem";
+
+    writeFloat(grams[0]);
+    write(names[0]);
+    writeln();
+
+    float[] grams2 = m2.grams;
+    string[] names2 = m2.names;
+    writeFloat(grams2[0]);
+    write(names2[0]);
+    writeln();
+
+    Point p = Point(10,20, int[5]);
+
+    int[] hist = pp.history;
+    hist[0]=2;
+    writeInt(hist[0]);
+
+    int[] hist2 = pp.history;
+    writeInt(hist2[0]);
+
+    p.x = 100;
+    pp.x = 100;
+    write("x total:");
     writeInt(pp.x + p.x);
+    write("y total:");
     writeInt(pp.y + p.y);
+
+
+
 }

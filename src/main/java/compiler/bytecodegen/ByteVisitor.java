@@ -57,6 +57,9 @@ public interface ByteVisitor {
     void visitStructDeclaration(StructDeclaration declaration);
 
     void visitDotOp(DotOperation op);
+    void prepDotOp(DotOperation op);
+    void prepIndexOp(IndexOp op);
+
 
 
 }

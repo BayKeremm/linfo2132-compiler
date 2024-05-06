@@ -77,4 +77,9 @@ public class IndexOp extends Expression {
         b.visitIndexOp(this);
 
     }
+
+    @Override
+    public void prepCodeGen(ByteVisitor b) {
+        b.prepIndexOp(this);
+    }
 }

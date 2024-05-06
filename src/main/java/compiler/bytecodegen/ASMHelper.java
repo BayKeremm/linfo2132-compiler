@@ -13,7 +13,6 @@ import org.objectweb.asm.Opcodes;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,7 +66,7 @@ public class ASMHelper {
         this.classWriter = cw;
     }
     // Only for structs
-    public void writeClass(String structName, String signature, HashMap<String, String> fields){
+    public void writeClass(String structName, String signature, HashMap<String, GenericType> fields){
         // Generate constructor for the struct class
         MethodVisitor constructor = classWriter.visitMethod(Opcodes.ACC_PUBLIC,
                 "<init>", signature, null, null);
@@ -76,13 +75,28 @@ public class ASMHelper {
         constructor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
 
         int index = 1;
-        for (Map.Entry<String, String> entry : fields.entrySet()) {
+        for (Map.Entry<String, GenericType> entry : fields.entrySet()) {
             String fieldName = entry.getKey();
-            String fieldType = entry.getValue();
+            GenericType fieldType = entry.getValue();
             constructor.visitVarInsn(Opcodes.ALOAD, 0); // Load 'this'
-            constructor.visitVarInsn(Opcodes.ILOAD, index);
-            // TODO: what if the field type is a string
-            String sig = getSignature(fieldType, null);
+            String sig = getSignature(fieldType.type(), null);
+            if(fieldType.isArray() ){
+                sig = "["+sig;
+                constructor.visitVarInsn(Opcodes.ALOAD, index);
+
+            }else{
+                switch (fieldType.type()){
+                    case "int", "bool":
+                        constructor.visitVarInsn(Opcodes.ILOAD, index);
+                        break;
+                    case "float":
+                        constructor.visitVarInsn(Opcodes.FLOAD, index);
+                        break;
+                    case "string":
+                        constructor.visitVarInsn(Opcodes.ALOAD, index);
+                        break;
+                }
+            }
             constructor.visitFieldInsn(Opcodes.PUTFIELD, structName, fieldName, sig);
             index++;
         }
@@ -225,6 +239,10 @@ public class ASMHelper {
         }
     }
 
+    public void getStructField(String name, String type){
+        this.currMethodVisitor.visitFieldInsn(Opcodes.GETSTATIC, className, name, "L"+type+";");
+    }
+
     public void getStaticFieldArray(String name, String type){
         switch(type){
             case "int":
@@ -246,6 +264,25 @@ public class ASMHelper {
         currMethodVisitor.visitLocalVariable(name, signature,
                 null, currentScope.getStartLabel(), currentScope.getEndLabel(),currentScope.getIndex(name) );
     }
+    public void putStructField(String name, String fieldName, GenericType type){
+        String sig = getSignature(type.type(), null);
+        if(type.isArray()){
+            sig = "[" + sig;
+        }
+        currMethodVisitor.visitFieldInsn(Opcodes.PUTFIELD, name, fieldName, sig);
+    }
+
+    public void loadStructField(String name){
+        int index = currentScope.getIndex(name);
+        this.currMethodVisitor.visitVarInsn(Opcodes.ALOAD, index);
+    }
+
+    public void loadStructFieldGlobal(String name){
+        int index = currentScope.getIndex(name);
+        this.currMethodVisitor.visitVarInsn(Opcodes.ALOAD, index);
+    }
+
+
 
     public void updateLocalVariable(String name){
         int index = currentScope.getIndex(name);
@@ -399,6 +436,7 @@ public class ASMHelper {
             }
         }
 
+        literal = literal.replace("\"", "");
         currMethodVisitor.visitLdcInsn(literal);
     }
 
@@ -480,6 +518,10 @@ public class ASMHelper {
     public void printString(){
         this.currMethodVisitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream",
                 "print", "(Ljava/lang/String;)V", false);
+    }
+    public void println(){
+        this.currMethodVisitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream",
+                "println", "()V", false);
     }
 
     public String getSignature(String type, Expression declarator){
