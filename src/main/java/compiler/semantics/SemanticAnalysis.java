@@ -256,6 +256,8 @@ public class SemanticAnalysis implements TypeVisitor {
     public void visitUnaryNegateExpression(UnaryExpression op) {
         // Only boolean
         assert op.getLhs() == null;
+        Expression rhs = op.getRhs();
+        rhs.typeAnalyse(this);
         GenericType tr = op.getRhs().getType();
         if(!tr.type().equals("bool")){
             reportSemanticError("OperatorError: Unary Negate Type Error: Cannot negate type %s",op.getRhs().getLine(),tr);

@@ -25,6 +25,7 @@ public class ByteCodeWizard implements ByteVisitor{
 
     private Program program;
     private String programName;
+    private String outputName;
     private Boolean localVariable = false;
     private Boolean structDeclarations = false;
 
@@ -38,9 +39,18 @@ public class ByteCodeWizard implements ByteVisitor{
 
     ASMHelper asmHelper;
 
-    public ByteCodeWizard(Program program){
+    public void setProgramName(String name){
+        this.programName = name;
+
+    }
+
+    public void setOutputName(String name){
+        this.outputName = name;
+    }
+
+    public ByteCodeWizard(Program program, String className){
         this.program = program;
-        this.programName = program.getFileName().replace(".lang","");
+        this.programName = className;
         this.procedureInfos = new HashMap<>();
         this.constants = new HashMap<>();
         this.globals = new HashMap<>();

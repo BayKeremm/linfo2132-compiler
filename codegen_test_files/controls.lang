@@ -1,0 +1,23 @@
+int a = 3;
+string message1 = "flipped";
+string message2 = "unflipped";
+def void main(){
+    int i;
+    bool flip = true;
+    int k = 81;
+    int kk = 0;
+    for (i=1, i<a, i = i+1) {
+        int j = 5+i;
+        while (j > 0) {
+            if(flip) {
+                writeInt(k);
+                k = k + 1;
+            } else {
+                writeInt(kk);
+                kk = kk+ 1;
+            }
+            j = j - 1;
+            flip = !(flip);
+        }
+    }
+}

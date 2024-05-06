@@ -11,6 +11,9 @@ import compiler.semantics.*;
 import java.io.FileReader;
 import java.io.LineNumberReader;
 
+import static java.lang.System.exit;
+import static java.lang.System.out;
+
 
 public class Compiler {
     public static void main(String[] args) throws Exception {
@@ -19,49 +22,42 @@ public class Compiler {
 
         boolean debug = false;
         boolean test = false;
-        String fileName;
+        String fileName = null;
+        String outputName = null;
 
-        if(args.length > 1){
-            if(args[0].equals("-parser")){
-                debug = true;
-            }
-            else if(args[0].equals("-test")){
-                test = true;
-
-            }
-            fileName = args[1];
-        }else{
+        if(args.length == 3){
             fileName = args[0];
+            outputName = args[2];
+        }else if(args.length == 2){
+            fileName = args[0];
+            int lastIndex = fileName.lastIndexOf("/");
+            if(lastIndex == -1){
+                outputName = fileName.replace(".lang","");
+            }else{
+                outputName = fileName.substring(lastIndex + 1);
+            }
 
+        }else{
+            System.err.println("Usage: gradle run --args=\"" +
+                    "<file_to_compile> Optional<-o <output_file_name>>\"");
+            exit(1);
         }
 
-        if(test){
-            TestParser testParser = new TestParser();
-            testParser.testConstantVariable();
-            testParser.testProcedure();
-            testParser.testStructGlobals();
-        }
+        reader = new LineNumberReader(new FileReader(fileName));
 
-        else{
-            reader = new LineNumberReader(new FileReader(fileName));
+        Lexer lexer = new Lexer(reader);
+        lexer.setFileName(fileName);
 
-            Lexer lexer = new Lexer(reader);
-            lexer.setFileName(fileName);
+        Parser parser = new Parser(lexer);
+        Program p = parser.program();
+        p.printNode();
 
-            Parser parser = new Parser(lexer);
-            Program p = parser.program();
-            p.printNode();
+        SemanticAnalysis semantics = new SemanticAnalysis(p);
+        semantics.typeCheck();
+        semantics.debug();
 
-            SemanticAnalysis semantics = new SemanticAnalysis(p);
-            semantics.typeCheck();
-            semantics.debug();
-
-            ByteCodeWizard wiz = new ByteCodeWizard(p);
-            wiz.codeGen();
-
-        }
-
-
+        ByteCodeWizard wiz = new ByteCodeWizard(p, outputName);
+        wiz.codeGen();
 
         //lexer.advanceLexer();
         //Symbol s = lexer.nextSymbol();

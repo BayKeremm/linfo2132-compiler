@@ -1,11 +1,12 @@
-I was going funciton by funciton and putting everything in the ASMHelper file
-Try to refactor there and keep clear function names that can be called from the wizard
-Do not forget to add documentation
+TODOs:
+- Set up the program arguments
+- write tests for so far
+https://stackoverflow.com/questions/16931244/checking-if-output-of-a-command-contains-a-certain-string-in-a-shell-script
+- Return statement => ARRAYS WILL NOT WORK
+- Try returning structs from functions 
+- reading built in funcitons
 
-15H30
-start with the operators
-then go to
-deal with scopes
+
 
 
 
@@ -23,9 +24,6 @@ bugs:
 
 
 
-TODOs:
-- Return statement => ARRAYS WILL NOT WORK
-- Function call visit
 
 
 
