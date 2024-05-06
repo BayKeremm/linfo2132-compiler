@@ -10,6 +10,7 @@ import compiler.semantics.Type;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -107,9 +108,25 @@ public class ByteCodeWizard implements ByteVisitor{
 
     @Override
     public void visitProcedure(Procedure procedure) {
-        asmHelper.startProcedureMethod(procedure.getProcedureIdentifier().image());
+        Type type = new Type(procedure.getProcedureReturnType().getTypeSymbol().image(),
+                procedure.getProcedureReturnType().getIsArray());
+
+        String signature = asmHelper.getSignature(type.type(), null);
+        if(type.isArray()){
+            signature = "["+signature;
+        }
+        signature = "(" + signature + ")" + asmHelper.getSignature(type.type(), null);
+
+        asmHelper.startProcedureMethod(procedure.getProcedureIdentifier().image(), signature);
 
         asmHelper.startNewScope();
+
+        ArrayList<Expression> params = procedure.getProcedureDeclarator().getProDecParameters();
+        for(var e : params){
+            asmHelper.addLocalToScope(e.getVariableName(), e.getType());
+        }
+
+
 
         ArrayList<Statement> statements = procedure.getProcedureDeclarator().
                 getProDecBlock().getStatements();
@@ -203,6 +220,12 @@ public class ByteCodeWizard implements ByteVisitor{
         }
         index.codeGen(this);
 
+    }
+
+    @Override
+    public void visitReturn(ReturnStatement ret) {
+        ret.getReturnExpression().codeGen(this);
+        asmHelper.performReturn(ret.getReturnExpression().getType());
     }
 
     @Override
@@ -729,11 +752,24 @@ public class ByteCodeWizard implements ByteVisitor{
             asmHelper.constructStructInstance(identifier.image(),
                     String.valueOf(signature));
         }
+        else{ // normal function call
+            StringBuilder signature = new StringBuilder();
+            signature.append("(");
+            for(Expression p: params){
+                p.codeGen(this);
+                GenericType t = p.getType();
+                String sig = asmHelper.getSignature(t.type(), null);
+                if(t.isArray()){
+                    sig = "[" + sig;
+                }
+                signature.append(sig);
+            }
+            signature.append(")");
+            GenericType t = functionCallExpression.getType();
+            signature.append(asmHelper.getSignature(t.type(), null));
+            asmHelper.performFunctionCall(identifier.image(), String.valueOf(signature));
 
-        if(params.isEmpty()){
-            // TODO: this is not only for empty things add parameter info as well
-            System.out.println("IMPLEMENT FUNCTION CALL EXPRESSION VISIT");
-            exit(1);
+
         }
 
     }

@@ -48,6 +48,6 @@ public class ReturnStatement extends Statement {
 
     @Override
     public void codeGen(ByteVisitor b) {
-
+        b.visitReturn(this);
     }
 }

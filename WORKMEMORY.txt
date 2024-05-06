@@ -19,3 +19,25 @@ bugs:
     Dot operation array access bug
     - p.history[0] gets null type and causes exception
 
+
+
+
+
+TODOs:
+- Return statement => ARRAYS WILL NOT WORK
+- Function call visit
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -60,6 +60,8 @@ public interface ByteVisitor {
     void prepDotOp(DotOperation op);
     void prepIndexOp(IndexOp op);
 
+    void visitReturn(ReturnStatement ret);
+
 
 
 }

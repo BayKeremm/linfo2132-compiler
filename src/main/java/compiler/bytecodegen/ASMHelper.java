@@ -151,16 +151,15 @@ public class ASMHelper {
         currentScope.addToTable(name,type);
     }
 
-    public void startProcedureMethod(String procedureName){
+    public void startProcedureMethod(String procedureName, String  signature){
         MethodVisitor mw;
         // Do the main signature like Java expects
         if(procedureName.equals("main")){
             mw = this.classWriter.visitMethod(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC,
                     "main", "([Ljava/lang/String;)V", null, null);
         }else{
-            // TODO: depending on parameters change the descriptor (build it depending on arguments)
             mw = this.classWriter.visitMethod(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC,
-                    procedureName, "()V", null, null);
+                    procedureName, signature, null, null);
         }
         mw.visitCode();
 
@@ -462,6 +461,38 @@ public class ASMHelper {
         }else{
             this.currMethodVisitor.visitInsn(opcode2);
         }
+    }
+
+    public void performReturn(GenericType type){
+        boolean arr = type.isArray();
+        switch(type.type()){
+            case "int", "bool":
+                if(arr){
+                    this.currMethodVisitor.visitInsn(Opcodes.IASTORE);
+                }else{
+                    this.currMethodVisitor.visitInsn(Opcodes.IRETURN);
+                }
+                break;
+            case "float":
+                if(arr){
+                    this.currMethodVisitor.visitInsn(Opcodes.FASTORE);
+                }else{
+                    this.currMethodVisitor.visitInsn(Opcodes.FRETURN);
+                }
+                break;
+            case "string":
+                if(arr){
+                    this.currMethodVisitor.visitInsn(Opcodes.AASTORE);
+                }else{
+                    this.currMethodVisitor.visitInsn(Opcodes.ARETURN);
+                }
+                break;
+        }
+
+    }
+
+    public void performFunctionCall(String name, String signature){
+        currMethodVisitor.visitMethodInsn(Opcodes.INVOKESTATIC, className, name, signature, false); // Call square method
     }
 
     public void setPrintStream(){
