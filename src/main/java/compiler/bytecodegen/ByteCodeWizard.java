@@ -10,7 +10,6 @@ import compiler.semantics.Type;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -121,22 +120,30 @@ public class ByteCodeWizard implements ByteVisitor{
         Type type = new Type(procedure.getProcedureReturnType().getTypeSymbol().image(),
                 procedure.getProcedureReturnType().getIsArray());
 
-        String signature = asmHelper.getSignature(type.type(), null);
+        String returnSig = asmHelper.getSignature(type.type(), null);
         if(type.isArray()){
-            signature = "["+signature;
+            returnSig = "["+returnSig;
         }
-        signature = "(" + signature + ")" + asmHelper.getSignature(type.type(), null);
 
-        asmHelper.startProcedureMethod(procedure.getProcedureIdentifier().image(), signature);
+        ArrayList<Expression> params = procedure.getProcedureDeclarator().getProDecParameters();
+        StringBuilder sig = new StringBuilder();
+        sig.append("(");
+        for(var e : params){
+            if(e.getType().isArray()){
+                sig.append("[");
+            }
+            sig.append(asmHelper.getSignature(e.getType().type(), null));
+        }
+        sig.append(")");
+        sig.append(returnSig);
+
+        asmHelper.startProcedureMethod(procedure.getProcedureIdentifier().image(), String.valueOf(sig));
 
         asmHelper.startNewScope();
 
-        ArrayList<Expression> params = procedure.getProcedureDeclarator().getProDecParameters();
-        for(var e : params){
+        for(var e : params) {
             asmHelper.addLocalToScope(e.getVariableName(), e.getType());
         }
-
-
 
         ArrayList<Statement> statements = procedure.getProcedureDeclarator().
                 getProDecBlock().getStatements();
@@ -209,7 +216,7 @@ public class ByteCodeWizard implements ByteVisitor{
                 .get(fieldName);
         GenericType userType = op.getLhs().getType();
 
-        asmHelper.loadStructField(name);
+        asmHelper.loadStruct(name);
     }
 
     @Override
@@ -223,7 +230,7 @@ public class ByteCodeWizard implements ByteVisitor{
             // We know it is an array
             sig = "["+sig;
             //asmHelper.getStaticFieldArray(identifier.image(), type.type());
-            asmHelper.getStaticFieldV2(identifier.image(), sig);
+            asmHelper.getStaticField(identifier.image(), sig);
         }
         else if(localVariable){
             asmHelper.loadLocalVariable(identifier.image());
@@ -266,7 +273,7 @@ public class ByteCodeWizard implements ByteVisitor{
                         .get(fieldName);
                 GenericType userType = identifier.getLhs().getType();
                 //asmHelper.getStructField(name, userType.type() );
-                asmHelper.getStaticFieldV2(name, "L"+userType.type()+";" );
+                asmHelper.getStaticField(name, "L"+userType.type()+";" );
                 declarator.codeGen(this);
                 asmHelper.putStructField(userType.type(),fieldName, fieldType);
             }
@@ -321,7 +328,7 @@ public class ByteCodeWizard implements ByteVisitor{
             if(type.isArray()){
                 sig = "["+sig;
             }
-            asmHelper.getStaticFieldV2(name, sig);
+            asmHelper.getStaticField(name, sig);
         }else{
             asmHelper.loadLocalVariable(name);
         }
@@ -345,37 +352,49 @@ public class ByteCodeWizard implements ByteVisitor{
         Symbol identifier = op.getIndexIdentifier();
         String name = identifier.image();
 
-        GenericType variableType = null;
-        if (constants.containsKey(name)) {
-            variableType = constants.get(name);
-        } else if (globals.containsKey(name)) {
-            variableType = globals.get(name);
-        }
-
-        if (variableType != null) {
-            String sig = asmHelper.getSignature(variableType.type(), null);
-            if (variableType.isArray()) {
-                sig = "[" + sig;
+        // TODO:
+        // if identifier in usertypes then it is struct array
+        if(structs.containsKey(name)){
+            //index.codeGen(this);
+            //asmHelper.visitArrayInitStruct(type);
+        }else{
+            GenericType variableType = null;
+            if (constants.containsKey(name)) {
+                variableType = constants.get(name);
+            } else if (globals.containsKey(name)) {
+                variableType = globals.get(name);
             }
-            asmHelper.getStaticFieldV2(name, sig);
-        } else if (localVariable) {
-            asmHelper.loadLocalVariable(name);
-        }
 
-        index.codeGen(this);
-        switch (type){
-            case "int":
-                asmHelper.performSingleOp(Opcodes.IALOAD);
-                break;
-            case "float":
-                asmHelper.performSingleOp(Opcodes.FALOAD);
-                break;
-            case "string":
-                asmHelper.performSingleOp(Opcodes.AALOAD);
-                break;
-            case "bool":
-                asmHelper.performSingleOp(Opcodes.BALOAD);
-                break;
+            if (variableType != null) {
+                String sig = asmHelper.getSignature(variableType.type(), null);
+                if (variableType.isArray()) {
+                    sig = "[" + sig;
+                }
+                asmHelper.getStaticField(name, sig);
+            } else if (localVariable) {
+                asmHelper.loadLocalVariable(name);
+            }
+
+            index.codeGen(this);
+            switch (type){
+                case "int":
+                    asmHelper.performSingleOp(Opcodes.IALOAD);
+                    break;
+                case "float":
+                    asmHelper.performSingleOp(Opcodes.FALOAD);
+                    break;
+                case "string":
+                    asmHelper.performSingleOp(Opcodes.AALOAD);
+                    break;
+                case "bool":
+                    asmHelper.performSingleOp(Opcodes.BALOAD);
+                    break;
+                default:
+                    // TODO:
+                    break;
+
+            }
+
         }
 
     }
@@ -598,8 +617,10 @@ public class ByteCodeWizard implements ByteVisitor{
         Label endLabel = asmHelper.getLabel();
         asmHelper.performJumpOp(Opcodes.GOTO, endLabel);
         asmHelper.visitLabel(elseLabel);
-        for(Statement s: elseBlock.getStatements()){
-            s.codeGen(this);
+        if(elseBlock != null){
+            for(Statement s: elseBlock.getStatements()){
+                s.codeGen(this);
+            }
         }
         asmHelper.visitLabel(endLabel);
         asmHelper.popScope();
@@ -776,7 +797,11 @@ public class ByteCodeWizard implements ByteVisitor{
             }
             signature.append(")");
             GenericType t = functionCallExpression.getType();
-            signature.append(asmHelper.getSignature(t.type(), null));
+            String retSig = asmHelper.getSignature(t.type(), null);
+            if(t.isArray()){
+                retSig = "[" + retSig;
+            }
+            signature.append(retSig);
             asmHelper.performFunctionCall(identifier.image(), String.valueOf(signature));
 
 

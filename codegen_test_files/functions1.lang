@@ -1,0 +1,15 @@
+struct Point {
+    int x;
+    int y;
+}
+//def Point copyPoints(Point[] p) {
+//    return Point(p[0].x+p[1].x, p[0].y+p[1].y);
+//}
+
+def void main(){
+    //Point p = Point(2,3);
+    Point[] ps = Point[10];
+    ps[0] = Point(2,3);
+    int x = ps[0].x;
+    //writeInt(x);
+}

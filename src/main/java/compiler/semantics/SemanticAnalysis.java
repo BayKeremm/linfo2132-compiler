@@ -300,12 +300,14 @@ public class SemanticAnalysis implements TypeVisitor {
     public void visitIndexOperation(IndexOp op) {
         Symbol iden = op.getIndexIdentifier();
         // FIX: CHECKS IF THE GIVEN IDENTIFIER IS INDEED AN ARRAY
-        if(!Objects.requireNonNull(checkContext(iden.image())).isArray()){
-            reportSemanticError("IndexOperationError: Trying to index with a non array %s", op.getLine(),iden);
-        }
-        GenericType indexType = op.getIndex().getType();
-        if(!indexType.type().equals(Token.INTEGER.image())){
-            reportSemanticError("IndexOperationError: Trying to index with non int %s", op.getLine(),indexType);
+        if(!userTypes.containsKey(iden.image())){
+            if(!Objects.requireNonNull(checkContext(iden.image())).isArray()){
+                reportSemanticError("IndexOperationError: Trying to index with a non array %s", op.getLine(),iden);
+            }
+            GenericType indexType = op.getIndex().getType();
+            if(!indexType.type().equals(Token.INTEGER.image())){
+                reportSemanticError("IndexOperationError: Trying to index with non int %s", op.getLine(),indexType);
+            }
         }
     }
 

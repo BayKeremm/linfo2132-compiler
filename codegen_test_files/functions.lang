@@ -1,0 +1,84 @@
+def int squareI(int v){
+    return v*v;
+}
+
+def float squareF(float v){
+    return v*v;
+}
+
+def string name(){
+    return "kerem";
+}
+
+def bool trueThis(){
+    return true;
+}
+
+def int[] my_alloc_int(int size){
+    return int[size];
+}
+
+def string[] my_alloc_string(int size){
+    return string[size];
+}
+
+def float[] my_alloc_float(int size){
+    return float[size];
+}
+
+
+def bool[] my_alloc_bool(int size){
+    return bool[size];
+}
+
+def void main(){
+    int x = 4;
+    writeInt(squareI(x));
+
+    float xx = 5.0;
+    writeFloat(squareF(xx));
+
+    write(name());
+    writeln();
+    if(trueThis()){
+        write("yessir");
+    }else{
+        write("nope");
+    }
+    writeln();
+
+    string[] names = my_alloc_string(10);
+    names[1] = "elfje";
+    write(names[1]);
+    writeln();
+
+    int[] ages = my_alloc_int(10);
+    ages[1] = 100 ;
+    writeInt(ages[1]);
+
+    float[] budgets = my_alloc_float(10);
+    budgets[1] = 222.222 ;
+    writeFloat(budgets[1]);
+
+
+    //bool k = false;
+    //if(k){
+    //    write("I'm losing it");
+    //    writeln();
+    //}
+
+    bool[] tfs = my_alloc_bool(10);
+    tfs[1] = false;
+    tfs[2] = true;
+    if(tfs[1]){
+        write("tfs[1] is true");
+    }else{
+        if(tfs[2]){
+            write("bruh");
+        }else{
+            write("aaaa");
+        }
+    }
+    writeln();
+
+}

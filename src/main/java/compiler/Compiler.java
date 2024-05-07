@@ -55,6 +55,7 @@ public class Compiler {
         SemanticAnalysis semantics = new SemanticAnalysis(p);
         semantics.typeCheck();
         semantics.debug();
+        System.out.println("-----------------------CODEGEN----------------------------");
 
         ByteCodeWizard wiz = new ByteCodeWizard(p, outputName);
         wiz.codeGen();

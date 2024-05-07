@@ -218,7 +218,7 @@ public class ASMHelper {
         }
     }
 
-    public void getStaticFieldV2(String name, String signature){
+    public void getStaticField(String name, String signature){
         this.currMethodVisitor.visitFieldInsn(Opcodes.GETSTATIC, className, name, signature);
     }
 
@@ -234,17 +234,10 @@ public class ASMHelper {
         currMethodVisitor.visitFieldInsn(Opcodes.PUTFIELD, name, fieldName, sig);
     }
 
-    public void loadStructField(String name){
+    public void loadStruct(String name){
         int index = currentScope.getIndex(name);
         this.currMethodVisitor.visitVarInsn(Opcodes.ALOAD, index);
     }
-
-    public void loadStructFieldGlobal(String name){
-        int index = currentScope.getIndex(name);
-        this.currMethodVisitor.visitVarInsn(Opcodes.ALOAD, index);
-    }
-
-
 
     public void updateLocalVariable(String name){
         int index = currentScope.getIndex(name);
@@ -253,7 +246,7 @@ public class ASMHelper {
         boolean arr = currentScope.getType(name).isArray();
 
         switch(type){
-            case "int", "bool":
+            case "int":
                 if(arr){
                     this.currMethodVisitor.visitInsn(Opcodes.IASTORE);
                 }else{
@@ -272,6 +265,13 @@ public class ASMHelper {
                     this.currMethodVisitor.visitInsn(Opcodes.AASTORE);
                 }else{
                     this.currMethodVisitor.visitVarInsn(Opcodes.ASTORE, index);
+                }
+                break;
+            case "bool":
+                if(arr){
+                    this.currMethodVisitor.visitInsn(Opcodes.BASTORE);
+                }else{
+                    this.currMethodVisitor.visitVarInsn(Opcodes.ISTORE, index);
                 }
                 break;
         }
@@ -372,6 +372,10 @@ public class ASMHelper {
         }
     }
 
+    public void visitArrayInitStruct(String type){
+        this.currMethodVisitor.visitTypeInsn(Opcodes.ANEWARRAY,type );
+    }
+
     public void pushLiteral(String literal){
         // Methodvisitor: visitLdcInsn: add constant to the stack
         try {
@@ -465,28 +469,21 @@ public class ASMHelper {
 
     public void performReturn(GenericType type){
         boolean arr = type.isArray();
-        switch(type.type()){
-            case "int", "bool":
-                if(arr){
-                    this.currMethodVisitor.visitInsn(Opcodes.IASTORE);
-                }else{
+        if(arr){
+            this.currMethodVisitor.visitInsn(Opcodes.ARETURN);
+        }else{
+            switch(type.type()){
+                case "int", "bool":
                     this.currMethodVisitor.visitInsn(Opcodes.IRETURN);
-                }
-                break;
-            case "float":
-                if(arr){
-                    this.currMethodVisitor.visitInsn(Opcodes.FASTORE);
-                }else{
+                    break;
+                case "float":
                     this.currMethodVisitor.visitInsn(Opcodes.FRETURN);
-                }
-                break;
-            case "string":
-                if(arr){
-                    this.currMethodVisitor.visitInsn(Opcodes.AASTORE);
-                }else{
+                    break;
+                case "string":
                     this.currMethodVisitor.visitInsn(Opcodes.ARETURN);
-                }
-                break;
+                    break;
+            }
+
         }
 
     }

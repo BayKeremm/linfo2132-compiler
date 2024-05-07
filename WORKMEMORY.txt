@@ -1,10 +1,8 @@
 TODOs:
-- Set up the program arguments
-- write tests for so far
-https://stackoverflow.com/questions/16931244/checking-if-output-of-a-command-contains-a-certain-string-in-a-shell-script
-- Return statement => ARRAYS WILL NOT WORK
+- STRUCT ARRAYS
 - Try returning structs from functions 
 - reading built in funcitons
+- continue tests
 
 
 
@@ -16,7 +14,6 @@ bugs:
     j = i + 1;
     => cannot turn i + 1 to float
 
-    without Else statement bug
     Dot operation array access bug
     - p.history[0] gets null type and causes exception
 

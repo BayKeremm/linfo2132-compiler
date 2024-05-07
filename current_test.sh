@@ -1,8 +1,5 @@
-gradle run --args="-parser structs.lang" &&
-java structs &&
-
-gradle run --args="-parser functions.lang" &&
-java functions
+gradle run --args="./codegen_test_files/functions1.lang -o functions1" &&
+java functions1
 
 
 
