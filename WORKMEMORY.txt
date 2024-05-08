@@ -1,5 +1,5 @@
 TODOs:
-- STRUCT ARRAYS
+- STRUCT ARRAYS in IndexOp
 - Try returning structs from functions 
 - reading built in funcitons
 - continue tests

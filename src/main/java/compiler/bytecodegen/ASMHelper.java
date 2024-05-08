@@ -274,6 +274,11 @@ public class ASMHelper {
                     this.currMethodVisitor.visitVarInsn(Opcodes.ISTORE, index);
                 }
                 break;
+            default:
+                // This is for stuff like:     int x = ps[0].x;
+                this.currMethodVisitor.visitInsn(Opcodes.AASTORE);
+                break;
+
         }
 
     }
@@ -482,6 +487,11 @@ public class ASMHelper {
                 case "string":
                     this.currMethodVisitor.visitInsn(Opcodes.ARETURN);
                     break;
+                default:
+                    // This is to return structs
+                    this.currMethodVisitor.visitInsn(Opcodes.ARETURN);
+                    break;
+
             }
 
         }

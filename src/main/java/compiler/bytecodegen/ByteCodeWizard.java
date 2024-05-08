@@ -355,8 +355,9 @@ public class ByteCodeWizard implements ByteVisitor{
         // TODO:
         // if identifier in usertypes then it is struct array
         if(structs.containsKey(name)){
-            //index.codeGen(this);
-            //asmHelper.visitArrayInitStruct(type);
+            //asmHelper.loadLocalVariable(name);
+            index.codeGen(this);
+            asmHelper.visitArrayInitStruct(type);
         }else{
             GenericType variableType = null;
             if (constants.containsKey(name)) {
@@ -391,6 +392,7 @@ public class ByteCodeWizard implements ByteVisitor{
                     break;
                 default:
                     // TODO:
+                    asmHelper.performSingleOp(Opcodes.AALOAD);
                     break;
 
             }
