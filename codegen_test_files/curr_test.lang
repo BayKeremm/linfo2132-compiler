@@ -28,8 +28,26 @@ struct Point {
     int y;
 }
 
-Point p = Point(3,4);
 def void main(){
-    free p;
-    int x = p.x; // ==> ERROR: Semantic Analysis error: ScopeError : Variable does not exist in context : p
+    string a = "123";
+    int i = len(a);
+    writeInt(i);
+
+    string[] aa = string[11];
+    int ii = len(aa);
+    writeInt(ii);
+
+    int[] ia = int[33];
+    int iaa = len(ia);
+    writeInt(iaa);
+
+    int val = 42;
+    string s = chr(val);
+    write(s);
+    writeln();
+
+    float f = 5.99;
+    int fi = floor(f);
+    writeInt(fi);
+
 }

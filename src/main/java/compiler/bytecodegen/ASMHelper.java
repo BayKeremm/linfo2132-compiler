@@ -524,6 +524,24 @@ public class ASMHelper {
                 "println", "()V", false);
     }
 
+    public void lengthStr(){
+        this.currMethodVisitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "length", "()I", false);
+    }
+
+    public void lengthArr(){
+        this.currMethodVisitor.visitInsn(Opcodes.ARRAYLENGTH);
+    }
+
+    public void turnIntToStr(){
+        this.currMethodVisitor.visitMethodInsn(Opcodes.INVOKESTATIC,
+                "java/lang/String", "valueOf",
+                "(I)Ljava/lang/String;", false);
+    }
+
+    public void floorFloat(){
+        this.currMethodVisitor.visitInsn(Opcodes.F2I);
+    }
+
     public String getSignature(String type, Expression declarator){
         String signature = "";
         switch (type){

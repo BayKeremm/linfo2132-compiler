@@ -343,7 +343,15 @@ public class SemanticAnalysis implements TypeVisitor {
                 e.typeAnalyse(this);
                 GenericType t0 = e.getType();
                 GenericType t1 = fields.get(i);
-                if(!checkTypes(t0, t1,false)){
+                if(identifier.image().equals("len")){
+                    if(e.getType().isArray() || e.getType().type().equals("string")){
+                        return;
+                    }else{
+                        reportSemanticError("ArgumentError: Argument type mismatch in %s: %s",exp.getLine(),context,
+                                t1.type() + "!=" + t0.type() );
+                    }
+                }
+                else if(!checkTypes(t0, t1,false)){
                     reportSemanticError("ArgumentError: Argument type mismatch in %s: %s",exp.getLine(),context,
                             t1.type() + "!=" + t0.type() );
                 }

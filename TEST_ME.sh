@@ -7,4 +7,6 @@ rm *.class &&
 source test_functions.sh &&
 rm *.class &&
 source test_functions1.sh &&
+rm *.class &&
+source test_builtin.sh &&
 rm *.class

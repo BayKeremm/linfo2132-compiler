@@ -752,6 +752,15 @@ public class ByteCodeWizard implements ByteVisitor{
                 case "writeln":
                     writeln();
                     return;
+                case "len":
+                    len(params.get(0));
+                    return;
+                case "chr":
+                    chr(params.get(0));
+                    return;
+                case "floor":
+                    floor(params.get(0));
+                    return;
             }
         }
 
@@ -825,6 +834,25 @@ public class ByteCodeWizard implements ByteVisitor{
     void writeln(){
         asmHelper.setPrintStream();
         asmHelper.println();
+    }
+
+    void len(Expression param){
+        param.codeGen(this);
+        if(param.getType().type().equals("string") && !param.getType().isArray()){
+            asmHelper.lengthStr();
+        }else{
+            asmHelper.lengthArr();
+        }
+    }
+
+    void chr(Expression param){
+        param.codeGen(this);
+        asmHelper.turnIntToStr();
+    }
+
+    void floor(Expression param){
+        param.codeGen(this);
+        asmHelper.floorFloat();
     }
 
 
