@@ -95,6 +95,9 @@ public class ASMHelper {
                     case "string":
                         constructor.visitVarInsn(Opcodes.ALOAD, index);
                         break;
+                    default:
+                        constructor.visitVarInsn(Opcodes.ALOAD, index);
+                        break;
                 }
             }
             constructor.visitFieldInsn(Opcodes.PUTFIELD, structName, fieldName, sig);
@@ -119,10 +122,9 @@ public class ASMHelper {
 
     }
 
-    public void getFieldOfStruct(String userType, String field,   String signature){
+    public void getFieldOfStruct(String userType, String field, String signature){
         currMethodVisitor.visitFieldInsn(Opcodes.GETFIELD,
                 userType, field, signature);
-
     }
 
 
@@ -622,6 +624,8 @@ public class ASMHelper {
                     signature = "Z";
                 }
                 break;
+            default:
+                signature = "L"+type+";";
         }
         return signature;
     }

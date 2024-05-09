@@ -5,15 +5,16 @@ import compiler.Parser.GenericType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class ProcedureContext extends ContextGod {
 
-    HashMap<String, GenericType> arguments;
+    LinkedHashMap<String, GenericType> arguments;
     HashMap<String, GenericType> procedureBlock;
 
 
     public ProcedureContext(ArrayList<Expression> parameters) {
-        this.arguments = new HashMap<>();
+        this.arguments = new LinkedHashMap<>();
         this.procedureBlock = new HashMap<>();
         for(Expression e: parameters){
             this.arguments.put(e.getVariableName(),e.getType());

@@ -16,6 +16,10 @@ public class ArrayInitializer extends Expression {
         this.size = size;
     }
 
+    public Expression getSizeExpression(){
+        return this.size;
+    }
+
     @Override
     public String getRep() {
         return null;

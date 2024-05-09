@@ -6,4 +6,5 @@ public  abstract class GenericType{
     public boolean isArray(){
         return false;
     }
+
 }

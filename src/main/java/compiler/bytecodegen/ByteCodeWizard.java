@@ -7,6 +7,7 @@ import compiler.Parser.expressions.*;
 import compiler.Parser.statements.*;
 import compiler.semantics.ProcedureInfo;
 import compiler.semantics.Type;
+import compiler.semantics.UserType;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 
@@ -16,15 +17,11 @@ import java.util.LinkedHashMap;
 
 import static java.lang.System.exit;
 
-// TODO: New functions, signature creation based on parameters
-// TODO: STRUCTS
-
 
 public class ByteCodeWizard implements ByteVisitor{
 
     private Program program;
     private String programName;
-    private String outputName;
     private Boolean localVariable = false;
     private Boolean structDeclarations = false;
 
@@ -38,14 +35,6 @@ public class ByteCodeWizard implements ByteVisitor{
 
     ASMHelper asmHelper;
 
-    public void setProgramName(String name){
-        this.programName = name;
-
-    }
-
-    public void setOutputName(String name){
-        this.outputName = name;
-    }
 
     public ByteCodeWizard(Program program, String className){
         this.program = program;
@@ -352,7 +341,6 @@ public class ByteCodeWizard implements ByteVisitor{
         Symbol identifier = op.getIndexIdentifier();
         String name = identifier.image();
 
-        // TODO:
         // if identifier in usertypes then it is struct array
         if(structs.containsKey(name)){
             //asmHelper.loadLocalVariable(name);
@@ -772,8 +760,13 @@ public class ByteCodeWizard implements ByteVisitor{
             StringBuilder signature = new StringBuilder();
             signature.append("(");
             for(Expression p: params){
+                // TODO: Problem: when struct init as paramter the type is not given correctly
+                // Instead of Point it gives [int, int] with t.type()
                p.codeGen(this);
                GenericType t = p.getType();
+               if(p instanceof FunctionCallExpression && t instanceof UserType){
+                   t = new Type(((FunctionCallExpression) p).getFunctionIdentifier().image(), false);
+               }
                String sig = asmHelper.getSignature(t.type(), null);
                if(t.isArray()){
                    sig = "[" + sig;

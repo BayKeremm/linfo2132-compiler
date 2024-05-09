@@ -4,9 +4,10 @@
 gradle run --args="./codegen_test_files/functions1.lang -o functions1"&&
 
 # Run your program and store its output
-output=$(java functions)
+output=$(java functions1)
 # Define the expected outputs
-expected_outputs=("16" "25.0" "kerem" "yessir" "elfje" "100" "222.222" "bruh")
+expected_outputs=("99" "113" "me" "33" "kerem" "0" "1" "2" "44" "55")
+
 
 
 # Count of expected outputs found in the program's output

@@ -479,6 +479,11 @@ public class SemanticAnalysis implements TypeVisitor {
 
                 }
 
+            }else if(rhs instanceof IndexOp){
+                Symbol identifier = ((IndexOp) rhs).getIndexIdentifier();
+                UserType type = userTypes.get(lhsType.type());
+                GenericType t0 = type.members.get(identifier.image());
+                t = new Type(t0.type(),false);
             }
             else{
                 member = rhs.getRep();
@@ -546,6 +551,7 @@ public class SemanticAnalysis implements TypeVisitor {
 
     @Override
     public void visitArrayInitializer(ArrayInitializer p) {
+        p.getSizeExpression().typeAnalyse(this);
 
     }
 
