@@ -18,6 +18,7 @@ public class SemanticAnalysis implements TypeVisitor {
     Program program;
     ContextGod currContext;
     HashMap<String, UserType> userTypes;
+    HashMap<String, Boolean> structState;
     HashMap<String, ArrayList<ProcedureInfo>> procedureInfos;
     public SemanticAnalysis(Program p ){
         this.program = p;
@@ -25,6 +26,7 @@ public class SemanticAnalysis implements TypeVisitor {
         this.currContext.setPrev(null);
         this.userTypes = new HashMap<>();
         this.procedureInfos = new HashMap<>();
+        this.structState = new HashMap<>();
         // Built-in functions
         // string s = chr(int x);
         ArrayList<GenericType> params = new ArrayList<>();
@@ -563,7 +565,13 @@ public class SemanticAnalysis implements TypeVisitor {
     @Override
     public void visitFreeStatement(FreeStatement st) {
         GenericType freedType = st.getType();
+        String name = st.getIdentifierExp().getRep();
+        if(structState.get(name)){
+            reportSemanticError("FreeError: Double free: %s", st.getLine(), name);
+        }
         if(userTypes.containsKey(freedType.type())||freedType.isArray()){
+            structState.put(name,true);
+            currContext.removeFromContext(name);
             return;
         }
         reportSemanticError("FreeError: Cannot free type: %s", st.getLine(), freedType.type());
@@ -587,6 +595,12 @@ public class SemanticAnalysis implements TypeVisitor {
             reportSemanticError("TypeError: Constant Variable type does not match the declaration type: %s",
                     var.getLine(),  var.typeDeclaration().toString() + " != " + var.declarator().getType() );
         }
+
+        if(userTypes.containsKey(decType.type())){
+            structState.put(var.identifier().getRep(),false);
+        }
+
+
         // add to the context
         Type t = new Type(decType.type(),var.typeDeclaration().getIsArray());
         t.setIsConstant(true);
@@ -612,6 +626,9 @@ public class SemanticAnalysis implements TypeVisitor {
             if(!checkTypes(varType, decType,true) || !compareForPromotion(varType,decType)){
                 reportSemanticError("TypeError: Global Variable type does not match the declaration type: %s",
                         var.getLine(),  var.typeDeclaration().toString() + " != " + var.declarator().getType() );
+            }
+            if(userTypes.containsKey(varType.type())){
+                structState.put(var.identifier().getRep(),false);
             }
         }
         // add to the context

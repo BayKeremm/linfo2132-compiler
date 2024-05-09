@@ -1,13 +1,7 @@
 TODOs:
-- TEST: STRUCT ARRAYS in IndexOp
-- TEST: Try returning structs from functions 
 - reading built in funcitons
-- continue tests
-
-IMMEDIATE TODOs:
-    - DotOperation get type returns null    
-    - passing struct init as parameter does not give the right type
-
+- len, chr, floor function
+- free
 
 bugs:
     float j;

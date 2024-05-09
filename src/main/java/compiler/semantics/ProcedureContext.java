@@ -52,6 +52,15 @@ public class ProcedureContext extends ContextGod {
     }
 
     @Override
+    public boolean removeFromContext(String id) {
+        if(procedureBlock.containsKey(id)){
+            procedureBlock.remove(id);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public GenericType getVarType(String id) {
         if(procedureBlock.containsKey(id)){
             return this.procedureBlock.get(id);

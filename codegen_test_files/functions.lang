@@ -61,11 +61,11 @@ def void main(){
     writeFloat(budgets[1]);
 
 
-    //bool k = false;
-    //if(k){
-    //    write("I'm losing it");
-    //    writeln();
-    //}
+    bool k = false;
+    if(k){
+        write("I'm losing it");
+        writeln();
+    }
 
     bool[] tfs = my_alloc_bool(10);
     tfs[1] = false;

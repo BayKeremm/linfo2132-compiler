@@ -92,9 +92,6 @@ public class ASMHelper {
                     case "float":
                         constructor.visitVarInsn(Opcodes.FLOAD, index);
                         break;
-                    case "string":
-                        constructor.visitVarInsn(Opcodes.ALOAD, index);
-                        break;
                     default:
                         constructor.visitVarInsn(Opcodes.ALOAD, index);
                         break;
@@ -610,7 +607,6 @@ public class ASMHelper {
                 }
                 break;
             case "string":
-                // TODO: EMPTY DEFAULT VAL ???
                 if(arr){
                     signature = "[Ljava/lang/String;";
                 }else{

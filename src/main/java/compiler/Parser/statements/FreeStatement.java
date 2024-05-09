@@ -25,6 +25,9 @@ public class FreeStatement extends Statement {
         System.out.println(indentation+"FreeStatement: " +identifierExp.toString());
 
     }
+    public Expression getIdentifierExp(){
+        return identifierExp;
+    }
 
     @Override
     public GenericType getType() {

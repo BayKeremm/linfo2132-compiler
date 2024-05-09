@@ -1,0 +1,35 @@
+//struct Mix{
+//    float grams;
+//}
+//struct Point {
+//    int x;
+//    int y;
+//    Mix mix;
+//}
+//struct Person {
+//    string name;
+//    Point location;
+//    int[] history;
+//}
+//def void main(){
+//    Person d = Person("me", Point(3,7, Mix(2.0)), int[2*2]);
+//    Point p = d.location;
+//    Mix m = p.mix;
+//    m.grams = 3.0;
+//
+//    Point pp = d.location;
+//    Mix mm = p.mix;
+//    writeFloat(mm.grams);
+//    free d;
+//}
+
+struct Point {
+    int x;
+    int y;
+}
+
+Point p = Point(3,4);
+def void main(){
+    free p;
+    int x = p.x; // ==> ERROR: Semantic Analysis error: ScopeError : Variable does not exist in context : p
+}

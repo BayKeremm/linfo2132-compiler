@@ -34,6 +34,15 @@ public class Context extends ContextGod {
         }
     }
 
+    @Override
+    public boolean removeFromContext(String id) {
+        if(symbolTable.containsKey(id)){
+            symbolTable.remove(id);
+            return true;
+        }
+        return false;
+    }
+
     public GenericType getVarType(String id){
         if(symbolTable.containsKey(id)){
             return symbolTable.get(id);

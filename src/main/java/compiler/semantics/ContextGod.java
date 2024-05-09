@@ -48,6 +48,7 @@ public abstract class ContextGod {
     public abstract boolean containsId(String id);
 
     public abstract boolean addToContext(String id, GenericType t);
+    public abstract boolean removeFromContext(String id);
     public abstract GenericType getVarType(String id);
     public abstract  void debugContext(String indentation);
     public abstract HashMap<String, GenericType> getContextTable();

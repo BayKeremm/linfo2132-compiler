@@ -28,13 +28,12 @@ public class Compiler {
         if(args.length == 3){
             fileName = args[0];
             outputName = args[2];
-        }else if(args.length == 2){
+        }else if(args.length == 1){
             fileName = args[0];
+            outputName = fileName.replace(".lang","");
             int lastIndex = fileName.lastIndexOf("/");
-            if(lastIndex == -1){
-                outputName = fileName.replace(".lang","");
-            }else{
-                outputName = fileName.substring(lastIndex + 1);
+            if(lastIndex != -1){
+                outputName = outputName.substring(lastIndex + 1);
             }
 
         }else{
