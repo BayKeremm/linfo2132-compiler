@@ -229,7 +229,7 @@ public class SemanticAnalysis implements TypeVisitor {
     }
     private void reportSemanticError(String message,int line, Object... args) throws Error{
         Error e = new Error(String.format("%s:%d: -> Semantic Analysis error: %s", program.getFileName(), line, String.format(message, args)));
-        e.printStackTrace();
+        //e.printStackTrace();
         try {
             throw e;
         }finally {
@@ -457,7 +457,6 @@ public class SemanticAnalysis implements TypeVisitor {
 
     @Override
     public GenericType visitSymbolTableDotOp(DotOperation op) {
-        op.prettyPrint("");
         Expression lhs = op.getLhs();
         Expression rhs = op.getRhs();
         lhs.typeAnalyse(this); // gets the struct type

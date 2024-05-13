@@ -1,12 +1,18 @@
 #!/bin/bash
 
 # Compile your program with Gradle and suppress the output
-gradle run --args="./codegen_test_files/builtin.lang -o builtin"&&
+if gradle run --args="./codegen_test_files/builtin.lang -o builtin" > /dev/null ; then
+  echo "compiled successfully"
+else
+  echo "Could not compile the file!"
+  gradle run --args="./codegen_test_files/builtin.lang -o builtin"
+  exit 1
+fi
 
 # Run your program and store its output
 output=$(java builtin)
 # Define the expected outputs
-expected_outputs=("3" "11" "33" "42" "5")
+expected_outputs=("3" "11" "66" "42" "5" "yessir")
 
 
 

@@ -49,12 +49,12 @@ public class Compiler {
 
         Parser parser = new Parser(lexer);
         Program p = parser.program();
-        p.printNode();
+        //p.printNode();
 
         SemanticAnalysis semantics = new SemanticAnalysis(p);
         semantics.typeCheck();
-        semantics.debug();
-        System.out.println("-----------------------CODEGEN----------------------------");
+        //semantics.debug();
+        //System.out.println("-----------------------CODEGEN----------------------------");
 
         ByteCodeWizard wiz = new ByteCodeWizard(p, outputName);
         wiz.codeGen();

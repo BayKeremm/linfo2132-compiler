@@ -7,7 +7,7 @@ def void main(){
     int ii = len(aa);
     writeInt(ii);
 
-    int[] ia = int[33];
+    int[] ia = int[66];
     int iaa = len(ia);
     writeInt(iaa);
 
@@ -19,5 +19,11 @@ def void main(){
     float f = 5.99;
     int fi = floor(f);
     writeInt(fi);
+
+    bool t = !(true);
+    if(!t){
+        write("yessir");
+        writeln();
+    }
 
 }

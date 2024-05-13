@@ -731,8 +731,19 @@ public class ByteCodeWizard implements ByteVisitor{
         asmHelper.getFieldOfStruct(lhs.getType().type(), rhs.getRep(), signature);
     }
 
+    public void readInt(){
+        asmHelper.getUserInput();
+        asmHelper.turnStrToInt();
+    }
 
+    public void readFloat(){
+        asmHelper.getUserInput();
+        asmHelper.turnStrToFloat();
+    }
 
+    public void readString(){
+        asmHelper.getUserInput();
+    }
     @Override
     public void visitFunctionCall(FunctionCallExpression functionCallExpression) {
         Symbol identifier = functionCallExpression.getFunctionIdentifier();
@@ -740,6 +751,15 @@ public class ByteCodeWizard implements ByteVisitor{
 
         if(procedureInfos.containsKey(identifier.image())){
             switch (identifier.image()){
+                case "readInt":
+                    readInt();
+                    return;
+                case "readString":
+                    readString();
+                    return;
+                case "readFloat":
+                    readFloat();
+                    return;
                 case "writeInt":
                     writeInt(params.get(0));
                     return;

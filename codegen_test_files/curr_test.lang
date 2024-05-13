@@ -1,53 +1,11 @@
-//struct Mix{
-//    float grams;
-//}
-//struct Point {
-//    int x;
-//    int y;
-//    Mix mix;
-//}
-//struct Person {
-//    string name;
-//    Point location;
-//    int[] history;
-//}
-//def void main(){
-//    Person d = Person("me", Point(3,7, Mix(2.0)), int[2*2]);
-//    Point p = d.location;
-//    Mix m = p.mix;
-//    m.grams = 3.0;
-//
-//    Point pp = d.location;
-//    Mix mm = p.mix;
-//    writeFloat(mm.grams);
-//    free d;
-//}
-
-struct Point {
-    int x;
-    int y;
-}
-
 def void main(){
-    string a = "123";
-    int i = len(a);
-    writeInt(i);
+    int i = readInt();
+    writeInt(i+1);
 
-    string[] aa = string[11];
-    int ii = len(aa);
-    writeInt(ii);
+    float j = readFloat();
+    writeFloat(j+0.01);
 
-    int[] ia = int[33];
-    int iaa = len(ia);
-    writeInt(iaa);
-
-    int val = 42;
-    string s = chr(val);
-    write(s);
+    string k = readString();
+    write(k);
     writeln();
-
-    float f = 5.99;
-    int fi = floor(f);
-    writeInt(fi);
-
 }

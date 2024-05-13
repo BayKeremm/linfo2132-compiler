@@ -1,8 +1,13 @@
 #!/bin/bash
 
 # Compile your program with Gradle and suppress the output
-gradle run --args="./codegen_test_files/globals.lang -o globals"&&
-
+if gradle run --args="./codegen_test_files/globals.lang -o globals" > /dev/null ; then
+  echo "compiled successfully"
+else
+  echo "Could not compile the file!"
+  gradle run --args="./codegen_test_files/globals.lang -o globals"
+  exit 1
+fi
 # Run your program and store its output
 output=$(java globals)
 

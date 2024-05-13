@@ -538,8 +538,30 @@ public class ASMHelper {
                 "(I)Ljava/lang/String;", false);
     }
 
+    public void turnStrToInt(){
+        currMethodVisitor.visitMethodInsn(Opcodes.INVOKESTATIC,
+                "java/lang/Integer", "parseInt", "(Ljava/lang/String;)I", false);
+    }
+
+    public void turnStrToFloat(){
+        currMethodVisitor.visitMethodInsn(Opcodes.INVOKESTATIC,
+                "java/lang/Float", "parseFloat", "(Ljava/lang/String;)F", false);
+    }
+
     public void floorFloat(){
         this.currMethodVisitor.visitInsn(Opcodes.F2I);
+    }
+
+    public void getUserInput(){
+        currMethodVisitor.visitTypeInsn(Opcodes.NEW, "java/util/Scanner");
+        currMethodVisitor.visitInsn(Opcodes.DUP);
+        currMethodVisitor.visitFieldInsn(Opcodes.GETSTATIC,
+                "java/lang/System", "in", "Ljava/io/InputStream;");
+        currMethodVisitor.visitMethodInsn(Opcodes.INVOKESPECIAL,
+                "java/util/Scanner", "<init>", "(Ljava/io/InputStream;)V", false);
+        currMethodVisitor.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
+                "java/util/Scanner", "nextLine", "()Ljava/lang/String;", false);
+
     }
 
     public String getSignature(String type, Expression declarator){

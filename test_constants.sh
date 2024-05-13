@@ -1,8 +1,13 @@
 #!/bin/bash
 
 # Compile your program with Gradle and suppress the output
-gradle run --args="./codegen_test_files/constants.lang -o constants"&&
-
+if gradle run --args="./codegen_test_files/constants.lang -o constants" > /dev/null ; then
+  echo "compiled successfully"
+else
+  echo "Could not compile the file!"
+  gradle run --args="./codegen_test_files/constants.lang -o constants"
+  exit 1
+fi
 # Run your program and store its output
 output=$(java constants)
 

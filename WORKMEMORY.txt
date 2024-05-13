@@ -1,7 +1,6 @@
 TODOs:
 - reading built in funcitons
-- len, chr, floor function
-- free
+-   => Take from stdin
 
 bugs:
     float j;
