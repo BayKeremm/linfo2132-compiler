@@ -5,7 +5,7 @@ if gradle run --args="./codegen_test_files/builtin.lang -o builtin" > /dev/null 
   echo "compiled successfully"
 else
   echo "Could not compile the file!"
-  gradle run --args="./codegen_test_files/builtin.lang -o builtin"
+  #gradle run --args="./codegen_test_files/builtin.lang -o builtin"
   exit 1
 fi
 

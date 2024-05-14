@@ -5,7 +5,7 @@ if gradle run --args="./codegen_test_files/functions1.lang -o functions1" > /dev
   echo "compiled successfully"
 else
   echo "Could not compile the file!"
-  gradle run --args="./codegen_test_files/functions1.lang -o functions1"
+  #gradle run --args="./codegen_test_files/functions1.lang -o functions1"
   exit 1
 fi
 

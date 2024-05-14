@@ -39,6 +39,7 @@ public class Lexer {
         keywords.put(DEF.image(),DEF);
         keywords.put(FOR.image(),FOR);
         keywords.put(WHILE.image(),WHILE);
+        keywords.put(BREAK.image(),BREAK);
         keywords.put(IF.image(),IF);
         keywords.put(ELSE.image(),ELSE);
         keywords.put(RETURN.image(),RETURN);

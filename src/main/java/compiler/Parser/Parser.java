@@ -177,8 +177,10 @@ public class Parser {
                 Expression id = expression();
                 statements.add(new FreeStatement(line, id));
                 mustbe(Token.SEMI_COLON);
-            }
-            else{
+            } else if (have(Token.BREAK)) {
+                statements.add(new BreakStatement(line));
+                mustbe(Token.SEMI_COLON);
+            } else{
                 statements.add(statement());
                 mustbe(Token.SEMI_COLON);
             }

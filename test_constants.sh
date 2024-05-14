@@ -5,7 +5,7 @@ if gradle run --args="./codegen_test_files/constants.lang -o constants" > /dev/n
   echo "compiled successfully"
 else
   echo "Could not compile the file!"
-  gradle run --args="./codegen_test_files/constants.lang -o constants"
+  #gradle run --args="./codegen_test_files/constants.lang -o constants"
   exit 1
 fi
 # Run your program and store its output

@@ -1,19 +1,18 @@
 #!/bin/bash
 
 # Compile your program with Gradle and suppress the output
-if gradle run --args="./codegen_test_files/controls.lang -o controls" > /dev/null ; then
+if gradle run --args="./codegen_test_files/break.lang -o break" > /dev/null ; then
   echo "compiled successfully"
 else
   echo "Could not compile the file!"
-  #gradle run --args="./codegen_test_files/controls.lang -o controls"
+  gradle run --args="./codegen_test_files/break.lang -o break"
   exit 1
 fi
 
 # Run your program and store its output
-output=$(java controls)
-
+output=$(java break)
 # Define the expected outputs
-expected_outputs=("81" "0" "82" "1" "83" "2" "84" "3" "85" "4" "86" "5" "87")
+expected_outputs=("end")
 
 
 
@@ -32,7 +31,7 @@ done
 
 # Check if all expected outputs are found
 if [ "$found_count" -eq "${#expected_outputs[@]}" ]; then
-    echo "Test 03: Controls: Passed!"
+    echo "Test 07: Break statement: Passed!"
 else
-    echo "Test 03: Controls: FAILED!"
+    echo "Test 07: Break statement: FAILED!"
 fi

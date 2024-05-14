@@ -62,6 +62,7 @@ public interface ByteVisitor {
 
     void visitReturn(ReturnStatement ret);
 
+    void visitBreak(BreakStatement brk);
 
 
 }

@@ -15,7 +15,7 @@ public enum Token {
 
     // KEYWORDS
     FINAL("final"), STRUCT("struct"), DEF("def"), FOR("for"),
-    WHILE("while"), IF("if"), ELSE("else"), RETURN("return"),
+    WHILE("while"), IF("if"), ELSE("else"), RETURN("return"), BREAK("break"),
 
     // LITERALS
     STRING_LITERAL("<STRING_LITERAL>"), NATURAL_LITERAL("<NATURAL_LITERAL>"), FLOAT_LITERAL("<FLOAT_LITERAL>"),

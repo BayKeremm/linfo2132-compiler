@@ -9,4 +9,8 @@ rm *.class &&
 source test_functions1.sh &&
 rm *.class &&
 source test_builtin.sh &&
+rm *.class &&
+source test_break.sh &&
+rm *.class &&
+source test_scope.sh &&
 rm *.class

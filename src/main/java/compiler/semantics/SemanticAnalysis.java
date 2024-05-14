@@ -573,8 +573,10 @@ public class SemanticAnalysis implements TypeVisitor {
     public void visitFreeStatement(FreeStatement st) {
         GenericType freedType = st.getType();
         String name = st.getIdentifierExp().getRep();
-        if(structState.get(name)){
-            reportSemanticError("FreeError: Double free: %s", st.getLine(), name);
+        if(structState.containsKey(name)){
+            if(structState.get(name)){
+                reportSemanticError("FreeError: Double free: %s", st.getLine(), name);
+            }
         }
         if(userTypes.containsKey(freedType.type())||freedType.isArray()){
             structState.put(name,true);

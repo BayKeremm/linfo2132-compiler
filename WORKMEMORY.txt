@@ -1,14 +1,6 @@
 TODOs:
-- reading built in funcitons
--   => Take from stdin
 
 bugs:
-    float j;
-    j = i + 1;
-    => cannot turn i + 1 to float
-
-    Dot operation array access bug
-    - p.history[0] gets null type and causes exception
 
 
 

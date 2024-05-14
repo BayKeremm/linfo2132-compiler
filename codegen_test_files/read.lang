@@ -1,0 +1,9 @@
+def void main(){
+    int i = readInt();
+    writeInt(i);
+    float j = readFloat();
+    writeFloat(j);
+    string k = readString();
+    write(k);
+    writeln();
+}

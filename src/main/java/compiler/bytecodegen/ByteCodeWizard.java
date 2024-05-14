@@ -235,6 +235,11 @@ public class ByteCodeWizard implements ByteVisitor{
     }
 
     @Override
+    public void visitBreak(BreakStatement brk) {
+        asmHelper.jumpToEnd();
+    }
+
+    @Override
     public void visitScopeVariable(ScopeVariable variable) {
         boolean arr = false;
 
@@ -639,6 +644,7 @@ public class ByteCodeWizard implements ByteVisitor{
         //  - load loop variable
         pos1.codeGen(this);
         Label endLabel = asmHelper.getLabel();
+        asmHelper.setCurrLoopEnd(endLabel);
         asmHelper.performJumpOp(Opcodes.IFEQ, endLabel);
 
         // Step 4: inside the loop
@@ -655,6 +661,7 @@ public class ByteCodeWizard implements ByteVisitor{
         // Step 7: end label
         asmHelper.visitLabel(endLabel);
         asmHelper.popScope();
+        asmHelper.setCurrLoopEnd(null);
 
     }
 
@@ -673,6 +680,7 @@ public class ByteCodeWizard implements ByteVisitor{
         //  - load loop variable
         condition.codeGen(this);
         Label endLabel = asmHelper.getLabel();
+        asmHelper.setCurrLoopEnd(endLabel);
         asmHelper.performJumpOp(Opcodes.IFEQ, endLabel);
 
         // Step 3: inside the loop
@@ -686,6 +694,7 @@ public class ByteCodeWizard implements ByteVisitor{
         // Step 5: end label
         asmHelper.visitLabel(endLabel);
         asmHelper.popScope();
+        asmHelper.setCurrLoopEnd(null);
 
     }
 

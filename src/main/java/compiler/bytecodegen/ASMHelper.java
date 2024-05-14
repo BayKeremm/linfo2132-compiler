@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.lang.System.exit;
+
 public class ASMHelper {
     private final String className;
 
@@ -25,9 +27,13 @@ public class ASMHelper {
     LocalScope currentScope;
 
     ClassWriter classWriter;
-    ClassWriter previousClassWriter;
+    Label currLoopEnd;
 
     MethodVisitor currMethodVisitor;
+
+    public void setCurrLoopEnd(Label end){
+        this.currLoopEnd = end;
+    }
 
     public ASMHelper(String className, HashMap<String, GenericType> constants,
                      HashMap<String, GenericType> globals, HashMap<String, StructDeclaration> structDeclarations) {
@@ -499,6 +505,16 @@ public class ASMHelper {
 
     public void performFunctionCall(String name, String signature){
         currMethodVisitor.visitMethodInsn(Opcodes.INVOKESTATIC, className, name, signature, false); // Call square method
+    }
+
+    public void jumpToEnd(){
+        if(currLoopEnd != null){
+            currMethodVisitor.visitJumpInsn(Opcodes.GOTO, currLoopEnd);
+        }
+        else{
+            System.out.println("WE HAVE AN ERROR SIR IN THE BREAK STMNT");
+            exit(1);
+        }
     }
 
     public void setPrintStream(){
