@@ -1,7 +1,7 @@
 package compiler.Parser.statements;
 
 import compiler.Parser.ASTNode;
-import compiler.Parser.GenericType;
+import compiler.semantics.GenericType;
 import compiler.bytecodegen.ByteCodeGenerator;
 import compiler.semantics.StatementChecker;
 

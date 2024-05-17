@@ -1,8 +1,6 @@
 package compiler.semantics;
 
 
-import compiler.Parser.GenericType;
-
 public class Type extends GenericType {
     String type;
     Boolean isArray;

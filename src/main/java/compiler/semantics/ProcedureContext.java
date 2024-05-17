@@ -1,7 +1,6 @@
 package compiler.semantics;
 
 import compiler.Parser.expressions.Expression;
-import compiler.Parser.GenericType;
 
 import java.util.ArrayList;
 import java.util.HashMap;

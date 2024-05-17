@@ -1,7 +1,6 @@
 package compiler.Parser.expressions;
 
-import compiler.Parser.GenericType;
-import compiler.Parser.expressions.Expression;
+import compiler.semantics.GenericType;
 
 /** UNARY EXPRESSION:
  *              unaryExpression -> ( NEGATE | MINUS ) unaryExpression | factorExpression

@@ -1,8 +1,7 @@
 package compiler.Parser.expressions;
 
 import compiler.Lexer.Token;
-import compiler.Parser.GenericType;
-import compiler.Parser.expressions.Expression;
+import compiler.semantics.GenericType;
 import compiler.semantics.Type;
 import compiler.semantics.TypeVisitor;
 

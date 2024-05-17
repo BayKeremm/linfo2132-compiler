@@ -1,6 +1,6 @@
 package compiler.bytecodegen;
 
-import compiler.Parser.GenericType;
+import compiler.semantics.GenericType;
 import compiler.Parser.expressions.ArrayInitializer;
 import compiler.Parser.expressions.Expression;
 import compiler.Parser.expressions.FunctionCallExpression;

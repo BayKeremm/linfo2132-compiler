@@ -1,6 +1,6 @@
 package compiler.bytecodegen;
 
-import compiler.Parser.GenericType;
+import compiler.semantics.GenericType;
 import org.objectweb.asm.Label;
 
 import java.util.HashMap;

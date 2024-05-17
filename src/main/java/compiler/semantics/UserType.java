@@ -1,7 +1,6 @@
 package compiler.semantics;
 
 import compiler.Parser.statements.Block;
-import compiler.Parser.GenericType;
 import compiler.Parser.statements.Statement;
 
 import java.util.ArrayList;

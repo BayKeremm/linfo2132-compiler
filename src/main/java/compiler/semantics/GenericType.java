@@ -1,4 +1,4 @@
-package compiler.Parser;
+package compiler.semantics;
 
 public  abstract class GenericType{
     public abstract String toString();

@@ -1,7 +1,5 @@
 package compiler.semantics;
 
-import compiler.Parser.GenericType;
-
 import java.util.HashMap;
 
 public abstract class ContextGod {

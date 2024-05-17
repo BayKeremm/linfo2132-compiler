@@ -5,6 +5,7 @@ import compiler.Lexer.Token;
 import compiler.Parser.*;
 import compiler.Parser.expressions.*;
 import compiler.Parser.statements.*;
+import compiler.semantics.GenericType;
 import compiler.semantics.ProcedureInfo;
 import compiler.semantics.Type;
 import compiler.semantics.UserType;

@@ -1,7 +1,7 @@
 package compiler.Parser.expressions;
 
 import compiler.Lexer.Symbol;
-import compiler.Parser.GenericType;
+import compiler.semantics.GenericType;
 import compiler.bytecodegen.ByteVisitor;
 import compiler.semantics.TypeVisitor;
 

@@ -1,6 +1,6 @@
 package compiler.Parser.statements;
 
-import compiler.Parser.GenericType;
+import compiler.semantics.GenericType;
 import compiler.Parser.expressions.IdentifierExpression;
 import compiler.Parser.expressions.Expression;
 import compiler.bytecodegen.ByteVisitor;
