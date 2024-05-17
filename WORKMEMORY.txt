@@ -1,4 +1,7 @@
 TODOs:
+built in functions
+write accepts all basic types
+writeln accepts all basic types I assume 
 
 bugs:
 

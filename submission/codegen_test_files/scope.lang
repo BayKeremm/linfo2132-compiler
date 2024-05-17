@@ -1,0 +1,28 @@
+def void main(){
+    int c = 10;
+    writeInt(c);
+    if(true){
+        int c = 99;
+        writeInt(c);
+    }
+    writeInt(c+12);
+
+    float i = 8.8;
+    writeFloat(i);
+    if(true){
+        float i = 7.7;
+        writeFloat(i);
+    }
+    writeFloat(i-3.3);
+
+    string k = "hello";
+    write(k);
+    writeln();
+    if(true){
+        string k = "yes it is me";
+        write(k);
+    writeln();
+    }
+    write(k);
+    writeln();
+}

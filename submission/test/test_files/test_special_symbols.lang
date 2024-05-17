@@ -1,0 +1,9 @@
+def int square(int v) {
+    return v*v;
+}
+
+struct Person {
+    string name;
+    Point location;
+    int[] history;
+}

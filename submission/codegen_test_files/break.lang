@@ -1,0 +1,19 @@
+def void main(){
+    int j;
+    for(j=0, j < 2, j = j + 1){
+        int i = 10;
+        while(true){
+            if(i < 0){
+                break;
+            }
+            i = i - 1;
+        }
+    }
+
+    while(true){
+        break;
+    }
+
+    write("end");
+    writeln();
+}
