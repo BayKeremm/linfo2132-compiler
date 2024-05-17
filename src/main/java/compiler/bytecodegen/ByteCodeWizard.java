@@ -16,7 +16,8 @@ import static java.lang.System.exit;
 public class ByteCodeWizard implements ByteVisitor{
 
     private Program program;
-    private String programName;
+    private String className;
+    String filename;
     private Boolean localVariable = false;
     private Boolean structDeclarations = false;
 
@@ -31,9 +32,13 @@ public class ByteCodeWizard implements ByteVisitor{
     ASMHelper asmHelper;
 
 
-    public ByteCodeWizard(Program program, String className){
+    public ByteCodeWizard(Program program, String className, String filename){
+
+        this.className = className;
+        this.filename = filename;
+
+
         this.program = program;
-        this.programName = className;
         this.procedureInfos = new HashMap<>();
         this.constants = new HashMap<>();
         this.globals = new HashMap<>();
@@ -59,7 +64,7 @@ public class ByteCodeWizard implements ByteVisitor{
            structFields.put(s.getStructIdentifier().getRep(), fields);
 
         }
-        asmHelper = new ASMHelper(programName, constants, globals, structs);
+        asmHelper = new ASMHelper(this.className, constants, globals, structs);
     }
 
     public void codeGen(){
@@ -251,9 +256,10 @@ public class ByteCodeWizard implements ByteVisitor{
 
         identifier.prepCodeGen(this);
 
-        if(!asmHelper.currentScope.varIndexTable.containsKey(name)){
+        if(asmHelper.currentScope.getIndex(name) == -1){
             checkConstantModify(name);
         }
+
 
         declarator.codeGen(this);
 
@@ -305,8 +311,8 @@ public class ByteCodeWizard implements ByteVisitor{
     public void visitIdentifier(IdentifierExpression expression) {
         String name = expression.getIdentifierSymbol().image();
         GenericType type = null;
-        Boolean constant = false;
-        if (asmHelper.currentScope != null && asmHelper.currentScope.varIndexTable.containsKey(name)) {
+        boolean constant = false;
+        if (asmHelper.currentScope != null && asmHelper.currentScope.getIndex(name) != -1 ) {
             constant = false;
         }
         else if(constants.containsKey(name) ){

@@ -36,10 +36,10 @@ public class Compiler {
         }else if(args.length == 1){
             fileName = args[0];
             outputName = fileName.replace(".lang","");
-            int lastIndex = fileName.lastIndexOf("/");
-            if(lastIndex != -1){
-                outputName = outputName.substring(lastIndex + 1);
-            }
+            //int lastIndex = fileName.lastIndexOf("/");
+            //if(lastIndex != -1){
+            //    outputName = outputName.substring(lastIndex + 1);
+            //}
 
         }else{
             System.err.println("Usage: gradle run --args=\"" +
@@ -61,7 +61,8 @@ public class Compiler {
         //semantics.debug();
         //System.out.println("-----------------------CODEGEN----------------------------");
 
-        ByteCodeWizard wiz = new ByteCodeWizard(p, outputName);
+        ByteCodeWizard wiz = new ByteCodeWizard(p, outputName, fileName);
+
         wiz.codeGen();
 
         //lexer.advanceLexer();

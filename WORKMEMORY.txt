@@ -4,6 +4,15 @@ write accepts all basic types
 writeln accepts all basic types I assume 
 
 bugs:
+the following gives a very long error:
+   final int a = 2;
+    def void main(){
+        if(true){
+            int a = a;
+            write(a);
+    
+        }
+    }
 
 
 

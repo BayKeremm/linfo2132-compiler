@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Compile your program with Gradle and suppress the output
-if gradle run --args="./codegen_test_files/constants.lang -o constants" > /dev/null ; then
+if gradle run --args="./codegen_test_files/constants.lang -o ./codegen_test_files/constants.class" > /dev/null ; then
   echo "compiled successfully"
 else
   echo "Could not compile the file!"
@@ -9,7 +9,7 @@ else
   exit 1
 fi
 # Run your program and store its output
-output=$(java constants)
+output=$(cd codegen_test_files && java constants)
 
 # Define the expected outputs
 expected_outputs=("6" "4.0" "hello" "true" "12")

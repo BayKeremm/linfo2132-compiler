@@ -121,7 +121,12 @@ public class ASMHelper {
         classWriter.visitEnd();
 
         var bytes = classWriter.toByteArray();
-        try(var outFile = new FileOutputStream(structName+".class")) {
+        int lastIndex = outputName.lastIndexOf("/");
+        String out = "";
+        if(lastIndex != -1){
+            out = outputName.substring(0,lastIndex+1 );
+        }
+        try(var outFile = new FileOutputStream(out+structName+".class")) {
             outFile.write(bytes);
         }
         catch(IOException e) {
@@ -638,6 +643,9 @@ public class ASMHelper {
                 }else{
                     signature = "Z";
                 }
+                break;
+            case "void":
+                signature = "V";
                 break;
             default:
                 signature = "L"+type+";";

@@ -1,16 +1,16 @@
 source test_constants.sh &&
-rm *.class &&
+rm ./codegen_test_files/*.class &&
 source test_globals.sh &&
-rm *.class &&
+rm ./codegen_test_files/*.class &&
 source test_controls.sh &&
-rm *.class &&
+rm ./codegen_test_files/*.class &&
 source test_functions.sh &&
-rm *.class &&
+rm ./codegen_test_files/*.class &&
 source test_functions1.sh &&
-rm *.class &&
+rm ./codegen_test_files/*.class &&
 source test_builtin.sh &&
-rm *.class &&
+rm ./codegen_test_files/*.class &&
 source test_break.sh &&
-rm *.class &&
+rm ./codegen_test_files/*.class &&
 source test_scope.sh &&
-rm *.class
+rm ./codegen_test_files/*.class

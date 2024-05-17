@@ -1,16 +1,15 @@
 #!/bin/bash
 
 # Compile your program with Gradle and suppress the output
-if gradle run --args="./codegen_test_files/controls.lang -o controls" > /dev/null ; then
+if gradle run --args="./codegen_test_files/controls.lang -o ./codegen_test_files/controls.class" > /dev/null ; then
   echo "compiled successfully"
 else
   echo "Could not compile the file!"
-  #gradle run --args="./codegen_test_files/controls.lang -o controls"
   exit 1
 fi
 
 # Run your program and store its output
-output=$(java controls)
+output=$(cd codegen_test_files && java controls)
 
 # Define the expected outputs
 expected_outputs=("81" "0" "82" "1" "83" "2" "84" "3" "85" "4" "86" "5" "87")

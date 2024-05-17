@@ -1,16 +1,15 @@
 #!/bin/bash
 
 # Compile your program with Gradle and suppress the output
-if gradle run --args="./codegen_test_files/functions.lang -o functions" > /dev/null ; then
+if gradle run --args="./codegen_test_files/functions.lang -o ./codegen_test_files/functions.class" > /dev/null ; then
   echo "compiled successfully"
 else
   echo "Could not compile the file!"
-  #gradle run --args="./codegen_test_files/functions.lang -o functions"
   exit 1
 fi
 
 # Run your program and store its output
-output=$(java functions)
+output=$(cd codegen_test_files && java functions)
 # Define the expected outputs
 expected_outputs=("16" "25.0" "kerem" "yessir" "elfje" "100" "222.222" "bruh")
 

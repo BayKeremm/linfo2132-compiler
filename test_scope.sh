@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Compile your program with Gradle and suppress the output
-if gradle run --args="./codegen_test_files/scope.lang -o scope" > /dev/null ; then
+if gradle run --args="./codegen_test_files/scope.lang -o ./codegen_test_files/scope.class" > /dev/null ; then
   echo "compiled successfully"
 else
   echo "Could not compile the file!"
@@ -10,7 +10,7 @@ else
 fi
 
 # Run your program and store its output
-output=$(java scope)
+output=$(cd codegen_test_files && java scope)
 # Define the expected outputs
 expected_outputs=("10" "99" "22" "8.8" "7.7" "5.5" "hello" "yes it is me" "hello")
 # Count of expected outputs found in the program's output

@@ -73,7 +73,7 @@ public class LocalScope {
         }
         //System.err.println("ERROR IN GET INDEX LOCAL SCOPE");
         //exit(1);
-        return 0;
+        return -1;
     }
     public GenericType getType(String name){
         if(varTypeTable.containsKey(name)){
