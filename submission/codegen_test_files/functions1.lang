@@ -1,0 +1,53 @@
+struct Point {
+    int x;
+    int y;
+}
+struct Person {
+    string name;
+    Point location;
+    int[] history;
+}
+
+def Point copyPoints(Point[] p) {
+    return Point(p[0].x+p[1].x, p[0].y+p[1].y);
+}
+
+def Person createPerson(string name, Point p, int[] hist){
+    return Person(name, p, hist);
+}
+
+def void main(){
+    Point[] ps = Point[2];
+    ps[0] = Point(99,9);
+    ps[1] = Point(14,3);
+    writeInt(ps[0].x);
+    Point res = copyPoints(ps);
+    writeInt(res.x);
+
+    Person d = Person("me", Point(3,7), int[2*2]);
+    write(d.name);
+    writeln();
+    int[] hist = d.history;
+    hist[0] = 33;
+
+    int[] hist1 = d.history;
+    writeInt(hist1[0]);
+
+    int[] my_history = int[3];
+    my_history[0] = 0;
+    my_history[1] = 1;
+    my_history[2] = 2;
+    string my_name = "kerem";
+    Point my_point = Point(44,55);
+    Person me = createPerson(my_name, my_point, my_history);
+    write(me.name);
+    writeln();
+    int[] h = me.history;
+    writeInt(h[0]);
+    writeInt(h[1]);
+    writeInt(h[2]);
+    Point p = me.location;
+    writeInt(p.x);
+    writeInt(p.y);
+
+}

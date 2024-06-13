@@ -1,6 +1,7 @@
 package compiler.Parser;
 
-public interface NodeVisitor {
+
+public interface TypeVisitor {
     void visitTermExpression(TermExpression op);
     void visitUnaryNegateExpression(UnaryExpression op);
 

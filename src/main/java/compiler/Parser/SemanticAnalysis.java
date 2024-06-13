@@ -1,155 +1,126 @@
 package compiler.Parser;
 
-import com.sun.tools.attach.AgentInitializationException;
 import compiler.Lexer.Symbol;
 import compiler.Lexer.Token;
-
-import java.lang.reflect.Array;
-import java.lang.reflect.Executable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReferenceArray;
 
 import static java.lang.System.exit;
-import static java.lang.System.in;
 
 
-/**
-* TODO:
- * -> proper error message for missing identifier for variable declarations instead of null pointer exception
- * What I did last:
- * -> missing free statement handling
- * -> missing return statement error is missing
- * -> fix float int promotion
- * -> composite struct accesses in one line
- *  -> variable scopes
- *  -> Child contexts
- *  -> how to update context
- * -> part of  struct accesses
- * -> Next step: Structs to user defined types
- * -> Update error messages
- * - refactored types to GenericType and extended more specific ones
- * - added array declarations
- * - declaration type changes the TypeDec type
- * - RootContext gives info about a variable so you can use idenexpressions
-* */
-
-
-public class TypeChecker implements NodeVisitor{
+public class SemanticAnalysis implements TypeVisitor {
     Program program;
     ContextGod currContext;
     HashMap<String, UserType> userTypes;
+    HashMap<String, GenericType> constants;
+    HashMap<String, Boolean> structState;
     HashMap<String, ArrayList<ProcedureInfo>> procedureInfos;
-    public TypeChecker(Program p ){
+    private void addProcedureInfo(String key, ProcedureInfo info) {
+        // Get the list of ProcedureInfo objects for the given key
+        ArrayList<ProcedureInfo> infos = procedureInfos.get(key);
+        if (infos == null) {
+            // If no list exists, create a new one
+            infos = new ArrayList<>();
+            procedureInfos.put(key, infos);
+        }
+        // Add the new ProcedureInfo to the list
+        infos.add(info);
+    }
+
+    public SemanticAnalysis(Program p ){
         this.program = p;
         this.currContext = new Context();
+        this.constants =  new HashMap<>();
         this.currContext.setPrev(null);
         this.userTypes = new HashMap<>();
         this.procedureInfos = new HashMap<>();
+        this.structState = new HashMap<>();
         // Built-in functions
-        // string s = chr(int x);
-        ArrayList<GenericType> params = new ArrayList<>();
+        // string s = chr(int x)
+        // chr
+        ArrayList<GenericType> params;
+        params = new ArrayList<>();
         params.add(new Type(Token.INTEGER.image(), false));
-        ArrayList<ProcedureInfo> infos = new ArrayList<>();
-        infos.add(new ProcedureInfo(
-                        "chr",
-                        new Type(Token.STRING.image(), false),
-                        params));
-        procedureInfos.put("chr", infos);
+        addProcedureInfo("chr", new ProcedureInfo("chr", new Type(Token.STRING.image(), false), params));
 
-        // int l = len(string or array);
+// len for string
         params = new ArrayList<>();
         params.add(new Type(Token.STRING.image(), false));
-        infos = new ArrayList<>();
-        infos.add(new ProcedureInfo(
-                        "len",
-                        new Type(Token.INTEGER.image(), false),
-                        params));
+        addProcedureInfo("len", new ProcedureInfo("len", new Type(Token.INTEGER.image(), false), params));
+
+// len for array
         params = new ArrayList<>();
         params.add(new Type("[]", false));
-        infos.add(new ProcedureInfo(
-                "len",
-                new Type(Token.INTEGER.image(), false),
-                params));
-        procedureInfos.put("len",infos);
+        addProcedureInfo("len", new ProcedureInfo("len", new Type(Token.INTEGER.image(), false), params));
 
-        // int l = floor(float);
+// floor
         params = new ArrayList<>();
         params.add(new Type(Token.FLOAT.image(), false));
-        infos = new ArrayList<>();
-        infos.add(new ProcedureInfo(
-                "floor",
-                new Type(Token.INTEGER.image(), false),
-                params));
-        procedureInfos.put("floor",infos);
+        addProcedureInfo("floor", new ProcedureInfo("floor", new Type(Token.INTEGER.image(), false), params));
 
-        // int l = readInt();
+// readInt
         params = new ArrayList<>();
-        infos = new ArrayList<>();
-        infos.add(new ProcedureInfo(
-                "readInt",
-                new Type(Token.INTEGER.image(), false),
-                params));
-        procedureInfos.put("readInt",infos);
+        addProcedureInfo("readInt", new ProcedureInfo("readInt", new Type(Token.INTEGER.image(), false), params));
 
-        // float l = readFloat();
+// readFloat
         params = new ArrayList<>();
-        infos = new ArrayList<>();
-        infos.add(new ProcedureInfo(
-                "readFloat",
-                new Type(Token.FLOAT.image(), false),
-                params));
-        procedureInfos.put("readFloat",infos);
+        addProcedureInfo("readFloat", new ProcedureInfo("readFloat", new Type(Token.FLOAT.image(), false), params));
 
-        // string l = readString();
+// readString
         params = new ArrayList<>();
-        infos = new ArrayList<>();
-        infos.add(new ProcedureInfo(
-                "readString",
-                new Type(Token.STRING.image(), false),
-                params));
-        procedureInfos.put("readString",infos);
+        addProcedureInfo("readString", new ProcedureInfo("readString", new Type(Token.STRING.image(), false), params));
 
-        // int l = writeInt(int x);
+// writeInt
         params = new ArrayList<>();
         params.add(new Type(Token.INTEGER.image(), false));
-        infos = new ArrayList<>();
-        infos.add(new ProcedureInfo(
-                "writeInt",
-                new Type(Token.INTEGER.image(), false),
-                params));
-        procedureInfos.put("writeInt",infos);
+        addProcedureInfo("writeInt", new ProcedureInfo("writeInt", new Type(Token.INTEGER.image(), false), params));
 
-        // int l = writeFloat(float x);
+// writeFloat
         params = new ArrayList<>();
         params.add(new Type(Token.FLOAT.image(), false));
-        infos = new ArrayList<>();
-        infos.add(new ProcedureInfo(
-                "writeFloat",
-                new Type(Token.INTEGER.image(), false),
-                params));
-        procedureInfos.put("writeFloat",infos);
+        addProcedureInfo("writeFloat", new ProcedureInfo("writeFloat", new Type(Token.INTEGER.image(), false), params));
 
-        // int l = write(string x);
+// write for string
         params = new ArrayList<>();
         params.add(new Type(Token.STRING.image(), false));
-        infos = new ArrayList<>();
-        infos.add(new ProcedureInfo(
-                "write",
-                new Type(Token.INTEGER.image(), false),
-                params));
-        procedureInfos.put("write",infos);
+        addProcedureInfo("write", new ProcedureInfo("write", new Type(Token.INTEGER.image(), false), params));
 
-        // int l = writeln();
+// write for integer
         params = new ArrayList<>();
-        infos = new ArrayList<>();
-        infos.add(new ProcedureInfo(
-                "writeln",
-                new Type(Token.INTEGER.image(), false),
-                params));
-        procedureInfos.put("writeln",infos);
+        params.add(new Type(Token.INTEGER.image(), false));
+        addProcedureInfo("write", new ProcedureInfo("write", new Type(Token.INTEGER.image(), false), params));
+
+// write for float
+        params = new ArrayList<>();
+        params.add(new Type(Token.FLOAT.image(), false));
+        addProcedureInfo("write", new ProcedureInfo("write", new Type(Token.INTEGER.image(), false), params));
+
+// write for boolean
+        params = new ArrayList<>();
+        params.add(new Type(Token.BOOLEAN.image(), false));
+        addProcedureInfo("write", new ProcedureInfo("write", new Type(Token.INTEGER.image(), false), params));
+
+// writeln for integer
+        params = new ArrayList<>();
+        params.add(new Type(Token.INTEGER.image(), false));
+        addProcedureInfo("writeln", new ProcedureInfo("writeln", new Type(Token.INTEGER.image(), false), params));
+
+// writeln for float
+        params = new ArrayList<>();
+        params.add(new Type(Token.FLOAT.image(), false));
+        addProcedureInfo("writeln", new ProcedureInfo("writeln", new Type(Token.INTEGER.image(), false), params));
+
+// writeln for boolean
+        params = new ArrayList<>();
+        params.add(new Type(Token.BOOLEAN.image(), false));
+        addProcedureInfo("writeln", new ProcedureInfo("writeln", new Type(Token.INTEGER.image(), false), params));
+
+// writeln for string
+        params = new ArrayList<>();
+        params.add(new Type(Token.STRING.image(), false));
+        addProcedureInfo("writeln", new ProcedureInfo("writeln", new Type(Token.INTEGER.image(), false), params));
 
 
     }
@@ -166,6 +137,7 @@ public class TypeChecker implements NodeVisitor{
     public void typeCheck(){
         for(ConstantVariable c : program.constantVariables){
             c.typeAnalyse(this);
+            constants.put(c.getVariableName(),c.getType());
         }
 
         for(StructDeclaration sd : program.structDeclarations){
@@ -250,7 +222,7 @@ public class TypeChecker implements NodeVisitor{
     }
     private void reportSemanticError(String message,int line, Object... args) throws Error{
         Error e = new Error(String.format("%s:%d: -> Semantic Analysis error: %s", program.getFileName(), line, String.format(message, args)));
-        e.printStackTrace();
+        //e.printStackTrace();
         try {
             throw e;
         }finally {
@@ -268,39 +240,42 @@ public class TypeChecker implements NodeVisitor{
 
     @Override
     public void visitTermExpression(TermExpression op) {
-        Expression lhs = op.lhs;
-        Expression rhs = op.rhs;
+        Expression lhs = op.getLhs();
+        Expression rhs = op.getRhs();
         if(!checkExpressionTypes(lhs,rhs)){
-            reportSemanticError("OperatorError: Term Expression Type Error: %s",rhs.line,
+            reportSemanticError("OperatorError: Term Expression Type Error: %s",rhs.getLine(),
                     lhs.getType().toString() + " is not compatible with " + rhs.getType().toString());
         }
 
     }
     public void visitUnaryNegateExpression(UnaryExpression op) {
         // Only boolean
-        assert op.lhs == null;
-        GenericType tr = op.rhs.getType();
+        assert op.getLhs() == null;
+        Expression rhs = op.getRhs();
+        rhs.typeAnalyse(this);
+        GenericType tr = op.getRhs().getType();
         if(!tr.type().equals("bool")){
-            reportSemanticError("OperatorError: Unary Negate Type Error: Cannot negate type %s",op.rhs.line,tr);
+            reportSemanticError("OperatorError: Unary Negate Type Error: Cannot negate type %s",op.getRhs().getLine(),tr);
         }
     }
 
     @Override
     public void visitUnaryMinusExpression(UnaryExpression op) {
         // Only float and int
-        assert op.lhs == null;
-        GenericType tr = op.rhs.getType();
+        assert op.getLhs() == null;
+        op.getRhs().typeAnalyse(this);
+        GenericType tr = op.getRhs().getType();
         if(!tr.type().equals("float") && !tr.type().equals("int")){
-            reportSemanticError("OperatorError: Unary Minus Type Error: Cannot make minus type %s",op.rhs.line,tr);
+            reportSemanticError("OperatorError: Unary Minus Type Error: Cannot make minus type %s",op.getRhs().getLine(),tr);
         }
     }
 
     @Override
     public void visitFactorExpression(FactorExpression op) {
-        Expression lhs = op.lhs;
-        Expression rhs = op.rhs;
+        Expression lhs = op.getLhs();
+        Expression rhs = op.getRhs();
         if(!checkExpressionTypes(lhs,rhs)){
-            reportSemanticError("OperatorError: Factor Expression Type Error: %s",rhs.line,
+            reportSemanticError("OperatorError: Factor Expression Type Error: %s",rhs.getLine(),
                     lhs.getType().toString() + " is not compatible with " + rhs.getType().toString());
         }
 
@@ -308,10 +283,10 @@ public class TypeChecker implements NodeVisitor{
 
     @Override
     public void visitPrimaryExpression(PrimaryExpression op) {
-        Expression lhs = op.lhs;
-        Expression rhs = op.rhs;
+        Expression lhs = op.getLhs();
+        Expression rhs = op.getRhs();
         if(!checkExpressionTypes(lhs,rhs)){
-            reportSemanticError("OperatorError: Primary Expression Type Error: %s",rhs.line,
+            reportSemanticError("OperatorError: Primary Expression Type Error: %s",rhs.getLine(),
                     lhs.getType().toString() + " is not compatible with " + rhs.getType().toString());
         }
 
@@ -319,10 +294,16 @@ public class TypeChecker implements NodeVisitor{
 
     @Override
     public void visitIndexOperation(IndexOp op) {
-        op.index.typeAnalyse(this);
-        GenericType indexType = op.index.getType();
-        if(!indexType.type().equals(Token.INTEGER.image())){
-            reportSemanticError("IndexOperationError: Trying to index with non int %s", op.line,indexType);
+        Symbol iden = op.getIndexIdentifier();
+        // FIX: CHECKS IF THE GIVEN IDENTIFIER IS INDEED AN ARRAY
+        if(!userTypes.containsKey(iden.image())){
+            if(!Objects.requireNonNull(checkContext(iden.image())).isArray()){
+                reportSemanticError("IndexOperationError: Trying to index with a non array %s", op.getLine(),iden);
+            }
+            GenericType indexType = op.getIndex().getType();
+            if(!indexType.type().equals(Token.INTEGER.image())){
+                reportSemanticError("IndexOperationError: Trying to index with non int %s", op.getLine(),indexType);
+            }
         }
     }
 
@@ -330,37 +311,74 @@ public class TypeChecker implements NodeVisitor{
     public void visitFunctionCallExpression(FunctionCallExpression exp) {
         // need to check if it isa struct init, since it is also parsed as functioncall expression in user defined types
         // need to also check if the function exists in the context
-        Symbol identifier = exp.identifier;
-        ArrayList<Expression> expressions = exp.expressionParams;
+        Symbol identifier = exp.getFunctionIdentifier();
+        ArrayList<Expression> expressions = exp.getFunctionExpressionParams();
 
         // is it a struct init?
         if(this.userTypes.containsKey(identifier.image()) || this.procedureInfos.containsKey(identifier.image())) {
 
             ArrayList<GenericType> fields;
             String context;
+            boolean overwritten = false;
 
             if(this.userTypes.containsKey(identifier.image())){
                 fields = this.userTypes.get(identifier.image()).fields; 
                 context = "Struct init";
             } else {
+                ArrayList<ProcedureInfo> a = this.procedureInfos.get(identifier.image());
+                if(a.size() > 1){
+                    overwritten = true;
+                }
                 fields = this.procedureInfos.get(identifier.image()).get(0).getParameters();
                 context = "Function call";
             }
-            
-            int field_size = fields.size();
-            if(field_size != expressions.size()){
-                reportSemanticError("ArgumentError: Wrong number of arguments in %s",exp.line,context);
-            }
-            int i = 0;
-            for(Expression e: expressions){
-                e.typeAnalyse(this);
-                GenericType t0 = e.getType();
-                GenericType t1 = fields.get(i);
-                if(!checkTypes(t0, t1,false)){
-                    reportSemanticError("ArgumentError: Argument type mismatch in %s: %s",exp.line,context,
-                            t1.type() + "!=" + t0.type() );
+
+            if(overwritten){
+                ArrayList<ProcedureInfo> procedureInfos = this.procedureInfos.get(identifier.image());
+                for(ProcedureInfo info : procedureInfos){
+                    fields = info.getParameters();
+                    if(fields.size() != expressions.size()){
+                        if(identifier.image().equals("writeln")){
+                            return;
+                        }else{
+                            reportSemanticError("ArgumentError: Wrong number of arguments in %s",exp.getLine(),context);
+                        }
+                    }
+                    int i = 0;
+                    for(Expression e: expressions){
+                        e.typeAnalyse(this);
+                        GenericType t0 = e.getType();
+                        GenericType t1 = fields.get(i);
+                        if(checkTypes(t0, t1,false)){
+                            return;
+                        }else if(t1.type().equals("[]") && t0.isArray()){ // this is for len accepting every array type
+                            return;
+                        }
+                        i++;
+
+                    }
+
                 }
-                i++;
+                reportSemanticError("ArgumentError: Argument type mismatch in %s: %s",exp.getLine(),
+                        context, identifier.image()
+                         );
+            }else{
+                int field_size = fields.size();
+                if(field_size != expressions.size()){
+                    reportSemanticError("ArgumentError: Wrong number of arguments in %s",exp.getLine(),context);
+                }
+                int i = 0;
+                for(Expression e: expressions){
+                    e.typeAnalyse(this);
+                    GenericType t0 = e.getType();
+                    GenericType t1 = fields.get(i);
+                    if(!checkTypes(t0, t1,false)){
+                        reportSemanticError("ArgumentError: Argument type mismatch in %s: %s",exp.getLine(),context,
+                                t1.type() + "!=" + t0.type() );
+                    }
+                    i++;
+
+                }
 
             }
         }
@@ -386,10 +404,10 @@ public class TypeChecker implements NodeVisitor{
 
     @Override
     public GenericType visitSymbolTableIdentifier(IdentifierExpression identifier) {
-        String id = identifier.id.image();
+        String id = identifier.getIdentifierSymbol().image();
         GenericType ret = checkContext(id);
         if(ret == null){
-            reportSemanticError("ScopeError : Variable does not exist in context : %s", identifier.line,id); //Not sure about the error type
+            reportSemanticError("ScopeError : Variable does not exist in context : %s", identifier.getLine(),id); //Not sure about the error type
         }
         
         return ret;
@@ -398,47 +416,51 @@ public class TypeChecker implements NodeVisitor{
 
     @Override
     public GenericType visitSymbolTableFunction(FunctionCallExpression functionCallExpression) {
-        String id = functionCallExpression.identifier.image();
+        String id = functionCallExpression.getFunctionIdentifier().image();
         GenericType ret = checkContext(id);
         if(ret != null){
             return ret;
         }
 
-        // All this is for len function accepting either array or string :)
+        //  FOR BUILT IN HOMIES
         ArrayList<ArrayList<GenericType>> typesAll = getProcedureParamTypes(id);
+
         if(typesAll == null){
-            reportSemanticError("ScopeError : Function does not exist in context : %s", functionCallExpression.line,id);
+            reportSemanticError("ScopeError : Function does not exist in context : %s", functionCallExpression.getLine(),id);
         }
-        ArrayList<Expression> params = functionCallExpression.expressionParams;
+
+        ArrayList<Expression> params = functionCallExpression.getFunctionExpressionParams();
+
+        assert typesAll != null;
         for(ArrayList<GenericType> types: typesAll){
-            if(types != null){
-                if(params.size() > 1){
-                    reportSemanticError("ScopeError : Function does not exist in context : %s", functionCallExpression.line,id);
-                }
-                else{
-                    // for functions that have no arguments
-                    if(params.isEmpty()&&types.isEmpty()){
-                        return getProcedureReturnType(id,0);
-                    }else{
-                        params.get(0).typeAnalyse(this);
-                        GenericType t = params.get(0).getType();
-                        int index = 0;
-                        for(GenericType type: types){
-                            boolean c0 = type.type().equals("[]");
-                            boolean c1 = params.get(0).getType().isArray();
-                            if( c0 && c1 ){
-                                return getProcedureReturnType(id,index);
-                            }
-                            if(type.type().equals(t.type())){
-                                return getProcedureReturnType(id,index);
-                            }
-                            index++;
+            if(params.size() > 1){
+                reportSemanticError("ScopeError : Function does not exist in context : %s", functionCallExpression.getLine(),id);
+            }
+            else{
+                // for functions that have no arguments
+                if(params.isEmpty()&&types.isEmpty()){
+                    return getProcedureReturnType(id,0);
+                } else if(id.equals("writeln")){
+                    return getProcedureReturnType(id,0);
+                } else{
+                    params.get(0).typeAnalyse(this);
+                    GenericType t = params.get(0).getType();
+                    int index = 0;
+                    for(GenericType type: types){
+                        boolean c0 = type.type().equals("[]");
+                        boolean c1 = params.get(0).getType().isArray();
+                        if( c0 && c1 ){
+                            return getProcedureReturnType(id,index);
                         }
+                        if(type.type().equals(t.type())){
+                            return getProcedureReturnType(id,index);
+                        }
+                        index++;
                     }
                 }
             }
         }
-        reportSemanticError("ScopeError : Function does not exist in context : %s", functionCallExpression.line,id);
+        reportSemanticError("ScopeError : Function does not exist in context : %s", functionCallExpression.getLine(),id);
         return null;
     }
 
@@ -446,14 +468,14 @@ public class TypeChecker implements NodeVisitor{
     public GenericType visitSymbolTableIndexOp(IndexOp op) {
         // is it actual index operation
         // or is it struct array init
-        if(userTypes.containsKey(op.identifier.image())){
-            return new Type(op.identifier.image(),true); // since we know it is an array init of struct
-        } else if (currContext.containsId(op.identifier.image())) {
-            GenericType arrayType = currContext.getVarType(op.identifier.image());
+        if(userTypes.containsKey(op.getIndexIdentifier().image())){
+            return new Type(op.getIndexIdentifier().image(),true); // since we know it is an array init of struct
+        } else if (currContext.containsId(op.getIndexIdentifier().image())) {
+            GenericType arrayType = currContext.getVarType(op.getIndexIdentifier().image());
             return new Type(arrayType.type(),false);
         }
         else{
-            reportSemanticError("ERROR IN VISIT SYMBOL TABLE INDEX OP", op.line);
+            reportSemanticError("ERROR IN VISIT SYMBOL TABLE INDEX OP", op.getLine());
         }
         return null;
     }
@@ -461,38 +483,42 @@ public class TypeChecker implements NodeVisitor{
 
     @Override
     public GenericType visitSymbolTableDotOp(DotOperation op) {
-        op.prettyPrint("");
-        Expression lhs = op.lhs;
-        Expression rhs = op.rhs;
+        Expression lhs = op.getLhs();
+        Expression rhs = op.getRhs();
         lhs.typeAnalyse(this); // gets the struct type
         GenericType lhsType = lhs.getType();
         if(userTypes.containsKey(lhsType.type())){
             UserType structType = userTypes.get(lhsType.type());
             String member;
             GenericType t = null;
-            if(rhs.lhs != null){
+            if(rhs.getLhs() != null){
                 Expression one_level_down = rhs;
-                while(one_level_down.lhs != null && one_level_down.rhs != null){
-                    Expression level_lhs = one_level_down.lhs;
+                while(one_level_down.getLhs() != null && one_level_down.getRhs() != null){
+                    Expression level_lhs = one_level_down.getLhs();
                     GenericType member1_type = structType.members.get(level_lhs.getRep());
                     if(userTypes.containsKey(member1_type.type())){
                         structType = userTypes.get(member1_type.type());
-                        one_level_down = one_level_down.rhs;
+                        one_level_down = one_level_down.getRhs();
                         if(one_level_down instanceof IndexOp){
-                            ((IndexOp) one_level_down).index.typeAnalyse(this);
-                            String type =  structType.members.get(((IndexOp) one_level_down).identifier.image()).type();
+                            ((IndexOp) one_level_down).getIndex().typeAnalyse(this);
+                            String type =  structType.members.get(((IndexOp) one_level_down).getIndexIdentifier().image()).type();
                             t = new Type(type,false);
                         }else{
                             t = structType.members.get(one_level_down.getRep());
                         }
 
                     }else{
-                        one_level_down = one_level_down.rhs;
+                        one_level_down = one_level_down.getRhs();
                         t = structType.members.get(member1_type.type());
                     }
 
                 }
 
+            }else if(rhs instanceof IndexOp){
+                Symbol identifier = ((IndexOp) rhs).getIndexIdentifier();
+                UserType type = userTypes.get(lhsType.type());
+                GenericType t0 = type.members.get(identifier.image());
+                t = new Type(t0.type(),false);
             }
             else{
                 member = rhs.getRep();
@@ -507,26 +533,6 @@ public class TypeChecker implements NodeVisitor{
         }
         return new Type("ERROR MORUK IN DOT OP SYMBOL TABLE", false);
     }
-//    @Override
-//    public GenericType visitSymbolTableDotOp_old(DotOperation op) {
-//        op.prettyPrint("");
-//        Expression lhs = op.lhs;
-//        Expression rhs = op.rhs;
-//        lhs.typeAnalyse(this); // gets the struct type
-//        GenericType lhsType = lhs.getType();
-//        if(userTypes.containsKey(lhsType.type())){
-//            UserType structType = userTypes.get(lhsType.type());
-//            String member = rhs.getRep();
-//            if(!structType.members.containsKey(member)){
-//                reportSemanticError("Member does not exist or composite struct access not supported: %s",
-//                        lhs.line,member);
-//            }
-//            GenericType t = structType.members.get(member);
-//            return t;
-//        }
-//        return new Type("ERROR MORUK IN DOT OP SYMBOL TABLE", false);
-//    }
-
 
 
     @Override
@@ -543,10 +549,10 @@ public class TypeChecker implements NodeVisitor{
 
     @Override
     public void visitLogicalExpression(LogicalExpression op) {
-        Expression lhs = op.lhs;
-        Expression rhs = op.rhs;
+        Expression lhs = op.getLhs();
+        Expression rhs = op.getRhs();
         if(!checkExpressionTypes(lhs,rhs)){
-            reportSemanticError("OperatorError: Logical Expression Type Error: %s", rhs.line,
+            reportSemanticError("OperatorError: Logical Expression Type Error: %s", rhs.getLine(),
             lhs.getType().toString() + " is not compatible with " + rhs.getType().toString());
         }
 
@@ -554,10 +560,10 @@ public class TypeChecker implements NodeVisitor{
 
     @Override
     public void visitComparisonExpression(ComparisionExpression op) {
-        Expression lhs = op.lhs;
-        Expression rhs = op.rhs;
+        Expression lhs = op.getLhs();
+        Expression rhs = op.getRhs();
         if(!checkExpressionTypes(lhs,rhs)){
-            reportSemanticError("OperatorError: Comparison Expression Type Error: %s", rhs.line,
+            reportSemanticError("OperatorError: Comparison Expression Type Error: %s", rhs.getLine(),
                     lhs.getType().toString() + " is not compatible with " + rhs.getType().toString());
         }
 
@@ -565,10 +571,10 @@ public class TypeChecker implements NodeVisitor{
 
     @Override
     public void visitEqualityCheckExpression(EqualityCheckExpression op) {
-        Expression lhs = op.lhs;
-        Expression rhs = op.rhs;
+        Expression lhs = op.getLhs();
+        Expression rhs = op.getRhs();
         if(!checkExpressionTypes(lhs,rhs)){
-            reportSemanticError("OperatorError: Equality Check Expression Type Error: %s", rhs.line,
+            reportSemanticError("OperatorError: Equality Check Expression Type Error: %s", rhs.getLine(),
                     lhs.getType().toString() + " is not compatible with " + rhs.getType().toString());
         }
     }
@@ -580,21 +586,30 @@ public class TypeChecker implements NodeVisitor{
 
     @Override
     public void visitArrayInitializer(ArrayInitializer p) {
+        p.getSizeExpression().typeAnalyse(this);
 
     }
 
     @Override
     public void visitParanExpression(ParanExpression p) {
-        p.expressions.get(0).typeAnalyse(this);
+        p.getParanExpressions().get(0).typeAnalyse(this);
     }
 
     @Override
     public void visitFreeStatement(FreeStatement st) {
         GenericType freedType = st.getType();
+        String name = st.getIdentifierExp().getRep();
+        if(structState.containsKey(name)){
+            if(structState.get(name)){
+                reportSemanticError("FreeError: Double free: %s", st.getLine(), name);
+            }
+        }
         if(userTypes.containsKey(freedType.type())||freedType.isArray()){
+            structState.put(name,true);
+            currContext.removeFromContext(name);
             return;
         }
-        reportSemanticError("FreeError: Cannot free type: %s", st.line, freedType.type());
+        reportSemanticError("FreeError: Cannot free type: %s", st.getLine(), freedType.type());
         //if(userTypes.containsKey(freedType.type()) && !freedType.isArray()){
         //    reportSemanticError("FreeError: Cannot free non-array built in type: %s", st.line, freedType.type());
         //}
@@ -610,17 +625,23 @@ public class TypeChecker implements NodeVisitor{
         var.declarator().typeAnalyse(this);
         // then check if the declaration type matches the id type
         GenericType decType = var.declarator().getType();
-        GenericType varType = new Type(var.typeDeclaration().type.image(),var.typeDeclaration().isArray);
+        GenericType varType = new Type(var.typeDeclaration().getTypeSymbol().image(),var.typeDeclaration().getIsArray());
         if(!checkTypes(varType, decType,true) || !compareForPromotion(varType,decType)){
             reportSemanticError("TypeError: Constant Variable type does not match the declaration type: %s",
-                    var.line,  var.typeDeclaration().toString() + " != " + var.declarator().getType() );
+                    var.getLine(),  var.typeDeclaration().toString() + " != " + var.declarator().getType() );
         }
+
+        if(userTypes.containsKey(decType.type())){
+            structState.put(var.identifier().getRep(),false);
+        }
+
+
         // add to the context
-        Type t = new Type(decType.type(),var.typeDeclaration().isArray);
+        Type t = new Type(decType.type(),var.typeDeclaration().getIsArray());
         t.setIsConstant(true);
         if(!currContext.addToContext(var.identifier().getRep(),t)){
            reportSemanticError("ScopeError: The variable %s already exists in context",
-                   var.identifier().line,
+                   var.identifier().getLine(),
                    var.identifier().getRep());
         }
     }
@@ -628,25 +649,28 @@ public class TypeChecker implements NodeVisitor{
     @Override
     public void visitVariable(VariableGod var) {
         String id = var.identifier().getRep();
-        if(currContext.getConstants_and_globals().containsKey(id)){
-            reportSemanticError("ScopeError : Trying to create a variable with the same name as one " +
-                    "of the globals or constants: %s", var.line,id ); //TODO
-        }
+        //if(constants.containsKey(id)){
+        //    reportSemanticError("ScopeError : Trying to create a variable with the same name as one " +
+        //            "of the constants: %s", var.getLine(),id ); //TODO
+        //}
         // whether it is an uninit variable or not
         if(var.declarator() != null){
             var.declarator().typeAnalyse(this);
             GenericType decType = var.declarator().getType();
-            GenericType varType = new Type(var.typeDeclaration().type.image(),var.typeDeclaration().isArray);
+            GenericType varType = new Type(var.typeDeclaration().getTypeSymbol().image(),var.typeDeclaration().getIsArray());
             if(!checkTypes(varType, decType,true) || !compareForPromotion(varType,decType)){
                 reportSemanticError("TypeError: Global Variable type does not match the declaration type: %s",
-                        var.line,  var.typeDeclaration().toString() + " != " + var.declarator().getType() );
+                        var.getLine(),  var.typeDeclaration().toString() + " != " + var.declarator().getType() );
+            }
+            if(userTypes.containsKey(varType.type())){
+                structState.put(var.identifier().getRep(),false);
             }
         }
         // add to the context
         if(!currContext.addToContext(var.identifier().getRep(),
-                new Type(var.typeDeclaration().type.image(),var.typeDeclaration().isArray))){
+                new Type(var.typeDeclaration().getTypeSymbol().image(),var.typeDeclaration().getIsArray()))){
             reportSemanticError("ScopeError: Variable already exists in context : %s",
-                    var.identifier().line,
+                    var.identifier().getLine(),
                     var.identifier().getRep());
         }
 
@@ -654,55 +678,55 @@ public class TypeChecker implements NodeVisitor{
 
     @Override
     public void visitScopeVariable(ScopeVariable var) {
-        Expression declarator = var.declarator;
-        Expression identifier = var.identifier;
+        Expression declarator = var.getScopeDeclarator();
+        Expression identifier = var.getScopeIdentifier();
         declarator.typeAnalyse(this);
         identifier.typeAnalyse(this);
         GenericType varType = identifier.getType();
         GenericType decType = declarator.getType();
         if(!checkTypes(varType, decType,true) || !compareForPromotion(varType,decType)){
             reportSemanticError("TypeError: Scope Variable type does not match the declaration type: %s",
-                    var.line,  varType + " != " + var.declarator().getType() );
+                    var.getLine(),  varType + " != " + var.declarator().getType() );
         }
     }
 
     @Override
     public void visitStructDeclaration(StructDeclaration s) {
-        Expression identifier = s.identifier;
-        Block block = s.block;
+        Expression identifier = s.getStructIdentifier();
+        Block block = s.getStructBlock();
 
         if(identifier.getRep().equals("while") || identifier.getRep().equals("if") || identifier.getRep().equals("for")){
-            reportSemanticError("StructError: Structure declaration overwirte existing types : %s", s.line, identifier.getRep());
+            reportSemanticError("StructError: Structure declaration overwirte existing types : %s", s.getLine(), identifier.getRep());
         }
         else if(userTypes.containsKey(identifier.getRep())) {
-            reportSemanticError("StructError: Structure declaration overwirte a previously defined structure : %s", s.line, identifier.getRep());
+            reportSemanticError("StructError: Structure declaration overwirte a previously defined structure : %s", s.getLine(), identifier.getRep());
         }
         this.userTypes.put(identifier.getRep(),new UserType(block));
     }
 
     @Override
     public void visitProcedure(Procedure p) {
-        TypeDeclaration typeDeclaration = p.returnType;
-        Symbol identifier = p.identifier;
-        ProcedureDeclarator declarator = p.declarator;
-        ArrayList<Expression> parameters = declarator.parameters;
+        TypeDeclaration typeDeclaration = p.getProcedureReturnType();
+        Symbol identifier = p.getProcedureIdentifier();
+        ProcedureDeclarator declarator = p.getProcedureDeclarator();
+        ArrayList<Expression> parameters = declarator.getProDecParameters();
 
-        GenericType ret = new Type(typeDeclaration.type.image(),typeDeclaration.isArray);
+        GenericType ret = new Type(typeDeclaration.getTypeSymbol().image(),typeDeclaration.getIsArray());
         currContext.addToContext(identifier.image(),ret);
 
         ProcedureContext procedureContext = new ProcedureContext(parameters);
         procedureContext.setContextName(identifier.image());
         pushContext(procedureContext);
 
-        Block block = declarator.block;
-        for(Statement s : block.statements){
+        Block block = declarator.getProDecBlock();
+        for(Statement s : block.getStatements()){
             s.typeAnalyse(this);
         }
         // Check the last statement, it needs to be a return if not ret is void
         if(!ret.type().equals("void")){
-            Statement last = block.statements.get(block.statements.size()-1);
+            Statement last = block.getStatements().get(block.getStatements().size()-1);
             if(!(last instanceof ReturnStatement)){
-                reportSemanticError("ReturnError : Missing return, please return with type: %s ", block.line, ret.type());
+                reportSemanticError("ReturnError : Missing return, please return with type: %s ", block.getLine(), ret.type());
             }
 
         }
@@ -712,7 +736,6 @@ public class TypeChecker implements NodeVisitor{
 
         ArrayList<GenericType> types = new ArrayList<>();
         for(Map.Entry<String, GenericType> entry : procedureContext.arguments.entrySet()) {
-            String key = entry.getKey();
             GenericType value = entry.getValue();
             types.add(value);
         }
@@ -725,17 +748,17 @@ public class TypeChecker implements NodeVisitor{
 
     @Override
     public void visitReturn(ReturnStatement ret) {
-        Expression retExp = ret.expression;
+        Expression retExp = ret.getReturnExpression();
         retExp.typeAnalyse(this);
 
-        if(retExp.getClass() == LiteralExpression.class && ((LiteralExpression) retExp).literal == null){
-            reportSemanticError("ReturnError : Return expression is empty", retExp.line);
+        if(retExp.getClass() == LiteralExpression.class && ((LiteralExpression) retExp).getLiteral() == null){
+            reportSemanticError("ReturnError : Return expression is empty", retExp.getLine());
         }
 
         GenericType retType = retExp.getType();
         String contextName = currContext.getContextName();
         if(!currContext.containsId(contextName)){
-            reportSemanticError("ReturnError : Trying to return in a strange way without a function context", ret.line);
+            reportSemanticError("ReturnError : Trying to return in a strange way without a function context", ret.getLine());
         }
         GenericType functionRetType = currContext.getVarType(contextName);
         if(userTypes.containsKey(functionRetType.type())){
@@ -743,14 +766,14 @@ public class TypeChecker implements NodeVisitor{
         }
         if(!checkTypes(retType, functionRetType, false)){
             reportSemanticError("ReturnError : Function return type mismatch: %s expects %s not %s"
-                    ,ret.line,contextName,functionRetType.type(),retType.type());
+                    ,ret.getLine(),contextName,functionRetType.type(),retType.type());
         }
     }
     @Override
     public void visitWhile(WhileStatement w) {
-        Expression condition = w.condition;
+        Expression condition = w.getWhileCondition();
         condition.typeAnalyse(this);
-        Block block = w.block;
+        Block block = w.getWhileBlock();
 
         Context whileContext = new Context();
         whileContext.setContextName(currContext.getContextName());
@@ -759,7 +782,7 @@ public class TypeChecker implements NodeVisitor{
         visitCondition(condition, "While");
 
         if(block != null){
-            for(Statement s : block.statements){
+            for(Statement s : block.getStatements()){
                 s.typeAnalyse(this);
             }
         }
@@ -768,10 +791,10 @@ public class TypeChecker implements NodeVisitor{
 
     @Override
     public void visitIfElse(IfElseStatement ifelse) {
-        Expression condition = ifelse.ifCondition;
+        Expression condition = ifelse.getIfCondition();
         condition.typeAnalyse(this);
-        Block ifBlock = ifelse.ifBlock;
-        Block elseBlock = ifelse.elseBlock;
+        Block ifBlock = ifelse.getIfBlock();
+        Block elseBlock = ifelse.getElseBlock();
 
         visitCondition(condition, "IfElse");
 
@@ -779,7 +802,7 @@ public class TypeChecker implements NodeVisitor{
             Context ifContext = new Context();
             ifContext.setContextName(currContext.getContextName());
             pushContext(ifContext);
-            for(Statement s : ifBlock.statements){
+            for(Statement s : ifBlock.getStatements()){
                 s.typeAnalyse(this);
             }
             popContext();
@@ -788,7 +811,7 @@ public class TypeChecker implements NodeVisitor{
             Context elseContext = new Context();
             elseContext.setContextName(currContext.getContextName());
             pushContext(elseContext);
-            for(Statement s : elseBlock.statements){
+            for(Statement s : elseBlock.getStatements()){
                 s.typeAnalyse(this);
             }
             popContext();
@@ -798,12 +821,12 @@ public class TypeChecker implements NodeVisitor{
 
     @Override
     public void visitFor(ForStatement forStatement) {
-        Statement pos0 = forStatement.pos0;
-        Expression pos1 = forStatement.pos1;
-        Statement pos2 = forStatement.pos2;
-        Block forBlock = forStatement.block;
+        Statement pos0 = forStatement.getPos0();
+        Expression pos1 = forStatement.getPos1();
+        Statement pos2 = forStatement.getPos2();
+        Block forBlock = forStatement.getForBlock();
         if(pos0.toString().equals("LiteralExp(null)") ||pos2.toString().equals("LiteralExp(null)")){
-            reportSemanticError("MissingConditionError : one of the statements in %s statement is empty", pos0.line, "For");
+            reportSemanticError("MissingConditionError : one of the statements in %s statement is empty", pos0.getLine(), "For");
         }
 
         pos0.typeAnalyse(this);
@@ -816,7 +839,7 @@ public class TypeChecker implements NodeVisitor{
             Context forContext = new Context();
             forContext.setContextName(currContext.getContextName());
             pushContext(forContext);
-            for(Statement s : forBlock.statements){
+            for(Statement s : forBlock.getStatements()){
                 s.typeAnalyse(this);
             }
             popContext();
@@ -825,12 +848,12 @@ public class TypeChecker implements NodeVisitor{
 
     public void visitCondition(Expression condition, String context){
         condition.typeAnalyse(this);
-        if(condition.getClass() == LiteralExpression.class && ((LiteralExpression) condition).literal.token() == Token.NULL){
-            reportSemanticError("MissingConditionError : Condition in %s statement is empty", condition.line, context);
+        if(condition.getClass() == LiteralExpression.class && ((LiteralExpression) condition).getLiteral().token() == Token.NULL){
+            reportSemanticError("MissingConditionError : Condition in %s statement is empty", condition.getLine(), context);
         }
 
         if(!checkTypes(condition.getType(),new Type("bool",false) , false)){
-            reportSemanticError("MissingConditionError :  Condition is in %s statement not a boolean expression : %s", condition.line, context, condition.getType().type());
+            reportSemanticError("MissingConditionError :  Condition is in %s statement not a boolean expression : %s", condition.getLine(), context, condition.getType().type());
         }
     }
 

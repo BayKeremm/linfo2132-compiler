@@ -1,0 +1,4 @@
+<<STRING_LITERAL>, "Hello">
+<<STRING_LITERAL>, "   with some space   ">
+<<STRING_LITERAL>, "1 2 3 4 5">
+<<STRING_LITERAL>, "abc 123 def 456">

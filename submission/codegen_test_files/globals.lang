@@ -1,0 +1,48 @@
+struct Point {
+    int x;
+    int y;
+}
+
+struct PointV2 {
+    int x;
+    int y;
+    int [] history;
+}
+
+int x = 10+(2*(-2));
+float y = 2.0 + 2.0;
+string z = "hello";
+bool q = true && false || true;
+Point pp = Point(2,4);
+
+string[] names = string[5];
+
+def void main(){
+    writeInt(x);
+    writeFloat(y);
+    write(z);
+    writeln();
+    if(q){
+        write("true");
+    }else{
+        write("false");
+    }
+    writeln();
+
+    Point p = Point(10,20);
+    writeInt(pp.x + p.x);
+    writeInt(pp.y + p.y);
+
+    PointV2 p2 = PointV2(10,20, int[5]);
+
+    int[] hist = p2.history;
+    hist[0]=5;
+    writeInt(hist[0]);
+
+    int[] hist2 = p2.history;
+    writeInt(hist2[0]);
+
+
+    names[4] = "kerem";
+    write(names[4]);
+}

@@ -1,0 +1,16 @@
+<"int", >
+<<IDENTIFIER>, x>
+<"bool", >
+<<IDENTIFIER>, y>
+<"float", >
+<"string", >
+<<IDENTIFIER>, z>
+<"final", >
+<"struct", >
+<"def", >
+<"for", >
+<"while", >
+<"if", >
+<"else", >
+<"return", >
+<"free", >
